@@ -1,0 +1,233 @@
+/* GT Fleet 365 - Design Professionale Definitivo */
+
+:root {
+    --blue:#0052BD; --blue-dark:#003F94; --blue-light:#E8F0FF; --blue-mid:#1A6FDD;
+    --cyan:#29ABE2; --orange:#FF6B00; --orange-h:#FF8533; --orange-dim:rgba(255,107,0,0.10);
+    --table-bg:#F7F7F8; --table-row:#FFFFFF; --table-alt:#F2F4F8;
+    --white:#FFFFFF; --text:#1A1F36; --text-sec:#4A5578; --text-muted:#8A93B0;
+    --border:#DDE2EF; --border-2:#C8D0E8; --input-bg:#FFFFFF; --success:#10B981;
+    --shadow-sm:0 1px 3px rgba(0,82,189,0.08); --shadow-md:0 4px 16px rgba(0,82,189,0.12);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: #EEF2FA;
+  color: var(--text);
+  min-height: 100vh;
+  font-size: 14px;
+}
+
+/* Header e Logo */
+header {
+  background: var(--blue);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+  height: 68px;
+  display: flex;
+  align-items: center;
+}
+
+.header-inner {
+  max-width: 100%;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 40px;
+  width: 100%;
+}
+
+.logo-area {
+  display: flex;
+  align-items: center;
+}
+
+.logo-img {
+  height: 38px !important;
+  width: auto !important;
+  display: block;
+}
+
+/* Stepper */
+.step-badges { display: flex; align-items: center; }
+.step-item { display: flex; align-items: center; gap: 8px; }
+.step-badge {
+  width: 28px; height: 28px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; font-family: 'Exo 2';
+  background: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.45);
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+}
+.step-badge.active { background: var(--orange); color: white; border: none; }
+.step-badge.done { background: var(--success); color: white; border: none; }
+.step-label { font-size: 12px; font-weight: 500; color: rgba(255, 255, 255, 0.5); white-space: nowrap; }
+.step-item.active .step-label { color: white; }
+.step-line { width: 28px; height: 2px; background: rgba(255, 255, 255, 0.2); margin: 0 6px; }
+.step-line.done { background: var(--success); }
+
+/* Layout */
+.container { max-width: 1140px; margin: 0 auto; padding: 28px 24px 100px; }
+
+/* Hero Banner FIX Icona */
+.step1-hero {
+  background: var(--blue);
+  border-radius: 14px;
+  padding: 28px 32px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center; gap: 20px;
+  box-shadow: var(--shadow-md); color: white;
+}
+.step1-hero-icon {
+  width: 52px; height: 52px; border-radius: 12px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.hero-text { flex: 1; }
+.hero-text h1 { font-family: 'Exo 2'; font-weight: 700; font-size: 20px; margin: 0; }
+.hero-text p { font-size: 13px; opacity: 0.8; margin: 4px 0 0 0; line-height: 1.5; }
+.btn-new { background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.25); color: white; padding: 6px 16px; border-radius: 20px; font-size: 11px; font-weight: 600; text-transform: uppercase; font-family: 'Exo 2'; }
+
+/* Card e Form */
+.card { background: white; border: 1.5px solid var(--blue); border-radius: 12px; overflow: hidden; margin-bottom: 20px; box-shadow: var(--shadow-sm); }
+.card-header { background: var(--blue); padding: 13px 22px; }
+.card-header h2 { font-family: 'Exo 2'; font-weight: 700; font-size: 13px; text-transform: uppercase; color: white; margin: 0; letter-spacing: 1px; }
+
+.cf-section { display: flex; border-bottom: 1px solid var(--border); }
+.cf-section-label { background: var(--blue-light); width: 100px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--blue); font-weight: 700; font-size: 10px; border-right: 1px solid var(--border); text-align: center; }
+.cf-fields { flex: 1; padding: 20px 24px; }
+.row-layout { display: flex; gap: 16px; }
+
+.field-group { display: flex; flex-direction: column; gap: 5px; margin-bottom: 15px; }
+.field-group label { font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--text-sec); }
+.field-group input { padding: 10px 13px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 14px; outline: none; transition: border-color 0.2s; }
+.field-group input.input-error { border-color: #ff4d4d !important; background-color: #fff5f5; }
+.error-text { color: #ff4d4d; font-size: 12px; font-weight: 600; margin-top: 4px; display: block; }
+.global-error { background: #fff5f5; color: #cc0000; border: 1px solid #ffcccc; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; font-weight: 600; text-align: center; }
+
+.flex-1 { flex: 1; }
+.flex-2 { flex: 2; }
+
+/* Switch Toggle */
+.toggle-group { display: flex; gap: 8px; }
+.toggle-btn { padding: 8px 15px; border-radius: 8px; border: 1.5px solid var(--border); background: white; cursor: pointer; font-weight: 600; }
+.toggle-btn.active { border-color: var(--orange); background: var(--orange-dim); color: var(--orange); }
+
+/* Tabelle */
+.text-center { text-align: center; }
+.vehicle-table { width: 100%; border-collapse: collapse; background: white; table-layout: fixed; }
+.vehicle-table thead th { background: var(--blue); color: white; padding: 12px 16px; text-align: left; font-size: 11px; font-family: 'Exo 2'; text-transform: uppercase; border: 1px solid var(--blue); }
+.vehicle-table thead th.text-center { text-align: center; }
+.vehicle-table td { padding: 10px 16px; border: 1px solid var(--blue); background: white; vertical-align: middle; }
+
+/* Larghezze Colonne */
+.vehicle-table th:nth-child(1) { width: auto; }
+.vehicle-table th:nth-child(2) { width: 140px; }
+.vehicle-table th:nth-child(3) { width: 180px; }
+
+.mezzo-name { font-weight: 600; color: var(--text); }
+.qty-input { width: 100px; padding: 8px; border: 1.5px solid var(--border-2); border-radius: 7px; text-align: center; font-family: 'Exo 2'; font-weight: 700; outline: none; transition: all 0.2s; }
+.qty-input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(0,82,189,0.1); }
+.qty-input.filled { background: var(--orange-dim); border-color: var(--orange); color: var(--orange); }
+
+/* Riepilogo */
+.card-body-padding { padding: 22px; }
+.client-summary { background: var(--blue-light); border-radius: 10px; padding: 20px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }
+.summary-item small { display: block; color: var(--text-muted); font-size: 10px; font-weight: 700; margin-bottom: 4px; }
+.summary-item strong { font-size: 13px; color: var(--text); }
+.section-title { font-size: 13px; color: var(--text-sec); margin-bottom: 18px; }
+
+.summary-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+.summary-card { background: white; border: 1px solid var(--blue); border-left: 4px solid var(--orange); border-radius: 8px; padding: 12px 20px; display: flex; align-items: center; gap: 15px; }
+.summary-card img { height:35px; width: auto; }
+.mezzo-title { flex: 1; font-size: 13px; font-weight: 600; color: var(--text-sec); }
+.mezzo-qty { font-size: 24px; font-weight: 800; color: var(--orange); font-family: 'Exo 2'; }
+
+.total-badge-container { margin-top: 30px; text-align: left; }
+.final-total-badge { background: var(--orange); color: white; display: inline-block; padding: 8px 24px; border-radius: 50px; font-size: 18px; font-weight: 800; font-family: 'Exo 2'; }
+
+/* Barra bassa */
+.bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid var(--border); padding: 12px 36px; display: flex; align-items: center; justify-content: space-between; z-index: 90; box-shadow: 0 -4px 20px rgba(0, 82, 189, 0.08); }
+.btn { padding: 10px 24px; border-radius: 8px; font-family: 'Exo 2'; font-weight: 700; text-transform: uppercase; cursor: pointer; border: none; display: flex; align-items: center; gap: 8px; }
+.btn-primary { background: var(--blue); color: white; }
+.btn:disabled { opacity: 0.7; cursor: not-allowed; }
+
+/* Spinner Animazione */
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.btn-accent { background: var(--orange); color: white; }
+.btn-ghost { background: transparent; border: 1.5px solid var(--border-2); color: var(--text-sec); }
+
+.fade-in { animation: fadeIn 0.3s ease-in; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* ==========================================================================
+   RESPONSIVITÀ (Mobile & Tablet)
+   ========================================================================== */
+
+/* Tablet e schermi medi (sotto i 992px) */
+@media (max-width: 992px) {
+  .container { padding: 20px 15px 100px; }
+  .client-summary { grid-template-columns: repeat(2, 1fr); } /* 2 colonne invece di 3 */
+}
+
+/* Mobile (sotto i 768px) */
+@media (max-width: 768px) {
+  /* Header: nascondo le etichette per risparmiare spazio, lascio solo i numeri */
+  .step-label { display: none; }
+  .header-inner { padding: 0 20px; }
+  .step-line { width: 15px; margin: 0 4px; }
+
+  /* Hero Banner: stack verticale */
+  .step1-hero { flex-direction: column; text-align: center; padding: 20px; }
+  .hero-text h1 { font-size: 18px; }
+
+  /* Form: le sezioni diventano verticali */
+  .cf-section { flex-direction: column; }
+  .cf-section-label { 
+    width: 100%; 
+    flex-direction: row; 
+    gap: 10px; 
+    padding: 10px; 
+    border-right: none; 
+    border-bottom: 1px solid var(--border); 
+  }
+  
+  /* Campi: uno sotto l'altro */
+  .row-layout { flex-direction: column; gap: 0; }
+  .cf-fields { padding: 15px; }
+
+  /* Tabella: la rendo scorrevole orizzontalmente per non rompere il layout */
+  .card { overflow-x: auto; }
+  .vehicle-table { min-width: 600px; } /* Impedisco che si stringa troppo */
+
+  /* Riepilogo */
+  .client-summary { grid-template-columns: 1fr; gap: 10px; }
+  .bottom-bar { padding: 12px 20px; }
+  .btn { padding: 10px 16px; font-size: 12px; }
+  .step-info { font-size: 11px; }
+}
+
+/* Schermi molto piccoli (sotto i 480px) */
+@media (max-width: 480px) {
+  .logo-img { height: 30px !important; }
+  .final-total-badge { width: 100%; text-align: center; font-size: 16px; }
+}
