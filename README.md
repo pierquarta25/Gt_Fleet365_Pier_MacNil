@@ -39,7 +39,7 @@ Il design è stato curato per riflettere l'identità di marca **GT Fleet 365**:
 
 ---
 
-## 💡 Pillole per la Presentazione (Tips per Pier)
+## 💡 Pillole per la Presentazione (Tips)
 1.  **"Affidabilità del Dato":** "Ho implementato una doppia validazione (frontend e backend). Il frontend guida l'utente, il backend protegge il sistema."
 2.  **"Resilienza dell'Interfaccia":** "Grazie al LocalStorage, mettiamo l'utente al centro: il suo lavoro è protetto anche in caso di refresh accidentale della pagina."
 3.  **"Professionalità Visiva":** "Ho trasformato una tabella zebra standard in una griglia dal design moderno che richiama la navbar, curando ogni stato (hover, focus, caricamento)."
