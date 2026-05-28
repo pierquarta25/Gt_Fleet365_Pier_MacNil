@@ -4,54 +4,76 @@ import { vehicleCategories } from '../data/vehicleTypes';
 
 export default function VehicleForm() {
     const [step, setStep] = useState(1);
-    const [errors, setErrors] = useState({}); // Traccio gli errori dei singoli campi
-    const [loading, setLoading] = useState(false); // Stato per il caricamento finale
+    const [errors, setErrors] = useState({});
+    const [loading, setLoading] = useState(false);
     
-    // Inizializzo i dati prendendoli dal localStorage se esistono, altrimenti vuoti
+    // Inizializza i dati dal localStorage o usa i valori predefiniti
     const [clientData, setClientData] = useState(() => {
         const saved = localStorage.getItem('gtfleet_clientData');
-        return saved ? JSON.parse(saved) : {
-            company: '', contact: '', email: '', phone: '', notes: '',
-            italia: false, estero: false
+        
+        // Estrae l'email dell'agente se presente nel percorso dell'URL
+        const path = window.location.pathname.replace(/^\//, '');
+        const agentEmail = path.includes('@') ? path : '';
+
+        const defaultData = {
+            company: '',
+            contact: '',
+            email: '',
+            phone: '',
+            notes: '',
+            italia: false,
+            estero: false,
+            agent_email: agentEmail
         };
+
+        if (saved) {
+            const parsed = JSON.parse(saved);
+            // Mantiene l'email dell'agente aggiornata dall'URL
+            return { ...parsed, agent_email: agentEmail || parsed.agent_email || '' };
+        }
+        return defaultData;
     });
 
+    // Inizializza le quantità dal localStorage
     const [quantities, setQuantities] = useState(() => {
         const saved = localStorage.getItem('gtfleet_quantities');
         return saved ? JSON.parse(saved) : {};
     });
 
-    // Salvo i dati nel localStorage ogni volta che cambiano
+    // Salva i dati cliente nel localStorage ad ogni modifica
     useEffect(() => {
         localStorage.setItem('gtfleet_clientData', JSON.stringify(clientData));
     }, [clientData]);
 
+    // Salva le quantità nel localStorage ad ogni modifica
     useEffect(() => {
         localStorage.setItem('gtfleet_quantities', JSON.stringify(quantities));
     }, [quantities]);
 
-    // Gestisco il cambio dei testi e resetto l'errore del campo che sto scrivendo
+    // Gestisce le modifiche ai campi di testo e rimuove l'errore relativo
     const handleTextChange = (e) => {
         const { id, value } = e.target;
-        setClientData({ ...clientData, [id]: value });
+        setClientData(prev => ({ ...prev, [id]: value }));
         
-        // Se c'era un errore su questo campo, lo cancello mentre l'utente digita
         if (errors[id]) {
-            setErrors({ ...errors, [id]: null });
+            setErrors(prev => ({ ...prev, [id]: null }));
         }
     };
 
-    // Funzione per validare il primo passo
+    // Valida i campi obbligatori dello Step 1
     const validateStep1 = () => {
-        let newErrors = {};
+        const newErrors = {};
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-        if (!clientData.company) newErrors.company = "La ragione sociale è obbligatoria";
-        if (!clientData.contact) newErrors.contact = "Il nome contatto è obbligatorio";
-        
-        if (!clientData.email) {
+        if (!clientData.company.trim()) {
+            newErrors.company = "La ragione sociale è obbligatoria";
+        }
+        if (!clientData.contact.trim()) {
+            newErrors.contact = "Il nome contatto è obbligatorio";
+        }
+        if (!clientData.email.trim()) {
             newErrors.email = "L'email è obbligatoria";
-        } else if (!emailRegex.test(clientData.email)) {
+        } else if (!emailRegex.test(clientData.email.trim())) {
             newErrors.email = "Inserisci un indirizzo email valido";
         }
 
@@ -59,44 +81,47 @@ export default function VehicleForm() {
         return Object.keys(newErrors).length === 0;
     };
 
+    // Attiva/disattiva le opzioni di traffico dati
     const togglePlace = (place) => {
-        setClientData({ ...clientData, [place]: !clientData[place] });
+        setClientData(prev => ({ ...prev, [place]: !prev[place] }));
     };
 
+    // Aggiorna la quantità di un veicolo specifico
     const handleQtyChange = (id, value) => {
-        setQuantities({ ...quantities, [id]: parseInt(value) || 0 });
+        setQuantities(prev => ({ ...prev, [id]: parseInt(value, 10) || 0 }));
     };
 
-    // Invio finale dei dati
+    // Invia i dati al backend
     const handleSubmit = async () => {
-        if (loading) return; // Evito invii multipli se sta già caricando
+        if (loading) return;
         
         setLoading(true);
         try {
             await axios.post('/api/vehicle-form', { client: clientData, vehicles: quantities });
             
-            // Se l'invio ha successo, pulisco il localStorage per il prossimo giro
+            // Pulisce il localStorage dopo l'invio con successo
             localStorage.removeItem('gtfleet_clientData');
             localStorage.removeItem('gtfleet_quantities');
             
             alert('Perfetto! I tuoi dati sono stati inviati a HubSpot con successo.');
-            window.location.reload(); // Ricarico per resettare tutto
+            window.location.reload();
         } catch (error) {
-            console.error(error);
+            console.error('Errore durante l\'invio:', error);
             alert('Ops! Qualcosa è andato storto durante l\'invio. Riprova tra poco.');
         } finally {
             setLoading(false);
         }
     };
 
+    const totalVehicles = Object.values(quantities).reduce((acc, qty) => acc + qty, 0);
+
     return (
         <div className="app-main">
-            
             {/* HEADER */}
             <header>
                 <div className="header-inner">
                     <div className="logo-area">
-                        <img src="/media/logo.png" alt="Logo" className="logo-img" />
+                        <img src="/media/logo.png" alt="GT Fleet 365 Logo" className="logo-img" />
                     </div>
                     
                     <div className="step-badges">
@@ -124,11 +149,12 @@ export default function VehicleForm() {
                 </div>
             </header>
 
-            <div className="container">
+            <main className="container">
+                <h1 className="visually-hidden">GT Fleet 365 - Configurazione Flotta</h1>
 
                 {step === 1 && (
                     <div className="fade-in">
-                        {/* HERO BANNER CON ICONA ORIGINALE */}
+                        {/* HERO BANNER */}
                         <div className="step1-hero">
                             <div className="step1-hero-icon">
                                 <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -137,7 +163,7 @@ export default function VehicleForm() {
                                 </svg>
                             </div>
                             <div className="hero-text">
-                                <h1>Configurazione Flotta</h1>
+                                <h2>Configurazione Flotta</h2>
                                 <p>Inserisci i dati aziendali del cliente e seleziona la tipologia e la quantità dei mezzi da monitorare.</p>
                             </div>
                             <div className="btn-new">Nuovo Preventivo</div>
@@ -150,7 +176,7 @@ export default function VehicleForm() {
                             </div>
                             
                             {Object.keys(errors).length > 0 && (
-                                <div className="global-error" style={{margin: '20px 22px 0 22px'}}>
+                                <div className="global-error" style={{margin: '20px 22px 0 22px'}} role="alert">
                                     ⚠️ Attenzione: controlla i campi evidenziati.
                                 </div>
                             )}
@@ -159,7 +185,7 @@ export default function VehicleForm() {
                                 <div className="cf-section-label"><span>🏢</span><span>Azienda</span></div>
                                 <div className="cf-fields">
                                     <div className="field-group">
-                                        <label>Nome Azienda *</label>
+                                        <label htmlFor="company">Nome Azienda *</label>
                                         <input 
                                             type="text" 
                                             id="company" 
@@ -167,8 +193,11 @@ export default function VehicleForm() {
                                             value={clientData.company} 
                                             onChange={handleTextChange} 
                                             placeholder="es. Logistica Sud S.r.l." 
+                                            aria-required="true"
+                                            aria-invalid={errors.company ? "true" : "false"}
+                                            aria-describedby={errors.company ? "company-error" : undefined}
                                         />
-                                        {errors.company && <span className="error-text">{errors.company}</span>}
+                                        {errors.company && <span id="company-error" className="error-text">{errors.company}</span>}
                                     </div>
                                 </div>
                             </div>
@@ -177,7 +206,7 @@ export default function VehicleForm() {
                                 <div className="cf-section-label"><span>👤</span><span>Referente</span></div>
                                 <div className="cf-fields row-layout">
                                     <div className="field-group flex-1">
-                                        <label>Nome Contatto *</label>
+                                        <label htmlFor="contact">Nome Contatto *</label>
                                         <input 
                                             type="text" 
                                             id="contact" 
@@ -185,11 +214,14 @@ export default function VehicleForm() {
                                             value={clientData.contact} 
                                             onChange={handleTextChange} 
                                             placeholder="es. Mario Rossi" 
+                                            aria-required="true"
+                                            aria-invalid={errors.contact ? "true" : "false"}
+                                            aria-describedby={errors.contact ? "contact-error" : undefined}
                                         />
-                                        {errors.contact && <span className="error-text">{errors.contact}</span>}
+                                        {errors.contact && <span id="contact-error" className="error-text">{errors.contact}</span>}
                                     </div>
                                     <div className="field-group flex-1">
-                                        <label>Email *</label>
+                                        <label htmlFor="email">Email *</label>
                                         <input 
                                             type="email" 
                                             id="email" 
@@ -197,13 +229,16 @@ export default function VehicleForm() {
                                             value={clientData.email} 
                                             onChange={handleTextChange} 
                                             placeholder="es. mario@email.it" 
+                                            aria-required="true"
+                                            aria-invalid={errors.email ? "true" : "false"}
+                                            aria-describedby={errors.email ? "email-error" : undefined}
                                         />
-                                        {errors.email && <span className="error-text">{errors.email}</span>}
+                                        {errors.email && <span id="email-error" className="error-text">{errors.email}</span>}
                                     </div>
                                     <div className="field-group flex-1">
-                                        <label>Telefono</label>
+                                        <label htmlFor="phone">Telefono</label>
                                         <input 
-                                            type="text" 
+                                            type="tel" 
                                             id="phone" 
                                             value={clientData.phone} 
                                             onChange={handleTextChange} 
@@ -217,7 +252,7 @@ export default function VehicleForm() {
                                 <div className="cf-section-label"><span>📡</span><span>Servizi</span></div>
                                 <div className="cf-fields row-layout">
                                     <div className="field-group flex-2">
-                                        <label>Note</label>
+                                        <label htmlFor="notes">Note</label>
                                         <input 
                                             type="text" 
                                             id="notes" 
@@ -228,9 +263,9 @@ export default function VehicleForm() {
                                     </div>
                                     <div className="field-group flex-1">
                                         <label>Traffico dati 4G</label>
-                                        <div className="toggle-group">
-                                            <button className={`toggle-btn ${clientData.italia ? 'active' : ''}`} onClick={() => togglePlace('italia')}>🇮🇹 Italia</button>
-                                            <button className={`toggle-btn ${clientData.estero ? 'active' : ''}`} onClick={() => togglePlace('estero')}>🌍 Estero</button>
+                                        <div className="toggle-group" role="group" aria-label="Ambito di traffico dati 4G">
+                                            <button type="button" className={`toggle-btn ${clientData.italia ? 'active' : ''}`} onClick={() => togglePlace('italia')} aria-pressed={clientData.italia}>🇮🇹 Italia</button>
+                                            <button type="button" className={`toggle-btn ${clientData.estero ? 'active' : ''}`} onClick={() => togglePlace('estero')} aria-pressed={clientData.estero}>🌍 Estero</button>
                                         </div>
                                     </div>
                                 </div>
@@ -239,7 +274,7 @@ export default function VehicleForm() {
 
                         <div className="bottom-bar">
                             <span className="step-info">Passo <strong>1</strong> di 3</span>
-                            <button className="btn btn-primary" onClick={() => {
+                            <button type="button" className="btn btn-primary" onClick={() => {
                                 if (validateStep1()) {
                                     setStep(2);
                                 }
@@ -267,14 +302,18 @@ export default function VehicleForm() {
                                         {cat.vehicles.map(v => (
                                             <tr key={v.id}>
                                                 <td className="mezzo-name">{v.name}</td>
-                                                <td className="text-center"><img src={v.img} height="38" alt="" /></td>
+                                                <td className="text-center"><img src={v.img} height="38" alt={`Immagine ${v.name}`} /></td>
                                                 <td className="text-center">
                                                     <input 
                                                         type="number" 
+                                                        id={`qty-${v.id}`}
+                                                        name={`qty-${v.id}`}
                                                         className={`qty-input ${quantities[v.id] > 0 ? 'filled' : ''}`} 
                                                         value={quantities[v.id] || ''} 
                                                         onChange={(e) => handleQtyChange(v.id, e.target.value)} 
                                                         placeholder="0"
+                                                        min="0"
+                                                        aria-label={`Quantità per ${v.name}`}
                                                     />
                                                 </td>
                                             </tr>
@@ -284,10 +323,10 @@ export default function VehicleForm() {
                             </div>
                         ))}
                         <div className="bottom-bar">
-                            <div className="total-info">Totale: <strong>{Object.values(quantities).reduce((a, b) => a + b, 0)}</strong> mezzi</div>
+                            <div className="total-info">Totale: <strong>{totalVehicles}</strong> mezzi</div>
                             <div style={{display: 'flex', gap: '10px'}}>
-                                <button className="btn btn-ghost" onClick={() => setStep(1)}>← Indietro</button>
-                                <button className="btn btn-primary" onClick={() => setStep(3)}>Avanti: Riepilogo →</button>
+                                <button type="button" className="btn btn-ghost" onClick={() => setStep(1)}>← Indietro</button>
+                                <button type="button" className="btn btn-primary" onClick={() => setStep(3)}>Avanti: Riepilogo →</button>
                             </div>
                         </div>
                     </div>
@@ -311,9 +350,10 @@ export default function VehicleForm() {
                                     {Object.entries(quantities).map(([id, q]) => {
                                         if (q <= 0) return null;
                                         const mezzo = vehicleCategories.flatMap(c => c.vehicles).find(v => v.id === id);
+                                        if (!mezzo) return null;
                                         return (
                                             <div className="summary-card" key={id}>
-                                                <img src={mezzo.img} alt="" />
+                                                <img src={mezzo.img} alt={`Immagine ${mezzo.name}`} />
                                                 <span className="mezzo-title">{mezzo.name}</span>
                                                 <span className="mezzo-qty">{q}</span>
                                             </div>
@@ -322,7 +362,7 @@ export default function VehicleForm() {
                                 </div>
                                 <div className="total-badge-container">
                                     <div className="final-total-badge">
-                                        TOTALE: {Object.values(quantities).reduce((a, b) => a + b, 0)} MEZZI
+                                        TOTALE: {totalVehicles} MEZZI
                                     </div>
                                 </div>
                             </div>
@@ -330,8 +370,9 @@ export default function VehicleForm() {
                         <div className="bottom-bar">
                             <span className="step-info"></span>
                             <div className="btn-group" style={{display: 'flex', gap: '10px'}}>
-                                <button className="btn btn-ghost" onClick={() => setStep(2)}>← Modifica Mezzi</button>
+                                <button type="button" className="btn btn-ghost" onClick={() => setStep(2)}>← Modifica Mezzi</button>
                                 <button 
+                                    type="button"
                                     className="btn btn-accent" 
                                     onClick={handleSubmit} 
                                     disabled={loading}
@@ -350,7 +391,7 @@ export default function VehicleForm() {
                         </div>
                     </div>
                 )}
-            </div>
+            </main>
         </div>
     );
 }

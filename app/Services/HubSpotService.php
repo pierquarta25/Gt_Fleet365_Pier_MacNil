@@ -12,19 +12,14 @@ class HubSpotService
 
     public function __construct()
     {
-        // Ricordati di aggiungere HUBSPOT_ACCESS_TOKEN nel tuo file .env
         $this->apiKey = config('services.hubspot.token');
     }
 
-    /**
-     * Crea un contatto e un deal associato su HubSpot.
-     */
+    // Crea un contatto e il relativo deal associato su HubSpot
     public function createLead(array $client, array $vehicles)
     {
-        // 1. Cerco o creo il contatto
         $contactId = $this->upsertContact($client);
 
-        // 2. Preparo la descrizione del Deal con la lista dei mezzi
         $vehicleSummary = "Richiesta Mezzi:\n";
         foreach ($vehicles as $name => $qty) {
             if ($qty > 0) {
@@ -32,10 +27,10 @@ class HubSpotService
             }
         }
 
-        // 3. Creo il Deal (Affare)
         return $this->createDeal($contactId, $client['company'], $vehicleSummary);
     }
 
+    // Crea o recupera un contatto tramite email
     private function upsertContact($client)
     {
         $payload = [
@@ -72,12 +67,13 @@ class HubSpotService
         return null;
     }
 
+    // Crea il deal e lo associa al contatto
     private function createDeal($contactId, $company, $summary)
     {
         $payload = [
             'properties' => [
                 'dealname' => "GT Fleet 365: $company",
-                'dealstage' => 'appointmentscheduled', // Stato iniziale
+                'dealstage' => 'appointmentscheduled',
                 'pipeline' => 'default',
                 'description' => $summary
             ]
@@ -89,7 +85,6 @@ class HubSpotService
         if ($response->successful()) {
             $dealId = $response->json()['id'];
             
-            // Associo il deal al contatto
             if ($contactId) {
                 Http::withToken($this->apiKey)
                     ->put("{$this->baseUrl}/deals/$dealId/associations/contact/$contactId/deal_to_contact");
@@ -101,3 +96,4 @@ class HubSpotService
         return null;
     }
 }
+

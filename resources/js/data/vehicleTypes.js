@@ -1,5 +1,4 @@
-// Questa è la lista completa dei veicoli presi dal documento PDF
-// Li dividiamo in categorie per replicare il layout a tabelle del documento originale
+// Lista dei veicoli suddivisi per categoria
 
 export const vehicleCategories = [
     {

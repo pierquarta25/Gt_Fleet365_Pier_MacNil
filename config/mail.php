@@ -115,4 +115,21 @@ return [
         'name' => env('MAIL_FROM_NAME', env('APP_NAME', 'Laravel')),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Indirizzi Email Reparto Commerciale
+    |--------------------------------------------------------------------------
+    |
+    | Qui definiamo la mail generica del reparto e i due capi commerciali
+    | per poterli includere automaticamente nell'invio dei lead.
+    |
+    */
+    'commerciale_generica' => env('MAIL_COMMERCIALE_GENERICA', 'commerciali@macnil.it'),
+
+    'capi_commerciali' => [
+        env('MAIL_CAPO_COMMERCIALE_1'),
+        env('MAIL_CAPO_COMMERCIALE_2'),
+    ],
+
 ];
+
