@@ -17,33 +17,38 @@ class MarketingAgentsSeeder extends Seeder
         $commerciali = [
             [
                 'name' => 'Pierfilippo Quartarella',
-                'email' => 'ingo@getpierfilippo.com',
+                'email' => 'info@getpierfilippo.com',
                 'slug' => 'pier-quartarella'
             ],
             [
-                'name' => 'Luca Bianchi',
-                'email' => 'luca.bianchi@esempio.it',
-                'slug' => 'luca-bianchi'
+                'name' => 'Gabriella Costanza',
+                'email' => 'gabriella.costanza@macnil.it',
+                'slug' => 'gabriella-costanza'
             ],
             [
-                'name' => 'Anna Verdi',
-                'email' => 'anna.verdi@esempio.it',
-                'slug' => 'anna-verdi'
+                'name' => 'Miria Varvara',
+                'email' => 'miria.varvara@macnil.it',
+                'slug' => 'miria-varvara'
             ],
             [
-                'name' => 'Giuseppe Neri',
-                'email' => 'giuseppe.neri@esempio.it',
-                'slug' => 'giuseppe-neri'
+                'name' => 'Marco Defilippo',
+                'email' => 'marco.defilippo@macnil.it',
+                'slug' => 'marco-defilippo'
             ],
             [
-                'name' => 'Elena Blu',
-                'email' => 'elena.blu@esempio.it',
-                'slug' => 'elena-blu'
+                'name' => 'Samuele Meliddo',
+                'email' => 'samuele.meliddo@macnil.it',
+                'slug' => 'samuele-meliddo'
             ],
             [
-                'name' => 'Commerciale 6',
-                'email' => 'commerciale6@macnil.it',
-                'slug' => 'commerciale-6'
+                'name' => 'Daniele Gandini',
+                'email' => 'daniele.gandini@macnil.it',
+                'slug' => 'daniele-gandini'
+            ],
+            [
+                'name' => 'Beppe Vero',
+                'email' => 'giuseppe.vero@macnil.it',
+                'slug' => 'beppe-vero'
             ],
         ];
 

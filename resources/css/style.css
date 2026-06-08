@@ -291,3 +291,93 @@ header {
   .logo-img { height: 30px !important; }
   .final-total-badge { width: 100%; text-align: center; font-size: 16px; }
 }
+
+/* Custom Modal Style */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 82, 189, 0.4);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+}
+
+.modal-custom {
+    background: white;
+    border-radius: 16px;
+    padding: 36px 24px;
+    max-width: 420px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    border: 2px solid var(--blue);
+    transform: translateY(0);
+    animation: modalScale 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes modalScale {
+    from { transform: scale(0.9) translateY(20px); opacity: 0; }
+    to { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.modal-icon {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px auto;
+}
+
+.modal-icon.success {
+    background: #E6FDF5;
+    color: #10B981;
+    border: 2px solid #10B981;
+}
+
+.modal-icon.error {
+    background: #FFF5F5;
+    color: #EF4444;
+    border: 2px solid #EF4444;
+}
+
+.modal-title {
+    font-family: 'Exo 2';
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--text);
+    margin-bottom: 12px;
+}
+
+.modal-message {
+    font-size: 14px;
+    color: var(--text-sec);
+    line-height: 1.6;
+    margin-bottom: 24px;
+}
+
+.modal-btn {
+    margin: 0 auto;
+    min-width: 180px;
+    justify-content: center;
+}
+
+/* Nasconde gli elementi a schermo ma li mantiene disponibili per gli spider SEO / screen reader */
+.visually-hidden {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}

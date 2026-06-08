@@ -7,6 +7,8 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Mail\Mailables\Attachment;
 
 class LeadSummaryMail extends Mailable
 {
@@ -30,18 +32,29 @@ class LeadSummaryMail extends Mailable
         );
     }
 
-    // Imposta il template Markdown da utilizzare
+    // Imposta il template HTML da utilizzare
     public function content(): Content
     {
         return new Content(
-            markdown: 'emails.lead-summary',
+            view: 'emails.lead-summary',
+            with: [
+                'isPdf' => false,
+            ]
         );
     }
 
-    // Eventuali allegati
+    // Eventuali allegati (genera e allega il PDF a runtime)
     public function attachments(): array
     {
-        return [];
+        $pdf = Pdf::loadView('emails.lead-summary', [
+            'client' => $this->client,
+            'vehicles' => $this->vehicles,
+            'isPdf' => true
+        ]);
+
+        return [
+            Attachment::fromData(fn () => $pdf->output(), 'riepilogo-flotta.pdf')
+                ->withMime('application/pdf'),
+        ];
     }
 }
-

@@ -126,10 +126,7 @@ return [
     */
     'commerciale_generica' => env('MAIL_COMMERCIALE_GENERICA', 'commerciali@macnil.it'),
 
-    'capi_commerciali' => [
-        env('MAIL_CAPO_COMMERCIALE_1'),
-        env('MAIL_CAPO_COMMERCIALE_2'),
-    ],
+    'capi_commerciali' => array_filter(array_map('trim', explode(',', env('MAIL_CAPI_COMMERCIALI', '')))),
 
 ];
 

@@ -30,6 +30,7 @@ class VehicleFormController extends Controller
         
         if ($agent) {
             session(['agent_email' => $agent->email]);
+            return redirect('/?agent=' . $slug);
         }
 
         return redirect('/');
@@ -44,6 +45,7 @@ class VehicleFormController extends Controller
             'client.contact' => 'required|string|max:255',
             'client.phone'   => 'nullable|string|max:30',
             'client.agent_email' => 'nullable|email|max:255',
+            'client.agent_slug'  => 'nullable|string|max:255',
             'vehicles'       => 'required|array'
         ], [
             'client.company.required' => 'La ragione sociale è obbligatoria.',
@@ -53,14 +55,25 @@ class VehicleFormController extends Controller
         $client = $request->input('client');
         $vehiclesInput = $request->input('vehicles');
 
-        $agentEmail = session('agent_email');
-        
+        $agent = null;
+        $agentSlug = $client['agent_slug'] ?? null;
+        $agentEmailFromClient = $client['agent_email'] ?? null;
+        $sessionAgentEmail = session('agent_email');
+
+        if ($agentSlug) {
+            $agent = User::where('slug', $agentSlug)->first();
+        }
+        if (!$agent && $agentEmailFromClient) {
+            $agent = User::where('email', $agentEmailFromClient)->first();
+        }
+        if (!$agent && $sessionAgentEmail) {
+            $agent = User::where('email', $sessionAgentEmail)->first();
+        }
+
         $dealId = null;
         if (config('services.hubspot.token')) {
             $dealId = $this->hubspot->createLead($client, $vehiclesInput);
         }
-
-        $agent = User::where('email', $agentEmail)->first();
         
         $toEmails = [];
         if ($agent) {
@@ -69,14 +82,35 @@ class VehicleFormController extends Controller
             $toEmails[] = $genericEmail;
         }
 
+        $capi = config('mail.capi_commerciali') ?? [];
+
+        // Se non c'è un destinatario principale, usiamo i capi commerciali come destinatari
+        if (empty($toEmails) && !empty($capi)) {
+            $toEmails = $capi;
+            $capi = [];
+        }
+
         if (!empty($toEmails)) {
             $formattedVehicles = [];
-            foreach ($vehiclesInput as $id => $qty) {
-                if ($qty > 0) {
+            $selectedVehicles = $request->input('selectedVehicles', []);
+
+            if (!empty($selectedVehicles)) {
+                foreach ($selectedVehicles as $item) {
                     $formattedVehicles[] = [
-                        'name' => ucfirst(str_replace('_', ' ', $id)),
-                        'qty' => $qty
+                        'name' => $item['name'] ?? ucfirst(str_replace('_', ' ', $item['id'] ?? '')),
+                        'qty' => $item['qty'],
+                        'img' => $item['img'] ?? ''
                     ];
+                }
+            } else {
+                foreach ($vehiclesInput as $id => $qty) {
+                    if ($qty > 0) {
+                        $formattedVehicles[] = [
+                            'name' => ucfirst(str_replace('_', ' ', $id)),
+                            'qty' => $qty,
+                            'img' => '/media/' . strtoupper($id) . '.png'
+                        ];
+                    }
                 }
             }
 
@@ -87,7 +121,6 @@ class VehicleFormController extends Controller
                 $ccEmails[] = $genericEmail;
             }
 
-            $capi = config('mail.capi_commerciali') ?? [];
             foreach ($capi as $capoEmail) {
                 if ($capoEmail && !in_array($capoEmail, $toEmails)) {
                     $ccEmails[] = $capoEmail;

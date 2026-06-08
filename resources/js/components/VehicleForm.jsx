@@ -6,11 +6,21 @@ export default function VehicleForm() {
     const [step, setStep] = useState(1);
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
-    
+    const [modalConfig, setModalConfig] = useState({
+        isOpen: false,
+        type: 'success',
+        title: '',
+        message: ''
+    });
+
     // Inizializza i dati dal localStorage o usa i valori predefiniti
     const [clientData, setClientData] = useState(() => {
         const saved = localStorage.getItem('gtfleet_clientData');
-        
+
+        // Estrae lo slug dell'agente se presente nella query dell'URL (?agent=slug)
+        const params = new URLSearchParams(window.location.search);
+        const agentSlug = params.get('agent') || '';
+
         // Estrae l'email dell'agente se presente nel percorso dell'URL
         const path = window.location.pathname.replace(/^\//, '');
         const agentEmail = path.includes('@') ? path : '';
@@ -23,13 +33,18 @@ export default function VehicleForm() {
             notes: '',
             italia: false,
             estero: false,
-            agent_email: agentEmail
+            agent_email: agentEmail,
+            agent_slug: agentSlug
         };
 
         if (saved) {
             const parsed = JSON.parse(saved);
-            // Mantiene l'email dell'agente aggiornata dall'URL
-            return { ...parsed, agent_email: agentEmail || parsed.agent_email || '' };
+            // Mantiene l'email e lo slug dell'agente aggiornati dall'URL
+            return {
+                ...parsed,
+                agent_email: agentEmail || parsed.agent_email || '',
+                agent_slug: agentSlug || parsed.agent_slug || ''
+            };
         }
         return defaultData;
     });
@@ -54,7 +69,7 @@ export default function VehicleForm() {
     const handleTextChange = (e) => {
         const { id, value } = e.target;
         setClientData(prev => ({ ...prev, [id]: value }));
-        
+
         if (errors[id]) {
             setErrors(prev => ({ ...prev, [id]: null }));
         }
@@ -94,20 +109,52 @@ export default function VehicleForm() {
     // Invia i dati al backend
     const handleSubmit = async () => {
         if (loading) return;
-        
+
         setLoading(true);
         try {
-            await axios.post('/api/vehicle-form', { client: clientData, vehicles: quantities });
-            
+            // Estrae i dettagli completi dei soli veicoli selezionati con quantità > 0
+            const selectedVehiclesDetails = Object.entries(quantities)
+                .filter(([_, qty]) => qty > 0)
+                .map(([id, qty]) => {
+                    const mezzo = vehicleCategories.flatMap(c => c.vehicles).find(v => v.id === id);
+                    return {
+                        id: id,
+                        name: mezzo ? mezzo.name : id,
+                        img: mezzo ? mezzo.img : '',
+                        qty: qty
+                    };
+                });
+
+            await axios.post('/api/vehicle-form', {
+                client: clientData,
+                vehicles: quantities,
+                selectedVehicles: selectedVehiclesDetails
+            });
+
             // Pulisce il localStorage dopo l'invio con successo
             localStorage.removeItem('gtfleet_clientData');
             localStorage.removeItem('gtfleet_quantities');
-            
-            alert('Perfetto! I tuoi dati sono stati inviati a HubSpot con successo.');
-            window.location.reload();
+
+            setModalConfig({
+                isOpen: true,
+                type: 'success',
+                title: 'Configurazione Inviata!',
+                message: 'Perfetto! I tuoi dati sono stati elaborati e inviati con successo.'
+            });
+
+            // Chiude la modale e ricarica la pagina automaticamente dopo 3 secondi
+            setTimeout(() => {
+                setModalConfig(prev => ({ ...prev, isOpen: false }));
+                window.location.reload();
+            }, 3000);
         } catch (error) {
             console.error('Errore durante l\'invio:', error);
-            alert('Ops! Qualcosa è andato storto durante l\'invio. Riprova tra poco.');
+            setModalConfig({
+                isOpen: true,
+                type: 'error',
+                title: 'Ops! Qualcosa è andato storto',
+                message: 'Non è stato possibile inviare i dati. Controlla la connessione e riprova.'
+            });
         } finally {
             setLoading(false);
         }
@@ -123,7 +170,7 @@ export default function VehicleForm() {
                     <div className="logo-area">
                         <img src="/media/logo.png" alt="GT Fleet 365 Logo" className="logo-img" />
                     </div>
-                    
+
                     <div className="step-badges">
                         <div className="step-item">
                             <div className={`step-badge ${step >= 1 ? 'active' : ''} ${step > 1 ? 'done' : ''}`}>
@@ -132,7 +179,7 @@ export default function VehicleForm() {
                             <span className="step-label">Dati Cliente</span>
                         </div>
                         <div className={`step-line ${step > 1 ? 'done' : ''}`}></div>
-                        
+
                         <div className="step-item">
                             <div className={`step-badge ${step === 2 ? 'active' : step > 2 ? 'done' : 'pending'}`}>
                                 {step > 2 ? '✓' : '2'}
@@ -140,7 +187,7 @@ export default function VehicleForm() {
                             <span className="step-label">Tipologia Mezzi</span>
                         </div>
                         <div className={`step-line ${step > 2 ? 'done' : ''}`}></div>
-                        
+
                         <div className="step-item">
                             <div className={`step-badge ${step === 3 ? 'active' : 'pending'}`}>3</div>
                             <span className="step-label">Riepilogo</span>
@@ -171,12 +218,12 @@ export default function VehicleForm() {
 
                         <div className="card">
                             <div className="card-header">
-                                <i className="fas fa-list-alt" style={{color:'white'}}></i>
+                                <i className="fas fa-list-alt" style={{ color: 'white' }}></i>
                                 <h2>Dati Cliente</h2>
                             </div>
-                            
+
                             {Object.keys(errors).length > 0 && (
-                                <div className="global-error" style={{margin: '20px 22px 0 22px'}} role="alert">
+                                <div className="global-error" style={{ margin: '20px 22px 0 22px' }} role="alert">
                                     ⚠️ Attenzione: controlla i campi evidenziati.
                                 </div>
                             )}
@@ -186,13 +233,13 @@ export default function VehicleForm() {
                                 <div className="cf-fields">
                                     <div className="field-group">
                                         <label htmlFor="company">Nome Azienda *</label>
-                                        <input 
-                                            type="text" 
-                                            id="company" 
+                                        <input
+                                            type="text"
+                                            id="company"
                                             className={errors.company ? 'input-error' : ''}
-                                            value={clientData.company} 
-                                            onChange={handleTextChange} 
-                                            placeholder="es. Logistica Sud S.r.l." 
+                                            value={clientData.company}
+                                            onChange={handleTextChange}
+                                            placeholder="es. Logistica Sud S.r.l."
                                             aria-required="true"
                                             aria-invalid={errors.company ? "true" : "false"}
                                             aria-describedby={errors.company ? "company-error" : undefined}
@@ -207,13 +254,13 @@ export default function VehicleForm() {
                                 <div className="cf-fields row-layout">
                                     <div className="field-group flex-1">
                                         <label htmlFor="contact">Nome Contatto *</label>
-                                        <input 
-                                            type="text" 
-                                            id="contact" 
+                                        <input
+                                            type="text"
+                                            id="contact"
                                             className={errors.contact ? 'input-error' : ''}
-                                            value={clientData.contact} 
-                                            onChange={handleTextChange} 
-                                            placeholder="es. Mario Rossi" 
+                                            value={clientData.contact}
+                                            onChange={handleTextChange}
+                                            placeholder="es. Mario Rossi"
                                             aria-required="true"
                                             aria-invalid={errors.contact ? "true" : "false"}
                                             aria-describedby={errors.contact ? "contact-error" : undefined}
@@ -222,13 +269,13 @@ export default function VehicleForm() {
                                     </div>
                                     <div className="field-group flex-1">
                                         <label htmlFor="email">Email *</label>
-                                        <input 
-                                            type="email" 
-                                            id="email" 
+                                        <input
+                                            type="email"
+                                            id="email"
                                             className={errors.email ? 'input-error' : ''}
-                                            value={clientData.email} 
-                                            onChange={handleTextChange} 
-                                            placeholder="es. mario@email.it" 
+                                            value={clientData.email}
+                                            onChange={handleTextChange}
+                                            placeholder="es. mario@email.it"
                                             aria-required="true"
                                             aria-invalid={errors.email ? "true" : "false"}
                                             aria-describedby={errors.email ? "email-error" : undefined}
@@ -237,12 +284,12 @@ export default function VehicleForm() {
                                     </div>
                                     <div className="field-group flex-1">
                                         <label htmlFor="phone">Telefono</label>
-                                        <input 
-                                            type="tel" 
-                                            id="phone" 
-                                            value={clientData.phone} 
-                                            onChange={handleTextChange} 
-                                            placeholder="es. +39..." 
+                                        <input
+                                            type="tel"
+                                            id="phone"
+                                            value={clientData.phone}
+                                            onChange={handleTextChange}
+                                            placeholder="es. +39..."
                                         />
                                     </div>
                                 </div>
@@ -253,12 +300,12 @@ export default function VehicleForm() {
                                 <div className="cf-fields row-layout">
                                     <div className="field-group flex-2">
                                         <label htmlFor="notes">Note</label>
-                                        <input 
-                                            type="text" 
-                                            id="notes" 
-                                            value={clientData.notes} 
-                                            onChange={handleTextChange} 
-                                            placeholder="es. Flotta principalmente al Nord Italia" 
+                                        <input
+                                            type="text"
+                                            id="notes"
+                                            value={clientData.notes}
+                                            onChange={handleTextChange}
+                                            placeholder="es. Flotta principalmente al Nord Italia"
                                         />
                                     </div>
                                     <div className="field-group flex-1">
@@ -304,13 +351,13 @@ export default function VehicleForm() {
                                                 <td className="mezzo-name">{v.name}</td>
                                                 <td className="text-center"><img src={v.img} height="38" alt={`Immagine ${v.name}`} /></td>
                                                 <td className="text-center">
-                                                    <input 
-                                                        type="number" 
+                                                    <input
+                                                        type="number"
                                                         id={`qty-${v.id}`}
                                                         name={`qty-${v.id}`}
-                                                        className={`qty-input ${quantities[v.id] > 0 ? 'filled' : ''}`} 
-                                                        value={quantities[v.id] || ''} 
-                                                        onChange={(e) => handleQtyChange(v.id, e.target.value)} 
+                                                        className={`qty-input ${quantities[v.id] > 0 ? 'filled' : ''}`}
+                                                        value={quantities[v.id] || ''}
+                                                        onChange={(e) => handleQtyChange(v.id, e.target.value)}
                                                         placeholder="0"
                                                         min="0"
                                                         aria-label={`Quantità per ${v.name}`}
@@ -324,7 +371,7 @@ export default function VehicleForm() {
                         ))}
                         <div className="bottom-bar">
                             <div className="total-info">Totale: <strong>{totalVehicles}</strong> mezzi</div>
-                            <div style={{display: 'flex', gap: '10px'}}>
+                            <div style={{ display: 'flex', gap: '10px' }}>
                                 <button type="button" className="btn btn-ghost" onClick={() => setStep(1)}>← Indietro</button>
                                 <button type="button" className="btn btn-primary" onClick={() => setStep(3)}>Avanti: Riepilogo →</button>
                             </div>
@@ -369,14 +416,14 @@ export default function VehicleForm() {
                         </div>
                         <div className="bottom-bar">
                             <span className="step-info"></span>
-                            <div className="btn-group" style={{display: 'flex', gap: '10px'}}>
+                            <div className="btn-group" style={{ display: 'flex', gap: '10px' }}>
                                 <button type="button" className="btn btn-ghost" onClick={() => setStep(2)}>← Modifica Mezzi</button>
-                                <button 
+                                <button
                                     type="button"
-                                    className="btn btn-accent" 
-                                    onClick={handleSubmit} 
+                                    className="btn btn-accent"
+                                    onClick={handleSubmit}
                                     disabled={loading}
-                                    style={{minWidth: '160px', justifyContent: 'center'}}
+                                    style={{ minWidth: '160px', justifyContent: 'center' }}
                                 >
                                     {loading ? (
                                         <>
@@ -392,6 +439,39 @@ export default function VehicleForm() {
                     </div>
                 )}
             </main>
+
+            {modalConfig.isOpen && (
+                <div className="modal-overlay fade-in">
+                    <div className="modal-custom">
+                        <div className={`modal-icon ${modalConfig.type}`}>
+                            {modalConfig.type === 'success' ? (
+                                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                    <polyline points="20 6 9 17 4 12" />
+                                </svg>
+                            ) : (
+                                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                    <line x1="18" y1="6" x2="6" y2="18" />
+                                    <line x1="6" y1="6" x2="18" y2="18" />
+                                </svg>
+                            )}
+                        </div>
+                        <h3 className="modal-title">{modalConfig.title}</h3>
+                        <p className="modal-message">{modalConfig.message}</p>
+                        <button
+                            type="button"
+                            className="btn btn-primary modal-btn"
+                            onClick={() => {
+                                setModalConfig(prev => ({ ...prev, isOpen: false }));
+                                if (modalConfig.type === 'success') {
+                                    window.location.reload();
+                                }
+                            }}
+                        >
+                            {modalConfig.type === 'success' ? 'Nuova Configurazione' : 'Riprova'}
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
