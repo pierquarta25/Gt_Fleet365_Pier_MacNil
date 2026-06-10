@@ -150,7 +150,7 @@ header {
 .mezzo-title { flex: 1; font-size: 13px; font-weight: 600; color: var(--text-sec); }
 .mezzo-qty { font-size: 24px; font-weight: 800; color: var(--orange); font-family: 'Exo 2'; }
 
-.total-badge-container { margin-top: 30px; text-align: left; }
+.total-badge-container { margin-top: 30px; text-align: right; }
 .final-total-badge { background: var(--orange); color: white; display: inline-block; padding: 8px 24px; border-radius: 50px; font-size: 18px; font-weight: 800; font-family: 'Exo 2'; }
 
 /* Barra bassa */

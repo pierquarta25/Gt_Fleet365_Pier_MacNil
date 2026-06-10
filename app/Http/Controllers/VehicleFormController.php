@@ -131,7 +131,11 @@ class VehicleFormController extends Controller
                 $mail->cc($ccEmails);
             }
 
-            $mail->send(new LeadSummaryMail($client, $formattedVehicles));
+            try {
+                $mail->send(new LeadSummaryMail($client, $formattedVehicles));
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error("Impossibile inviare l'email di riepilogo: " . $e->getMessage());
+            }
         }
 
         return response()->json([
