@@ -9,6 +9,7 @@ use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Mail\Mailables\Attachment;
+use Illuminate\Support\Str;
 
 class LeadSummaryMail extends Mailable
 {
@@ -52,8 +53,16 @@ class LeadSummaryMail extends Mailable
             'isPdf' => true
         ]);
 
+        $company = $this->client['company'] ?? 'azienda';
+        $safeCompany = Str::slug($company);
+        if (empty($safeCompany)) {
+            $safeCompany = 'azienda';
+        }
+        $timestamp = now()->format('Y-m-d-H-i-s');
+        $fileName = "riepilogo-flotta-{$safeCompany}-{$timestamp}.pdf";
+
         return [
-            Attachment::fromData(fn () => $pdf->output(), 'riepilogo-flotta.pdf')
+            Attachment::fromData(fn () => $pdf->output(), $fileName)
                 ->withMime('application/pdf'),
         ];
     }
