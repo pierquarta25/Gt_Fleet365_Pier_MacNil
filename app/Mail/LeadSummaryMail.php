@@ -58,8 +58,8 @@ class LeadSummaryMail extends Mailable
         if (empty($safeCompany)) {
             $safeCompany = 'azienda';
         }
-        $timestamp = now()->format('Y-m-d-H-i-s');
-        $fileName = "riepilogo-flotta-{$safeCompany}-{$timestamp}.pdf";
+        $date = now()->format('Y-m-d');
+        $fileName = "riepilogo-flotta-{$safeCompany}-{$date}.pdf";
 
         return [
             Attachment::fromData(fn () => $pdf->output(), $fileName)

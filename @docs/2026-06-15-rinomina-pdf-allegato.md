@@ -7,11 +7,10 @@
 L'utente richiede che il file PDF di riepilogo della flotta allegato all'email non si chiami più in modo statico `riepilogo-flotta.pdf`, ma che assuma un nome dinamico e auto-esplicativo contenente:
 1. Prefisso fisso `riepilogo-flotta`
 2. Nome dell'azienda (slugificato per essere sicuro nei nomi di file)
-3. Data corrente della configurazione nel formato `YYYY-MM-DD`
-4. Ora corrente della configurazione nel formato `H-i-s` (ore-minuti-secondi)
+3. Data corrente della configurazione nel formato `YYYY-MM-DD` (trattini al posto di slash per la compatibilità con i sistemi operativi)
 
 Esempio finale del nome file:  
-`riepilogo-flotta-azienda-test-srl-2026-06-15-17-01-44.pdf`
+`riepilogo-flotta-azienda-test-srl-2026-06-15.pdf`
 
 ---
 
