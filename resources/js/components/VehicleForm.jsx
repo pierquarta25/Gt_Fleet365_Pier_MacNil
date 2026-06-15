@@ -28,8 +28,10 @@ export default function VehicleForm() {
         const defaultData = {
             company: '',
             contact: '',
+            lastname: '',
             email: '',
             phone: '',
+            drivers: 0,
             notes: '',
             italia: false,
             estero: false,
@@ -41,6 +43,8 @@ export default function VehicleForm() {
             const parsed = JSON.parse(saved);
             // Mantiene l'email e lo slug dell'agente aggiornati dall'URL
             return {
+                lastname: '',
+                drivers: 0,
                 ...parsed,
                 agent_email: agentEmail || parsed.agent_email || '',
                 agent_slug: agentSlug || parsed.agent_slug || ''
@@ -85,6 +89,9 @@ export default function VehicleForm() {
         }
         if (!clientData.contact.trim()) {
             newErrors.contact = "Il nome contatto è obbligatorio";
+        }
+        if (!clientData.lastname || !clientData.lastname.trim()) {
+            newErrors.lastname = "Il cognome contatto è obbligatorio";
         }
         if (!clientData.email.trim()) {
             newErrors.email = "L'email è obbligatoria";
@@ -260,12 +267,27 @@ export default function VehicleForm() {
                                             className={errors.contact ? 'input-error' : ''}
                                             value={clientData.contact}
                                             onChange={handleTextChange}
-                                            placeholder="es. Mario Rossi"
+                                            placeholder="es. Mario"
                                             aria-required="true"
                                             aria-invalid={errors.contact ? "true" : "false"}
                                             aria-describedby={errors.contact ? "contact-error" : undefined}
                                         />
                                         {errors.contact && <span id="contact-error" className="error-text">{errors.contact}</span>}
+                                    </div>
+                                    <div className="field-group flex-1">
+                                        <label htmlFor="lastname">Cognome Contatto *</label>
+                                        <input
+                                            type="text"
+                                            id="lastname"
+                                            className={errors.lastname ? 'input-error' : ''}
+                                            value={clientData.lastname || ''}
+                                            onChange={handleTextChange}
+                                            placeholder="es. Rossi"
+                                            aria-required="true"
+                                            aria-invalid={errors.lastname ? "true" : "false"}
+                                            aria-describedby={errors.lastname ? "lastname-error" : undefined}
+                                        />
+                                        {errors.lastname && <span id="lastname-error" className="error-text">{errors.lastname}</span>}
                                     </div>
                                     <div className="field-group flex-1">
                                         <label htmlFor="email">Email *</label>
@@ -291,6 +313,45 @@ export default function VehicleForm() {
                                             onChange={handleTextChange}
                                             placeholder="es. +39..."
                                         />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="cf-section">
+                                <div className="cf-section-label"><span>👥</span><span>Autisti</span></div>
+                                <div className="cf-fields row-layout">
+                                    <div className="field-group" style={{ marginBottom: 0 }}>
+                                        <label htmlFor="drivers">Numero Autisti</label>
+                                        <div className="counter-container">
+                                            <button 
+                                                type="button" 
+                                                className="counter-btn" 
+                                                onClick={() => setClientData(prev => ({ ...prev, drivers: Math.max(0, (prev.drivers || 0) - 1) }))}
+                                                aria-label="Diminuisci autisti"
+                                            >
+                                                -
+                                            </button>
+                                            <input
+                                                type="number"
+                                                id="drivers"
+                                                className="counter-input"
+                                                value={clientData.drivers || 0}
+                                                onChange={(e) => {
+                                                    const val = parseInt(e.target.value, 10);
+                                                    setClientData(prev => ({ ...prev, drivers: isNaN(val) ? 0 : Math.max(0, val) }));
+                                                }}
+                                                min="0"
+                                                aria-label="Numero Autisti"
+                                            />
+                                            <button 
+                                                type="button" 
+                                                className="counter-btn" 
+                                                onClick={() => setClientData(prev => ({ ...prev, drivers: (prev.drivers || 0) + 1 }))}
+                                                aria-label="Aumenta autisti"
+                                            >
+                                                +
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -386,9 +447,10 @@ export default function VehicleForm() {
                             <div className="card-body-padding">
                                 <div className="client-summary">
                                     <div className="summary-item"><small>AZIENDA</small><strong>{clientData.company}</strong></div>
-                                    <div className="summary-item"><small>CONTATTO</small><strong>{clientData.contact}</strong></div>
+                                    <div className="summary-item"><small>CONTATTO</small><strong>{clientData.contact} {clientData.lastname || ''}</strong></div>
                                     <div className="summary-item"><small>EMAIL</small><strong>{clientData.email}</strong></div>
                                     <div className="summary-item"><small>TELEFONO</small><strong>{clientData.phone || '—'}</strong></div>
+                                    <div className="summary-item"><small>AUTISTI</small><strong>{clientData.drivers || 0}</strong></div>
                                     <div className="summary-item"><small>TRAFFICO 4G</small><strong>{[clientData.italia ? 'Italia' : '', clientData.estero ? 'Estero' : ''].filter(Boolean).join(', ') || '—'}</strong></div>
                                     <div className="summary-item"><small>NOTE</small><strong>{clientData.notes || '—'}</strong></div>
                                 </div>

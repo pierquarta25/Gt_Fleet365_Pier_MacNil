@@ -167,7 +167,7 @@
                         </td>
                         <td>
                             <span class="label">Contatto</span>
-                            <span class="value">{{ $client['contact'] }}</span>
+                            <span class="value">{{ $client['contact'] }} {{ $client['lastname'] ?? '' }}</span>
                         </td>
                         <td>
                             <span class="label">Email</span>
@@ -178,6 +178,10 @@
                         <td style="padding-top: 15px;">
                             <span class="label">Telefono</span>
                             <span class="value">{{ $client['phone'] ?? '—' }}</span>
+                        </td>
+                        <td style="padding-top: 15px;">
+                            <span class="label">Autisti</span>
+                            <span class="value">{{ $client['drivers'] ?? '0' }}</span>
                         </td>
                         <td style="padding-top: 15px;">
                             <span class="label">Traffico 4G</span>
@@ -192,7 +196,9 @@
                                 @endphp
                             </span>
                         </td>
-                        <td style="padding-top: 15px;">
+                    </tr>
+                    <tr>
+                        <td colspan="3" style="padding-top: 15px;">
                             <span class="label">Note</span>
                             <span class="value">{{ $client['notes'] ?? '—' }}</span>
                         </td>

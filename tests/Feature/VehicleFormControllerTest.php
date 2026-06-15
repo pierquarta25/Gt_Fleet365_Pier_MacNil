@@ -70,11 +70,13 @@ class VehicleFormControllerTest extends TestCase
             'client' => [
                 'company' => 'Azienda Test S.r.l.',
                 'email' => 'cliente@test.com',
-                'contact' => 'John Doe',
+                'contact' => 'John',
+                'lastname' => 'Doe',
                 'phone' => '123456',
                 'notes' => 'Note di test',
                 'italia' => true,
                 'estero' => false,
+                'drivers' => 3,
             ],
             'vehicles' => [
                 'auto' => 2,
@@ -122,12 +124,14 @@ class VehicleFormControllerTest extends TestCase
             'client' => [
                 'company' => 'Azienda Test S.r.l.',
                 'email' => 'cliente@test.com',
-                'contact' => 'John Doe',
+                'contact' => 'John',
+                'lastname' => 'Doe',
                 'phone' => '123456',
                 'notes' => 'Note di test',
                 'italia' => true,
                 'estero' => false,
                 'agent_slug' => 'mario-rossi',
+                'drivers' => 3,
             ],
             'vehicles' => [
                 'auto' => 2,
@@ -167,12 +171,14 @@ class VehicleFormControllerTest extends TestCase
             'client' => [
                 'company' => 'Azienda Test S.r.l.',
                 'email' => 'cliente@test.com',
-                'contact' => 'John Doe',
+                'contact' => 'John',
+                'lastname' => 'Doe',
                 'phone' => '123456',
                 'notes' => 'Note di test',
                 'italia' => true,
                 'estero' => false,
                 'agent_email' => 'mario.rossi@macnil.it',
+                'drivers' => 3,
             ],
             'vehicles' => [
                 'auto' => 2,
@@ -203,11 +209,13 @@ class VehicleFormControllerTest extends TestCase
             'client' => [
                 'company' => 'Azienda Test S.r.l.',
                 'email' => 'cliente@test.com',
-                'contact' => 'John Doe',
+                'contact' => 'John',
+                'lastname' => 'Doe',
                 'phone' => '123456',
                 'notes' => 'Note di test',
                 'italia' => true,
                 'estero' => false,
+                'drivers' => 3,
             ],
             'vehicles' => [
                 'auto' => 2,

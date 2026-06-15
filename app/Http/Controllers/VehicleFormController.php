@@ -43,12 +43,16 @@ class VehicleFormController extends Controller
             'client.company' => 'required|string|max:255',
             'client.email'   => 'required|email|max:255',
             'client.contact' => 'required|string|max:255',
+            'client.lastname'=> 'required|string|max:255',
             'client.phone'   => 'nullable|string|max:30',
+            'client.drivers' => 'nullable|integer|min:0',
             'client.agent_email' => 'nullable|email|max:255',
             'client.agent_slug'  => 'nullable|string|max:255',
             'vehicles'       => 'required|array'
         ], [
             'client.company.required' => 'La ragione sociale è obbligatoria.',
+            'client.contact.required' => 'Il nome contatto è obbligatorio.',
+            'client.lastname.required'=> 'Il cognome contatto è obbligatorio.',
             'client.email.email'      => 'Il formato email non è valido.',
         ]);
 

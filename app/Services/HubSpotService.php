@@ -27,6 +27,9 @@ class HubSpotService
             }
         }
 
+        $drivers = $client['drivers'] ?? 0;
+        $vehicleSummary .= "\nNumero Autisti: $drivers\n";
+
         return $this->createDeal($contactId, $client['company'], $vehicleSummary);
     }
 
@@ -37,6 +40,7 @@ class HubSpotService
             'properties' => [
                 'email' => $client['email'],
                 'firstname' => $client['contact'],
+                'lastname' => $client['lastname'] ?? '',
                 'company' => $client['company'],
                 'phone' => $client['phone'] ?? '',
             ]
