@@ -127,6 +127,7 @@
 
         .total-container {
             margin-top: 24px;
+            text-align: right;
         }
 
         .total-badge {
