@@ -94,6 +94,13 @@ class VehicleFormController extends Controller
             $capi = [];
         }
 
+        \Illuminate\Support\Facades\Log::info("Debug invio email", [
+            'default_mailer' => config('mail.default'),
+            'toEmails' => $toEmails,
+            'capi' => $capi,
+            'agent' => $agent ? $agent->email : null
+        ]);
+
         if (!empty($toEmails)) {
             $formattedVehicles = [];
             $selectedVehicles = $request->input('selectedVehicles', []);
@@ -135,11 +142,21 @@ class VehicleFormController extends Controller
                 $mail->cc($ccEmails);
             }
 
+            \Illuminate\Support\Facades\Log::info("Tentativo invio con mailer: " . config('mail.default'), [
+                'to' => $toEmails,
+                'cc' => $ccEmails
+            ]);
+
             try {
                 $mail->send(new LeadSummaryMail($client, $formattedVehicles));
+                \Illuminate\Support\Facades\Log::info("Email inviata con successo.");
             } catch (\Exception $e) {
-                \Illuminate\Support\Facades\Log::error("Impossibile inviare l'email di riepilogo: " . $e->getMessage());
+                \Illuminate\Support\Facades\Log::error("Impossibile inviare l'email di riepilogo: " . $e->getMessage(), [
+                    'exception' => $e
+                ]);
             }
+        } else {
+            \Illuminate\Support\Facades\Log::warning("Invio email saltato: nessun destinatario configurato.");
         }
 
         return response()->json([
