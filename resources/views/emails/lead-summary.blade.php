@@ -215,7 +215,7 @@
                         <tr>
                             <td class="img-cell">
                                 @if(!empty($item['img']))
-                                    <img src="{{ ($isPdf ?? false) ? public_path($item['img']) : config('app.url') . $item['img'] }}"
+                                    <img src="{{ ($isPdf ?? false) ? public_path($item['img']) : asset($item['img']) }}"
                                         alt="{{ $item['name'] }}">
                                 @else
                                     <span style="font-size: 20px;">📦</span>
