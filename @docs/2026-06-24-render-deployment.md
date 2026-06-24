@@ -10,7 +10,7 @@ L'utente desidera distribuire l'applicazione monolitica (Laravel 13 + React 19) 
 Per fare ciò senza separare l'app in due progetti distinti (Frontend e Backend), configureremo un **Web Service gratuito** su Render che utilizzi un container **Docker**.
 
 Questo documento descrive la configurazione di:
-1. Un **Dockerfile** multi-stage per compilare gli asset React e configurare l'ambiente PHP 8.3 con Apache.
+1. Un **Dockerfile** multi-stage per compilare gli asset React e configurare l'ambiente PHP 8.4 con Apache.
 2. Una configurazione custom per il server web Apache per servire la cartella `public` di Laravel.
 3. Uno script di avvio (`render-start.sh`) per gestire cache e migrazioni automatiche su Render.
 
@@ -22,7 +22,7 @@ Questo documento descrive la configurazione di:
 
 * **[NEW] [Dockerfile](file:///Users/pierfilippoquartarella/GT_FLEET365/gt_fleet_form/gtfleet365/Dockerfile)**:
   - Definizione di uno Stage 1 per Node.js per installare i pacchetti npm e lanciare `npm run build` compilando gli asset tramite Vite.
-  - Definizione di uno Stage 2 basato su `php:8.3-apache`.
+  - Definizione di uno Stage 2 basato su `php:8.4-apache`.
   - Installazione delle estensioni PHP necessarie: `pdo`, `pdo_pgsql`, `pgsql`, `zip`, `gd`.
   - Installazione di Composer copiato dall'immagine ufficiale.
   - Abilitazione del modulo Apache `mod_rewrite`.

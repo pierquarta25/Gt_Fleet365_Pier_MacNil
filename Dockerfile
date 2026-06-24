@@ -7,7 +7,7 @@ COPY . .
 RUN npm run build
 
 # Stage 2: Ambiente PHP di Produzione
-FROM php:8.3-apache
+FROM php:8.4-apache
 
 # Installazione delle dipendenze di sistema ed estensioni PHP per PostgreSQL
 RUN apt-get update && apt-get install -y \
