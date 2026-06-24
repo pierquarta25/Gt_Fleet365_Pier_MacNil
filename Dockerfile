@@ -9,14 +9,18 @@ RUN npm run build
 # Stage 2: Ambiente PHP di Produzione
 FROM php:8.4-apache
 
-# Installazione delle dipendenze di sistema ed estensioni PHP per PostgreSQL
+# Installazione delle dipendenze di sistema ed estensioni PHP per PostgreSQL e GD (richiesta da Dompdf)
 RUN apt-get update && apt-get install -y \
     libpq-dev \
     libzip-dev \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
     zip \
     unzip \
     git \
-    && docker-php-ext-install pdo pdo_pgsql pgsql zip \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install pdo pdo_pgsql pgsql zip gd \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Abilitazione del modulo rewrite di Apache per gestire le rotte di Laravel
