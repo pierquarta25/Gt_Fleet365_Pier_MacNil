@@ -243,10 +243,10 @@
             </div>
 
             @if(!empty($groupToken) && !($isPdf ?? false))
-                <div style="text-align: center; margin-top: 32px; margin-bottom: 16px;">
+                <div style="text-align: right; margin-top: 16px; margin-bottom: 8px; padding-right: 4px;">
                     <a href="{{ url('/servizi/' . $groupToken) }}"
-                       style="display: inline-block; padding: 14px 32px; background: linear-gradient(135deg, #0052BD 0%, #003A8C 100%); color: #ffffff; text-decoration: none; border-radius: 50px; font-family: 'Exo 2', Arial, sans-serif; font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 16px rgba(0, 82, 189, 0.3);">
-                        Configura Servizi Preventivo
+                       style="color: #0052BD; text-decoration: none; font-size: 12px; font-weight: 600; border-bottom: 1px solid #0052BD; font-family: 'Inter', Arial, sans-serif;">
+                        Configura Servizi Preventivo →
                     </a>
                 </div>
             @endif
