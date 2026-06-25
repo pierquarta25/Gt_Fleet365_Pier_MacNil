@@ -99,5 +99,51 @@ class HubSpotService
 
         return null;
     }
+
+    /**
+     * Aggiunge una nota al Deal con i servizi selezionati per un mezzo.
+     */
+    public function addServiceNote(string $dealId, string $vehicleName, array $services, ?string $notes = null): void
+    {
+        $body = "📋 Servizi configurati per: {$vehicleName}\n\n";
+
+        foreach ($services as $service) {
+            $line = "✔ {$service['name']}";
+            if (!empty($service['qty'])) {
+                $line .= " (×{$service['qty']})";
+            }
+            $body .= $line . "\n";
+        }
+
+        if ($notes) {
+            $body .= "\n📝 Note: {$notes}";
+        }
+
+        // Crea una nota (engagement) tramite API v3
+        $notePayload = [
+            'properties' => [
+                'hs_timestamp' => now()->toIso8601String(),
+                'hs_note_body' => $body,
+            ],
+            'associations' => [
+                [
+                    'to' => ['id' => $dealId],
+                    'types' => [
+                        [
+                            'associationCategory' => 'HUBSPOT_DEFINED',
+                            'associationTypeId' => 214, // note_to_deal
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $response = Http::withToken($this->apiKey)
+            ->post("{$this->baseUrl}/notes", $notePayload);
+
+        if (!$response->successful()) {
+            Log::warning("Impossibile creare nota servizi su HubSpot per deal {$dealId}: " . $response->body());
+        }
+    }
 }
 

@@ -230,6 +230,14 @@
                         </tr>
                     </table>
                 </div>
+                @if(!empty($item['service_token']) && !($isPdf ?? false))
+                    <div style="text-align: center; margin-top: -6px; margin-bottom: 16px;">
+                        <a href="{{ url('/servizi/' . $item['service_token']) }}"
+                           style="display: inline-block; padding: 8px 24px; background-color: #0052BD; color: #ffffff; text-decoration: none; border-radius: 50px; font-family: 'Exo 2', Arial, sans-serif; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
+                            🔗 Link ai Servizi
+                        </a>
+                    </div>
+                @endif
             @endforeach
 
             <div class="total-container">

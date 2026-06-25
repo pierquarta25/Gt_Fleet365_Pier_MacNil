@@ -7,6 +7,8 @@ use App\Services\HubSpotService;
 use App\Mail\LeadSummaryMail;
 use Illuminate\Support\Facades\Mail;
 use App\Models\User;
+use App\Models\ServiceRequest;
+use Illuminate\Support\Str;
 
 class VehicleFormController extends Controller
 {
@@ -110,7 +112,8 @@ class VehicleFormController extends Controller
                     $formattedVehicles[] = [
                         'name' => $item['name'] ?? ucfirst(str_replace('_', ' ', $item['id'] ?? '')),
                         'qty' => $item['qty'],
-                        'img' => $item['img'] ?? ''
+                        'img' => $item['img'] ?? '',
+                        'id'  => $item['id'] ?? '',
                     ];
                 }
             } else {
@@ -119,11 +122,32 @@ class VehicleFormController extends Controller
                         $formattedVehicles[] = [
                             'name' => ucfirst(str_replace('_', ' ', $id)),
                             'qty' => $qty,
-                            'img' => '/media/' . strtoupper($id) . '.png'
+                            'img' => '/media/' . strtoupper($id) . '.png',
+                            'id'  => $id,
                         ];
                     }
                 }
             }
+
+            // Genera un token univoco per ogni mezzo e crea i record ServiceRequest
+            foreach ($formattedVehicles as &$vehicle) {
+                $token = Str::random(48);
+
+                ServiceRequest::create([
+                    'token'        => $token,
+                    'vehicle_type' => $vehicle['id'] ?? Str::slug($vehicle['name'], '_'),
+                    'vehicle_name' => $vehicle['name'],
+                    'vehicle_qty'  => $vehicle['qty'],
+                    'vehicle_img'  => $vehicle['img'] ?? null,
+                    'client_data'  => $client,
+                    'agent_email'  => $agent ? $agent->email : null,
+                    'hubspot_deal_id' => $dealId,
+                    'status'       => 'pending',
+                ]);
+
+                $vehicle['service_token'] = $token;
+            }
+            unset($vehicle); // Rilascia il riferimento
 
             $mail = Mail::to($toEmails);
             $ccEmails = [];
