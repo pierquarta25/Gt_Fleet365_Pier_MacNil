@@ -231,10 +231,10 @@
                     </table>
                 </div>
                 @if(!empty($item['service_token']) && !($isPdf ?? false))
-                    <div style="text-align: center; margin-top: -6px; margin-bottom: 16px;">
+                    <div style="text-align: right; margin-top: -4px; margin-bottom: 14px; padding-right: 4px;">
                         <a href="{{ url('/servizi/' . $item['service_token']) }}"
-                           style="display: inline-block; padding: 8px 24px; background-color: #0052BD; color: #ffffff; text-decoration: none; border-radius: 50px; font-family: 'Exo 2', Arial, sans-serif; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
-                            🔗 Link ai Servizi
+                           style="color: #0052BD; text-decoration: none; font-size: 11px; font-weight: 600; border-bottom: 1px solid #0052BD;">
+                            Configura Servizi →
                         </a>
                     </div>
                 @endif
