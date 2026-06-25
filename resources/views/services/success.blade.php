@@ -120,21 +120,25 @@
             I dati sono stati registrati nel sistema e il PDF è stato generato.
         </p>
 
-        @if(isset($serviceRequest))
-            <div class="vehicle-badge">
-                <span>🚛</span>
-                <span class="vehicle-badge-name">{{ $serviceRequest->vehicle_name }} × {{ $serviceRequest->vehicle_qty }}</span>
+        @if(isset($serviceRequests) && $serviceRequests->isNotEmpty())
+            <div style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 32px;">
+                @foreach($serviceRequests as $req)
+                    <div class="vehicle-badge" style="margin-bottom: 0;">
+                        <span>🚛</span>
+                        <span class="vehicle-badge-name">{{ $req->vehicle_name }} × {{ $req->vehicle_qty }}</span>
+                    </div>
+                @endforeach
             </div>
         @endif
 
         <br>
 
-        @if(isset($serviceRequest))
-            <a href="/servizi/{{ $serviceRequest->token }}/pdf" class="back-link" style="background: linear-gradient(135deg, #FF6B00 0%, #E55D00 100%); margin-bottom: 12px;">
-                📄 Scarica PDF
+        @if(isset($groupToken))
+            <a href="/servizi/{{ $groupToken }}/pdf" class="back-link" style="background: linear-gradient(135deg, #FF6B00 0%, #E55D00 100%); margin-bottom: 12px;">
+                📄 Scarica PDF Riepilogativo
             </a>
             <br><br>
-            <a href="/servizi/{{ $serviceRequest->token }}" class="back-link">
+            <a href="/servizi/{{ $groupToken }}" class="back-link">
                 Modifica Configurazione
             </a>
         @endif

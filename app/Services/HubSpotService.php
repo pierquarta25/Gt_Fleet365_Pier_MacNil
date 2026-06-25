@@ -101,22 +101,31 @@ class HubSpotService
     }
 
     /**
-     * Aggiunge una nota al Deal con i servizi selezionati per un mezzo.
+     * Aggiunge una nota al Deal con i servizi selezionati per tutti i mezzi.
      */
-    public function addServiceNote(string $dealId, string $vehicleName, array $services, ?string $notes = null): void
+    public function addServiceNote(string $dealId, $serviceRequests): void
     {
-        $body = "📋 Servizi configurati per: {$vehicleName}\n\n";
+        $body = "📋 Riepilogo Servizi Configurati per Preventivo\n\n";
 
-        foreach ($services as $service) {
-            $line = "✔ {$service['name']}";
-            if (!empty($service['qty'])) {
-                $line .= " (×{$service['qty']})";
+        foreach ($serviceRequests as $req) {
+            if (empty($req->services)) {
+                continue;
             }
-            $body .= $line . "\n";
-        }
 
-        if ($notes) {
-            $body .= "\n📝 Note: {$notes}";
+            $body .= "🚛 {$req->vehicle_name} (Qtà: {$req->vehicle_qty})\n";
+
+            foreach ($req->services as $service) {
+                $line = "  ✔ {$service['name']}";
+                if (!empty($service['qty'])) {
+                    $line .= " (×{$service['qty']})";
+                }
+                $body .= $line . "\n";
+            }
+
+            if ($req->notes) {
+                $body .= "  📝 Note: {$req->notes}\n";
+            }
+            $body .= "\n";
         }
 
         // Crea una nota (engagement) tramite API v3

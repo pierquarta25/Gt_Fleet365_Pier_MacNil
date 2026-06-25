@@ -9,6 +9,7 @@ class ServiceRequest extends Model
     protected $fillable = [
         'lead_id',
         'token',
+        'group_token',
         'vehicle_type',
         'vehicle_name',
         'vehicle_qty',

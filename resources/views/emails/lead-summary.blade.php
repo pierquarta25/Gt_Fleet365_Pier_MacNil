@@ -230,14 +230,7 @@
                         </tr>
                     </table>
                 </div>
-                @if(!empty($item['service_token']) && !($isPdf ?? false))
-                    <div style="text-align: right; margin-top: -4px; margin-bottom: 14px; padding-right: 4px;">
-                        <a href="{{ url('/servizi/' . $item['service_token']) }}"
-                           style="color: #0052BD; text-decoration: none; font-size: 11px; font-weight: 600; border-bottom: 1px solid #0052BD;">
-                            Configura Servizi →
-                        </a>
-                    </div>
-                @endif
+
             @endforeach
 
             <div class="total-container">
@@ -248,6 +241,15 @@
                     Totale: {{ $totaleMezzi }} Mezzi
                 </div>
             </div>
+
+            @if(!empty($groupToken) && !($isPdf ?? false))
+                <div style="text-align: center; margin-top: 32px; margin-bottom: 16px;">
+                    <a href="{{ url('/servizi/' . $groupToken) }}"
+                       style="display: inline-block; padding: 14px 32px; background: linear-gradient(135deg, #0052BD 0%, #003A8C 100%); color: #ffffff; text-decoration: none; border-radius: 50px; font-family: 'Exo 2', Arial, sans-serif; font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 16px rgba(0, 82, 189, 0.3);">
+                        Configura Servizi Preventivo
+                    </a>
+                </div>
+            @endif
         </div>
     </div>
     <div class="footer">

@@ -17,12 +17,14 @@ class LeadSummaryMail extends Mailable
 
     public $client;
     public $vehicles;
+    public $groupToken;
 
     // Inizializza i dati del client e dei veicoli configurati
-    public function __construct($client, $vehicles)
+    public function __construct($client, $vehicles, $groupToken = null)
     {
         $this->client = $client;
         $this->vehicles = $vehicles;
+        $this->groupToken = $groupToken;
     }
 
     // Imposta l'oggetto dell'email

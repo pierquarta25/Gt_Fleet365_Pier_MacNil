@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Riepilogo Servizi - GT Fleet 365</title>
+    <title>Riepilogo Servizi Globale - GT Fleet 365</title>
     <style>
         body {
             font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
@@ -29,6 +29,7 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             border-radius: 8px 8px 0 0;
+            text-align: center;
         }
 
         .body {
@@ -38,31 +39,12 @@
             border-radius: 0 0 8px 8px;
         }
 
-        .vehicle-box {
-            background-color: #E8F0FF;
-            border-radius: 10px;
-            padding: 16px 20px;
-            margin-bottom: 20px;
-            border-left: 4px solid #FF6B00;
-        }
-
-        .vehicle-name {
-            font-family: 'Exo 2', Arial, sans-serif;
-            font-size: 16px;
-            font-weight: 800;
-            color: #1A1F36;
-        }
-
-        .vehicle-qty {
-            font-size: 12px;
-            color: #4A5578;
-            margin-top: 4px;
-        }
-
         .client-info {
-            margin-bottom: 20px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid #DDE2EF;
+            background-color: #F8FAFF;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            border: 1px solid #E3E8F4;
         }
 
         .client-row {
@@ -83,13 +65,46 @@
             color: #1A1F36;
         }
 
+        .vehicle-section {
+            margin-bottom: 32px;
+            padding-bottom: 16px;
+            border-bottom: 2px dashed #E3E8F4;
+        }
+
+        .vehicle-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .vehicle-box {
+            background-color: #E8F0FF;
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin-bottom: 16px;
+            border-left: 4px solid #FF6B00;
+        }
+
+        .vehicle-name {
+            font-family: 'Exo 2', Arial, sans-serif;
+            font-size: 16px;
+            font-weight: 800;
+            color: #1A1F36;
+        }
+
+        .vehicle-qty {
+            font-size: 12px;
+            color: #4A5578;
+            margin-top: 4px;
+        }
+
         .section-title {
             font-family: 'Exo 2', Arial, sans-serif;
             font-size: 13px;
             font-weight: 700;
             color: #0052BD;
             text-transform: uppercase;
-            margin: 20px 0 10px;
+            margin: 16px 0 8px;
             padding-bottom: 6px;
             border-bottom: 2px solid #E3E8F4;
         }
@@ -97,7 +112,7 @@
         .service-list {
             list-style: none;
             padding: 0;
-            margin: 0;
+            margin: 0 0 16px 0;
         }
 
         .service-list li {
@@ -110,12 +125,6 @@
 
         .service-list li:last-child {
             border-bottom: none;
-        }
-
-        .service-check {
-            color: #10B981;
-            font-weight: bold;
-            margin-right: 8px;
         }
 
         .service-qty-badge {
@@ -132,7 +141,7 @@
             border: 1px solid #E3E8F4;
             border-radius: 8px;
             padding: 12px 16px;
-            margin-top: 16px;
+            margin-top: 12px;
         }
 
         .notes-title {
@@ -170,93 +179,99 @@
 <body>
     <div class="container">
         <div class="header">
-            Riepilogo Servizi Configurati
+            Riepilogo Servizi Preventivo
         </div>
         <div class="body">
-            {{-- Info mezzo --}}
-            <div class="vehicle-box">
-                <table style="width: 100%; border-collapse: collapse;">
-                    <tr>
-                        @if($serviceRequest->vehicle_img)
-                            <td style="width: 80px; vertical-align: middle;">
-                                <img src="{{ public_path($serviceRequest->vehicle_img) }}" alt="{{ $serviceRequest->vehicle_name }}" style="max-width: 70px; max-height: 50px;">
-                            </td>
-                        @endif
-                        <td style="vertical-align: middle;">
-                            <div class="vehicle-name">{{ $serviceRequest->vehicle_name }}</div>
-                            <div class="vehicle-qty">Quantità: {{ $serviceRequest->vehicle_qty }}</div>
-                        </td>
-                    </tr>
-                </table>
-            </div>
-
-            {{-- Info cliente --}}
-            @if($serviceRequest->client_data)
+            
+            {{-- Info Cliente Globale --}}
+            @php
+                $firstReq = $serviceRequests->first();
+            @endphp
+            @if($firstReq && $firstReq->client_data)
                 <div class="client-info">
-                    @if(!empty($serviceRequest->client_data['company']))
+                    @if(!empty($firstReq->client_data['company']))
                         <div class="client-row">
                             <span class="client-label">Azienda</span>
-                            <span class="client-value">{{ $serviceRequest->client_data['company'] }}</span>
+                            <span class="client-value">{{ $firstReq->client_data['company'] }}</span>
                         </div>
                     @endif
-                    @if(!empty($serviceRequest->client_data['contact']))
+                    @if(!empty($firstReq->client_data['contact']))
                         <div class="client-row">
                             <span class="client-label">Contatto</span>
-                            <span class="client-value">{{ $serviceRequest->client_data['contact'] }} {{ $serviceRequest->client_data['lastname'] ?? '' }}</span>
+                            <span class="client-value">{{ $firstReq->client_data['contact'] }} {{ $firstReq->client_data['lastname'] ?? '' }}</span>
                         </div>
                     @endif
-                    @if(!empty($serviceRequest->client_data['email']))
+                    @if(!empty($firstReq->client_data['email']))
                         <div class="client-row">
                             <span class="client-label">Email</span>
-                            <span class="client-value">{{ $serviceRequest->client_data['email'] }}</span>
+                            <span class="client-value">{{ $firstReq->client_data['email'] }}</span>
                         </div>
                     @endif
                 </div>
             @endif
 
-            {{-- Servizi selezionati --}}
-            @if($serviceRequest->services && count($serviceRequest->services) > 0)
-                @php
-                    $basePackage = collect($serviceRequest->services)->firstWhere('type', 'base_package');
-                    $addons = collect($serviceRequest->services)->where('type', 'addon')->values();
-                @endphp
-
-                @if($basePackage)
-                    <div class="section-title">PACCHETTO BASE</div>
-                    <ul class="service-list">
-                        <li>
-                            <span>{{ $basePackage['name'] }}</span>
-                        </li>
-                    </ul>
-                @endif
-
-                @if($addons->count() > 0)
-                    <div class="section-title">SERVIZI & HARDWARE SELEZIONATI</div>
-                    <ul class="service-list">
-                        @foreach($addons as $addon)
-                            <li>
-                                <span>{{ $addon['name'] }}</span>
-                                @if(!empty($addon['qty']))
-                                    <span class="service-qty-badge">× {{ $addon['qty'] }}</span>
+            {{-- Iterazione sui Mezzi --}}
+            @foreach($serviceRequests as $req)
+                <div class="vehicle-section">
+                    <div class="vehicle-box">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <tr>
+                                @if($req->vehicle_img)
+                                    <td style="width: 80px; vertical-align: middle;">
+                                        <img src="{{ public_path($req->vehicle_img) }}" alt="{{ $req->vehicle_name }}" style="max-width: 70px; max-height: 50px;">
+                                    </td>
                                 @endif
-                            </li>
-                        @endforeach
-                    </ul>
-                @endif
-            @else
-                <p style="color: #8A93B0; font-style: italic;">Nessun servizio selezionato.</p>
-            @endif
+                                <td style="vertical-align: middle;">
+                                    <div class="vehicle-name">{{ $req->vehicle_name }}</div>
+                                    <div class="vehicle-qty">Quantità: {{ $req->vehicle_qty }}</div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
 
-            {{-- Note --}}
-            @if($serviceRequest->notes)
-                <div class="notes-box">
-                    <div class="notes-title">Note Aggiuntive</div>
-                    <div class="notes-text">{{ $serviceRequest->notes }}</div>
+                    @if($req->services && count($req->services) > 0)
+                        @php
+                            $basePackage = collect($req->services)->firstWhere('type', 'base_package');
+                            $addons = collect($req->services)->where('type', 'addon')->values();
+                        @endphp
+
+                        @if($basePackage)
+                            <div class="section-title">PACCHETTO BASE</div>
+                            <ul class="service-list">
+                                <li>
+                                    <span>{{ $basePackage['name'] }}</span>
+                                </li>
+                            </ul>
+                        @endif
+
+                        @if($addons->count() > 0)
+                            <div class="section-title">SERVIZI & HARDWARE SELEZIONATI</div>
+                            <ul class="service-list">
+                                @foreach($addons as $addon)
+                                    <li>
+                                        <span>{{ $addon['name'] }}</span>
+                                        @if(!empty($addon['qty']))
+                                            <span class="service-qty-badge">× {{ $addon['qty'] }}</span>
+                                        @endif
+                                    </li>
+                                @endforeach
+                            </ul>
+                        @endif
+                    @else
+                        <p style="color: #8A93B0; font-style: italic;">Nessun servizio selezionato per questo mezzo.</p>
+                    @endif
+
+                    @if($req->notes)
+                        <div class="notes-box">
+                            <div class="notes-title">Note Aggiuntive ({{ $req->vehicle_name }})</div>
+                            <div class="notes-text">{{ $req->notes }}</div>
+                        </div>
+                    @endif
                 </div>
-            @endif
+            @endforeach
 
             <div class="timestamp">
-                Compilato il {{ $serviceRequest->completed_at ? $serviceRequest->completed_at->format('d/m/Y H:i') : now()->format('d/m/Y H:i') }}
+                Compilato il {{ now()->format('d/m/Y H:i') }}
             </div>
         </div>
 

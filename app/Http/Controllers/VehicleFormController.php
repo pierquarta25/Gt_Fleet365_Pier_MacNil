@@ -129,12 +129,16 @@ class VehicleFormController extends Controller
                 }
             }
 
+            // Genera un token univoco per il gruppo (tutto il preventivo)
+            $groupToken = Str::random(48);
+
             // Genera un token univoco per ogni mezzo e crea i record ServiceRequest
             foreach ($formattedVehicles as &$vehicle) {
                 $token = Str::random(48);
 
                 ServiceRequest::create([
                     'token'        => $token,
+                    'group_token'  => $groupToken,
                     'vehicle_type' => $vehicle['id'] ?? Str::slug($vehicle['name'], '_'),
                     'vehicle_name' => $vehicle['name'],
                     'vehicle_qty'  => $vehicle['qty'],
@@ -145,6 +149,7 @@ class VehicleFormController extends Controller
                     'status'       => 'pending',
                 ]);
 
+                // Manteniamo service_token se serve in futuro, ma usiamo group_token per la mail globale
                 $vehicle['service_token'] = $token;
             }
             unset($vehicle); // Rilascia il riferimento
@@ -172,7 +177,7 @@ class VehicleFormController extends Controller
             ]);
 
             try {
-                $mail->send(new LeadSummaryMail($client, $formattedVehicles));
+                $mail->send(new LeadSummaryMail($client, $formattedVehicles, $groupToken));
                 \Illuminate\Support\Facades\Log::info("Email inviata con successo.");
             } catch (\Exception $e) {
                 \Illuminate\Support\Facades\Log::error("Impossibile inviare l'email di riepilogo: " . $e->getMessage(), [
