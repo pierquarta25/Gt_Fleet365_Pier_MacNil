@@ -175,8 +175,19 @@
         <div class="body">
             {{-- Info mezzo --}}
             <div class="vehicle-box">
-                <div class="vehicle-name">{{ $serviceRequest->vehicle_name }}</div>
-                <div class="vehicle-qty">Quantità: {{ $serviceRequest->vehicle_qty }}</div>
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        @if($serviceRequest->vehicle_img)
+                            <td style="width: 80px; vertical-align: middle;">
+                                <img src="{{ public_path($serviceRequest->vehicle_img) }}" alt="{{ $serviceRequest->vehicle_name }}" style="max-width: 70px; max-height: 50px;">
+                            </td>
+                        @endif
+                        <td style="vertical-align: middle;">
+                            <div class="vehicle-name">{{ $serviceRequest->vehicle_name }}</div>
+                            <div class="vehicle-qty">Quantità: {{ $serviceRequest->vehicle_qty }}</div>
+                        </td>
+                    </tr>
+                </table>
             </div>
 
             {{-- Info cliente --}}
