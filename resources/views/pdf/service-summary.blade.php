@@ -211,20 +211,20 @@
                 @endphp
 
                 @if($basePackage)
-                    <div class="section-title">📡 Pacchetto Base</div>
+                    <div class="section-title">PACCHETTO BASE</div>
                     <ul class="service-list">
                         <li>
-                            <span><span class="service-check">✔</span> {{ $basePackage['name'] }}</span>
+                            <span><span class="service-check">&bull;</span> {{ $basePackage['name'] }}</span>
                         </li>
                     </ul>
                 @endif
 
                 @if($addons->count() > 0)
-                    <div class="section-title">📱 Servizi & Hardware Selezionati</div>
+                    <div class="section-title">SERVIZI & HARDWARE SELEZIONATI</div>
                     <ul class="service-list">
                         @foreach($addons as $addon)
                             <li>
-                                <span><span class="service-check">✔</span> {{ $addon['name'] }}</span>
+                                <span><span class="service-check">&bull;</span> {{ $addon['name'] }}</span>
                                 @if(!empty($addon['qty']))
                                     <span class="service-qty-badge">× {{ $addon['qty'] }}</span>
                                 @endif
