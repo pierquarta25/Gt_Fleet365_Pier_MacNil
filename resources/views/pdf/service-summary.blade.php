@@ -214,7 +214,7 @@
                     <div class="section-title">PACCHETTO BASE</div>
                     <ul class="service-list">
                         <li>
-                            <span><span class="service-check">&bull;</span> {{ $basePackage['name'] }}</span>
+                            <span>{{ $basePackage['name'] }}</span>
                         </li>
                     </ul>
                 @endif
@@ -224,7 +224,7 @@
                     <ul class="service-list">
                         @foreach($addons as $addon)
                             <li>
-                                <span><span class="service-check">&bull;</span> {{ $addon['name'] }}</span>
+                                <span>{{ $addon['name'] }}</span>
                                 @if(!empty($addon['qty']))
                                     <span class="service-qty-badge">× {{ $addon['qty'] }}</span>
                                 @endif
