@@ -36,6 +36,27 @@ class ServiceFormController extends Controller
     }
 
     /**
+     * Scarica il PDF di riepilogo servizi.
+     * GET /servizi/{token}/pdf
+     */
+    public function downloadPdf(string $token)
+    {
+        $serviceRequest = ServiceRequest::byToken($token)->first();
+
+        if (!$serviceRequest || !$serviceRequest->isCompleted()) {
+            abort(404, 'PDF non disponibile.');
+        }
+
+        $pdf = Pdf::loadView('pdf.service-summary', [
+            'serviceRequest' => $serviceRequest,
+        ]);
+
+        $fileName = 'servizi-' . $serviceRequest->vehicle_name . '-' . now()->format('Y-m-d') . '.pdf';
+
+        return $pdf->download($fileName);
+    }
+
+    /**
      * Mostra il form di configurazione servizi per un mezzo specifico.
      * GET /servizi/{token}
      */

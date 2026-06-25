@@ -18,4 +18,5 @@ Route::post('/api/vehicle-form', [VehicleFormController::class, 'store']);
 // Rotte per il form di configurazione servizi (accessibile via link nella mail)
 Route::get('/servizi/{token}', [ServiceFormController::class, 'show']);
 Route::get('/servizi/{token}/successo', [ServiceFormController::class, 'success']);
+Route::get('/servizi/{token}/pdf', [ServiceFormController::class, 'downloadPdf']);
 Route::post('/api/servizi/{token}', [ServiceFormController::class, 'store']);

@@ -130,6 +130,10 @@
         <br>
 
         @if(isset($serviceRequest))
+            <a href="/servizi/{{ $serviceRequest->token }}/pdf" class="back-link" style="background: linear-gradient(135deg, #FF6B00 0%, #E55D00 100%); margin-bottom: 12px;">
+                📄 Scarica PDF
+            </a>
+            <br><br>
             <a href="/servizi/{{ $serviceRequest->token }}" class="back-link">
                 Modifica Configurazione
             </a>
