@@ -200,6 +200,7 @@ header {
   .step-line { width: 10px; margin: 0 3px; }
   .lang-switcher-text { gap: 6px; font-size: 12px; flex: 0 0 auto; }
   .logo-area { flex: 0 0 auto; }
+  .step-badges { margin-left: auto; margin-right: 20px; }
 
   /* Hero Banner: stack verticale */
   .step1-hero { flex-direction: column; text-align: center; padding: 20px; }
