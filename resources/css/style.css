@@ -196,6 +196,7 @@ header {
   .step-label { display: none; }
   .header-inner { padding: 0 20px; }
   .step-line { width: 15px; margin: 0 4px; }
+  .lang-switcher-text { gap: 6px; font-size: 12px; }
 
   /* Hero Banner: stack verticale */
   .step1-hero { flex-direction: column; text-align: center; padding: 20px; }
