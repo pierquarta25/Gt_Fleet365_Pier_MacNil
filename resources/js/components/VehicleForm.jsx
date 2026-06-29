@@ -181,22 +181,23 @@ export default function VehicleForm() {
                         <img src="/media/logo.png" alt="GT Fleet 365 Logo" className="logo-img" />
                     </div>
 
-                    <div className="lang-switcher">
+                    <div className="lang-switcher-premium" data-lang={language}>
+                        <div className="lang-slider"></div>
                         <button
                             type="button"
-                            className={`lang-btn ${language === 'it' ? 'active' : ''}`}
+                            className={`lang-btn-premium ${language === 'it' ? 'active' : ''}`}
                             onClick={() => setLanguage('it')}
                             aria-label="Italiano"
                         >
-                            🇮🇹
+                            IT
                         </button>
                         <button
                             type="button"
-                            className={`lang-btn ${language === 'en' ? 'active' : ''}`}
+                            className={`lang-btn-premium ${language === 'en' ? 'active' : ''}`}
                             onClick={() => setLanguage('en')}
                             aria-label="English"
                         >
-                            🇬🇧
+                            EN
                         </button>
                     </div>
 
