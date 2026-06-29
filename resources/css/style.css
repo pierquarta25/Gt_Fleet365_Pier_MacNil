@@ -44,6 +44,7 @@ header {
 .logo-area {
   display: flex;
   align-items: center;
+  flex: 1;
 }
 
 .logo-img {
@@ -437,8 +438,10 @@ header {
 .lang-switcher-text {
     display: flex;
     align-items: center;
-    gap: 6px;
-    font-size: 11px;
+    justify-content: flex-end;
+    flex: 1;
+    gap: 10px;
+    font-size: 14px;
     font-weight: 600;
     font-family: 'Inter', sans-serif;
     color: rgba(255, 255, 255, 0.5);

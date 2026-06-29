@@ -181,18 +181,6 @@ export default function VehicleForm() {
                         <img src="/media/logo.png" alt="GT Fleet 365 Logo" className="logo-img" />
                     </div>
 
-                    <div className="lang-switcher-text">
-                        <span 
-                            className={`lang-link ${language === 'it' ? 'active' : ''}`}
-                            onClick={() => setLanguage('it')}
-                        >IT</span>
-                        <span className="lang-separator">|</span>
-                        <span 
-                            className={`lang-link ${language === 'en' ? 'active' : ''}`}
-                            onClick={() => setLanguage('en')}
-                        >EN</span>
-                    </div>
-
                     <div className="step-badges">
                         <div className="step-item">
                             <div className={`step-badge ${step >= 1 ? 'active' : ''} ${step > 1 ? 'done' : ''}`}>
@@ -214,6 +202,18 @@ export default function VehicleForm() {
                             <div className={`step-badge ${step === 3 ? 'active' : 'pending'}`}>3</div>
                             <span className="step-label">{t('header.step3')}</span>
                         </div>
+                    </div>
+
+                    <div className="lang-switcher-text">
+                        <span 
+                            className={`lang-link ${language === 'it' ? 'active' : ''}`}
+                            onClick={() => setLanguage('it')}
+                        >IT</span>
+                        <span className="lang-separator">|</span>
+                        <span 
+                            className={`lang-link ${language === 'en' ? 'active' : ''}`}
+                            onClick={() => setLanguage('en')}
+                        >EN</span>
                     </div>
                 </div>
             </header>
