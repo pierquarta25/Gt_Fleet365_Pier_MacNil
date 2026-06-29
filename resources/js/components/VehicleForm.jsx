@@ -235,7 +235,6 @@ export default function VehicleForm() {
                                 <h2>{t('hero.title')}</h2>
                                 <p>{t('hero.subtitle')}</p>
                             </div>
-                            <div className="btn-new">{t('hero.newQuote')}</div>
                         </div>
 
                         <div className="card">
