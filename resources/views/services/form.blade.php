@@ -416,9 +416,10 @@
     <div class="header">
         <div class="header-title">{{ __('Service Configuration') }}</div>
         <div class="header-subtitle">MacNil — GT Fleet 365</div>
-        <div style="margin-top: 8px;">
-            <a href="?lang=it" style="color: #fff; text-decoration: none; font-size: 14px; {{ app()->getLocale() === 'it' ? 'font-weight: 800; border-bottom: 2px solid #fff;' : 'opacity: 0.7;' }} padding: 2px 6px;">🇮🇹 IT</a>
-            <a href="?lang=en" style="color: #fff; text-decoration: none; font-size: 14px; {{ app()->getLocale() === 'en' ? 'font-weight: 800; border-bottom: 2px solid #fff;' : 'opacity: 0.7;' }} padding: 2px 6px;">🇬🇧 EN</a>
+        <div style="margin-top: 12px; display: inline-flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600; font-family: 'Inter', sans-serif;">
+            <a href="?lang=it" style="text-decoration: none; {{ app()->getLocale() === 'it' ? 'color: #ffffff; font-weight: 800;' : 'color: rgba(255, 255, 255, 0.5);' }} transition: color 0.2s ease;">IT</a>
+            <span style="color: rgba(255, 255, 255, 0.2); font-weight: 400;">|</span>
+            <a href="?lang=en" style="text-decoration: none; {{ app()->getLocale() === 'en' ? 'color: #ffffff; font-weight: 800;' : 'color: rgba(255, 255, 255, 0.5);' }} transition: color 0.2s ease;">EN</a>
         </div>
     </div>
 
