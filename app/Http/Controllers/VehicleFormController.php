@@ -52,13 +52,20 @@ class VehicleFormController extends Controller
             'client.agent_slug'  => 'nullable|string|max:255',
             'vehicles'       => 'required|array'
         ], [
-            'client.company.required' => 'La ragione sociale è obbligatoria.',
-            'client.contact.required' => 'Il nome contatto è obbligatorio.',
-            'client.lastname.required'=> 'Il cognome contatto è obbligatorio.',
-            'client.email.email'      => 'Il formato email non è valido.',
+            'client.company.required' => __('Company name is required.'),
+            'client.contact.required' => __('Contact first name is required.'),
+            'client.lastname.required'=> __('Contact last name is required.'),
+            'client.email.email'      => __('Invalid email format.'),
         ]);
 
         $client = $request->input('client');
+
+        // Set locale from frontend language
+        $locale = $request->input('language', 'it');
+        if (in_array($locale, ['it', 'en'])) {
+            app()->setLocale($locale);
+        }
+
         $vehiclesInput = $request->input('vehicles');
 
         $agent = null;
@@ -190,7 +197,7 @@ class VehicleFormController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => $dealId ? 'Configurazione salvata con successo.' : 'Configurazione inviata in modalità test.',
+            'message' => $dealId ? __('Configuration saved successfully.') : __('Configuration sent in test mode.'),
             'deal_id' => $dealId
         ]);
     }

@@ -2,6 +2,7 @@
 
 export const vehicleCategories = [
     {
+        id: "road_vehicles",
         title: "Veicoli Stradali",
         icon: "fa-car",
         vehicles: [
@@ -27,6 +28,7 @@ export const vehicleCategories = [
         ]
     },
     {
+        id: "heavy_transport",
         title: "Trasporto Pesante & Semirimorchi",
         icon: "fa-truck",
         vehicles: [
@@ -52,6 +54,7 @@ export const vehicleCategories = [
         ]
     },
     {
+        id: "assets_special",
         title: "Asset, Cantieri & Speciali",
         icon: "fa-tools",
         vehicles: [

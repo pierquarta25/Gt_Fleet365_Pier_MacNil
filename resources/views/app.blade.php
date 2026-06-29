@@ -1,19 +1,19 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="{{ app()->getLocale() }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GT Fleet 365 – Tipologia Mezzi</title>
+    <title>{{ __('GT Fleet 365 – Vehicle Types') }}</title>
     
     <!-- SEO Meta Tags -->
-    <meta name="description" content="Configuratore flotta interattivo GT Fleet 365 per la gestione e il monitoraggio dei veicoli aziendali con integrazione HubSpot CRM.">
+    <meta name="description" content="{{ __('Interactive fleet configurator GT Fleet 365 for managing and monitoring company vehicles with HubSpot CRM integration.') }}">
     <meta name="robots" content="index, follow">
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ url()->current() }}">
-    <meta property="og:title" content="GT Fleet 365 – Tipologia Mezzi">
-    <meta property="og:description" content="Configura online la tua flotta aziendale e ricevi un preventivo personalizzato per il monitoraggio dei tuoi veicoli.">
+    <meta property="og:title" content="{{ __('GT Fleet 365 – Vehicle Types') }}">
+    <meta property="og:description" content="{{ __('Configure your company fleet online and receive a personalized quote for monitoring your vehicles.') }}">
     <meta property="og:image" content="{{ asset('media/logo.png') }}">
 
     <!-- Google Fonts -->

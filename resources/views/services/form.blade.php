@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="{{ app()->getLocale() }}">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Configurazione Servizi Globale - GT Fleet 365</title>
-    <meta name="description" content="Configura i servizi GT Fleet 365 per tutto il preventivo.">
+    <title>{{ __('Global Service Configuration - GT Fleet 365') }}</title>
+    <meta name="description" content="{{ __('Configure GT Fleet 365 services for your entire quote.') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -414,16 +414,20 @@
 
 <body>
     <div class="header">
-        <div class="header-title">Configurazione Servizi</div>
+        <div class="header-title">{{ __('Service Configuration') }}</div>
         <div class="header-subtitle">MacNil — GT Fleet 365</div>
+        <div style="margin-top: 8px;">
+            <a href="?lang=it" style="color: #fff; text-decoration: none; font-size: 14px; {{ app()->getLocale() === 'it' ? 'font-weight: 800; border-bottom: 2px solid #fff;' : 'opacity: 0.7;' }} padding: 2px 6px;">🇮🇹 IT</a>
+            <a href="?lang=en" style="color: #fff; text-decoration: none; font-size: 14px; {{ app()->getLocale() === 'en' ? 'font-weight: 800; border-bottom: 2px solid #fff;' : 'opacity: 0.7;' }} padding: 2px 6px;">🇬🇧 EN</a>
+        </div>
     </div>
 
     <div class="container">
 
         @if($alreadyCompleted)
             <div class="completed-banner">
-                ✅ Questa configurazione globale è già stata completata.
-                Puoi modificarla e inviarla nuovamente.
+                ✅ {{ __('This global configuration has already been completed.') }}
+                {{ __('You can edit and submit it again.') }}
             </div>
         @endif
 
@@ -475,7 +479,7 @@
                         <div class="vehicle-header-info">
                             <div class="vehicle-name">{{ $req->vehicle_name }}</div>
                             <div class="qty-field">
-                                <label>Quantità:</label>
+                                <label>{{ __('Quantity:') }}</label>
                                 <input type="number" 
                                        name="vehicles[{{ $req->id }}][vehicle_qty]" 
                                        class="qty-input" 
@@ -490,7 +494,7 @@
                         <div class="section">
                             <div class="section-header" onclick="toggleSection('body-{{ $req->id }}-{{ $sIndex }}', 'toggle-{{ $req->id }}-{{ $sIndex }}')">
                                 <span class="section-icon">{{ $section['icon'] }}</span>
-                                <span class="section-title">{{ $section['title'] }}</span>
+                                <span class="section-title">{{ __($section['title']) }}</span>
                                 <span class="section-toggle" id="toggle-{{ $req->id }}-{{ $sIndex }}">▼</span>
                             </div>
                             <div class="section-body" id="body-{{ $req->id }}-{{ $sIndex }}">
@@ -510,7 +514,7 @@
                                                    {{ $alreadyCompleted && collect($req->services)->where('id', $item['id'])->isNotEmpty() ? 'checked' : '' }}>
                                         @endif
 
-                                        <span class="service-name">{{ $item['name'] }}</span>
+                                        <span class="service-name">{{ __($item['name']) }}</span>
 
                                         @if(isset($item['input']) && $item['input'] === 'qty')
                                             @php
@@ -535,10 +539,10 @@
 
                     {{-- Notes --}}
                     <div class="notes-section">
-                        <div class="notes-label"><span>📝</span> Note per {{ $req->vehicle_name }}</div>
+                        <div class="notes-label"><span>📝</span> {{ __('Notes for') }} {{ $req->vehicle_name }}</div>
                         <textarea class="notes-textarea"
                                   name="vehicles[{{ $req->id }}][notes]"
-                                  placeholder="Inserisci eventuali note o richieste particolari per questo mezzo...">{{ $req->notes }}</textarea>
+                                  placeholder="{{ __('Enter any notes or special requests for this vehicle...') }}">{{ $req->notes }}</textarea>
                     </div>
 
                 </div>
@@ -549,7 +553,7 @@
     {{-- Submit --}}
     <div class="submit-container">
         <button class="submit-btn" id="submitBtn" onclick="submitForm()">
-            <span id="btnText">Salva Tutti i Mezzi</span>
+            <span id="btnText">{{ __('Save All Vehicles') }}</span>
             <div class="spinner" id="btnSpinner"></div>
         </button>
     </div>
@@ -642,10 +646,10 @@
                         window.location.href = '/servizi/{{ $groupToken }}/successo';
                     }, 1500);
                 } else {
-                    showToast('❌ ' + (data.message || 'Errore durante il salvataggio.'), 'error');
+                    showToast('❌ ' + (data.message || '{{ __('Error during submission.') }}'), 'error');
                 }
             } catch (error) {
-                showToast('❌ Errore di connessione. Riprova.', 'error');
+                showToast('❌ {{ __("Connection error. Please try again.") }}', 'error');
             } finally {
                 btn.disabled = false;
                 btnText.style.display = 'inline';

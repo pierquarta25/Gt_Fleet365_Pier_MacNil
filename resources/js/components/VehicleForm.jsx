@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { vehicleCategories } from '../data/vehicleTypes';
+import { useLanguage } from '../i18n/LanguageContext';
 
 export default function VehicleForm() {
+    const { language, setLanguage, t } = useLanguage();
     const [step, setStep] = useState(1);
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
@@ -85,18 +87,18 @@ export default function VehicleForm() {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
         if (!clientData.company.trim()) {
-            newErrors.company = "La ragione sociale è obbligatoria";
+            newErrors.company = t('errors.companyRequired');
         }
         if (!clientData.contact.trim()) {
-            newErrors.contact = "Il nome contatto è obbligatorio";
+            newErrors.contact = t('errors.contactRequired');
         }
         if (!clientData.lastname || !clientData.lastname.trim()) {
-            newErrors.lastname = "Il cognome contatto è obbligatorio";
+            newErrors.lastname = t('errors.lastnameRequired');
         }
         if (!clientData.email.trim()) {
-            newErrors.email = "L'email è obbligatoria";
+            newErrors.email = t('errors.emailRequired');
         } else if (!emailRegex.test(clientData.email.trim())) {
-            newErrors.email = "Inserisci un indirizzo email valido";
+            newErrors.email = t('errors.emailInvalid');
         }
 
         setErrors(newErrors);
@@ -126,7 +128,7 @@ export default function VehicleForm() {
                     const mezzo = vehicleCategories.flatMap(c => c.vehicles).find(v => v.id === id);
                     return {
                         id: id,
-                        name: mezzo ? mezzo.name : id,
+                        name: t('vehicles.' + id),
                         img: mezzo ? mezzo.img : '',
                         qty: qty
                     };
@@ -135,7 +137,8 @@ export default function VehicleForm() {
             await axios.post('/api/vehicle-form', {
                 client: clientData,
                 vehicles: quantities,
-                selectedVehicles: selectedVehiclesDetails
+                selectedVehicles: selectedVehiclesDetails,
+                language: language
             });
 
             // Pulisce il localStorage dopo l'invio con successo
@@ -145,8 +148,8 @@ export default function VehicleForm() {
             setModalConfig({
                 isOpen: true,
                 type: 'success',
-                title: 'Configurazione Inviata!',
-                message: 'Perfetto! I tuoi dati sono stati elaborati e inviati con successo.'
+                title: t('modal.successTitle'),
+                message: t('modal.successMessage')
             });
 
             // Chiude la modale e ricarica la pagina automaticamente dopo 3 secondi
@@ -159,8 +162,8 @@ export default function VehicleForm() {
             setModalConfig({
                 isOpen: true,
                 type: 'error',
-                title: 'Ops! Qualcosa è andato storto',
-                message: 'Non è stato possibile inviare i dati. Controlla la connessione e riprova.'
+                title: t('modal.errorTitle'),
+                message: t('modal.errorMessage')
             });
         } finally {
             setLoading(false);
@@ -178,12 +181,31 @@ export default function VehicleForm() {
                         <img src="/media/logo.png" alt="GT Fleet 365 Logo" className="logo-img" />
                     </div>
 
+                    <div className="lang-switcher">
+                        <button
+                            type="button"
+                            className={`lang-btn ${language === 'it' ? 'active' : ''}`}
+                            onClick={() => setLanguage('it')}
+                            aria-label="Italiano"
+                        >
+                            🇮🇹
+                        </button>
+                        <button
+                            type="button"
+                            className={`lang-btn ${language === 'en' ? 'active' : ''}`}
+                            onClick={() => setLanguage('en')}
+                            aria-label="English"
+                        >
+                            🇬🇧
+                        </button>
+                    </div>
+
                     <div className="step-badges">
                         <div className="step-item">
                             <div className={`step-badge ${step >= 1 ? 'active' : ''} ${step > 1 ? 'done' : ''}`}>
                                 {step > 1 ? '✓' : '1'}
                             </div>
-                            <span className="step-label">Dati Cliente</span>
+                            <span className="step-label">{t('header.step1')}</span>
                         </div>
                         <div className={`step-line ${step > 1 ? 'done' : ''}`}></div>
 
@@ -191,20 +213,20 @@ export default function VehicleForm() {
                             <div className={`step-badge ${step === 2 ? 'active' : step > 2 ? 'done' : 'pending'}`}>
                                 {step > 2 ? '✓' : '2'}
                             </div>
-                            <span className="step-label">Tipologia Mezzi</span>
+                            <span className="step-label">{t('header.step2')}</span>
                         </div>
                         <div className={`step-line ${step > 2 ? 'done' : ''}`}></div>
 
                         <div className="step-item">
                             <div className={`step-badge ${step === 3 ? 'active' : 'pending'}`}>3</div>
-                            <span className="step-label">Riepilogo</span>
+                            <span className="step-label">{t('header.step3')}</span>
                         </div>
                     </div>
                 </div>
             </header>
 
             <main className="container">
-                <h1 className="visually-hidden">GT Fleet 365 - Configurazione Flotta</h1>
+                <h1 className="visually-hidden">{t('seo.pageTitle')}</h1>
 
                 {step === 1 && (
                     <div className="fade-in">
@@ -217,36 +239,36 @@ export default function VehicleForm() {
                                 </svg>
                             </div>
                             <div className="hero-text">
-                                <h2>Configurazione Flotta</h2>
-                                <p>Inserisci i dati aziendali del cliente e seleziona la tipologia e la quantità dei mezzi da monitorare.</p>
+                                <h2>{t('hero.title')}</h2>
+                                <p>{t('hero.subtitle')}</p>
                             </div>
-                            <div className="btn-new">Nuovo Preventivo</div>
+                            <div className="btn-new">{t('hero.newQuote')}</div>
                         </div>
 
                         <div className="card">
                             <div className="card-header">
                                 <i className="fas fa-list-alt" style={{ color: 'white' }}></i>
-                                <h2>Dati Cliente</h2>
+                                <h2>{t('header.step1')}</h2>
                             </div>
 
                             {Object.keys(errors).length > 0 && (
                                 <div className="global-error" style={{ margin: '20px 22px 0 22px' }} role="alert">
-                                    ⚠️ Attenzione: controlla i campi evidenziati.
+                                    ⚠️ {t('errors.globalAlert')}
                                 </div>
                             )}
 
                             <div className="cf-section">
-                                <div className="cf-section-label"><span>🏢</span><span>Azienda</span></div>
+                                <div className="cf-section-label"><span>🏢</span><span>{t('sections.company')}</span></div>
                                 <div className="cf-fields">
                                     <div className="field-group">
-                                        <label htmlFor="company">Nome Azienda *</label>
+                                        <label htmlFor="company">{t('form.companyName')} {t('form.required')}</label>
                                         <input
                                             type="text"
                                             id="company"
                                             className={errors.company ? 'input-error' : ''}
                                             value={clientData.company}
                                             onChange={handleTextChange}
-                                            placeholder="es. Logistica Sud S.r.l."
+                                            placeholder={t('form.companyPlaceholder')}
                                             aria-required="true"
                                             aria-invalid={errors.company ? "true" : "false"}
                                             aria-describedby={errors.company ? "company-error" : undefined}
@@ -257,17 +279,17 @@ export default function VehicleForm() {
                             </div>
 
                             <div className="cf-section">
-                                <div className="cf-section-label"><span>👤</span><span>Referente</span></div>
+                                <div className="cf-section-label"><span>👤</span><span>{t('sections.referent')}</span></div>
                                 <div className="cf-fields row-layout">
                                     <div className="field-group flex-1">
-                                        <label htmlFor="contact">Nome Contatto *</label>
+                                        <label htmlFor="contact">{t('form.contactName')} {t('form.required')}</label>
                                         <input
                                             type="text"
                                             id="contact"
                                             className={errors.contact ? 'input-error' : ''}
                                             value={clientData.contact}
                                             onChange={handleTextChange}
-                                            placeholder="es. Mario"
+                                            placeholder={t('form.contactPlaceholder')}
                                             aria-required="true"
                                             aria-invalid={errors.contact ? "true" : "false"}
                                             aria-describedby={errors.contact ? "contact-error" : undefined}
@@ -275,14 +297,14 @@ export default function VehicleForm() {
                                         {errors.contact && <span id="contact-error" className="error-text">{errors.contact}</span>}
                                     </div>
                                     <div className="field-group flex-1">
-                                        <label htmlFor="lastname">Cognome Contatto *</label>
+                                        <label htmlFor="lastname">{t('form.contactLastname')} {t('form.required')}</label>
                                         <input
                                             type="text"
                                             id="lastname"
                                             className={errors.lastname ? 'input-error' : ''}
                                             value={clientData.lastname || ''}
                                             onChange={handleTextChange}
-                                            placeholder="es. Rossi"
+                                            placeholder={t('form.lastnamePlaceholder')}
                                             aria-required="true"
                                             aria-invalid={errors.lastname ? "true" : "false"}
                                             aria-describedby={errors.lastname ? "lastname-error" : undefined}
@@ -290,14 +312,14 @@ export default function VehicleForm() {
                                         {errors.lastname && <span id="lastname-error" className="error-text">{errors.lastname}</span>}
                                     </div>
                                     <div className="field-group flex-1">
-                                        <label htmlFor="email">Email *</label>
+                                        <label htmlFor="email">{t('form.email')} {t('form.required')}</label>
                                         <input
                                             type="email"
                                             id="email"
                                             className={errors.email ? 'input-error' : ''}
                                             value={clientData.email}
                                             onChange={handleTextChange}
-                                            placeholder="es. mario@email.it"
+                                            placeholder={t('form.emailPlaceholder')}
                                             aria-required="true"
                                             aria-invalid={errors.email ? "true" : "false"}
                                             aria-describedby={errors.email ? "email-error" : undefined}
@@ -305,29 +327,29 @@ export default function VehicleForm() {
                                         {errors.email && <span id="email-error" className="error-text">{errors.email}</span>}
                                     </div>
                                     <div className="field-group flex-1">
-                                        <label htmlFor="phone">Telefono</label>
+                                        <label htmlFor="phone">{t('form.phone')}</label>
                                         <input
                                             type="tel"
                                             id="phone"
                                             value={clientData.phone}
                                             onChange={handleTextChange}
-                                            placeholder="es. +39..."
+                                            placeholder={t('form.phonePlaceholder')}
                                         />
                                     </div>
                                 </div>
                             </div>
 
                             <div className="cf-section">
-                                <div className="cf-section-label"><span>👥</span><span>Autisti</span></div>
+                                <div className="cf-section-label"><span>👥</span><span>{t('sections.drivers')}</span></div>
                                 <div className="cf-fields row-layout">
                                     <div className="field-group" style={{ marginBottom: 0 }}>
-                                        <label htmlFor="drivers">Numero Autisti</label>
+                                        <label htmlFor="drivers">{t('form.driversCount')}</label>
                                         <div className="counter-container">
                                             <button 
                                                 type="button" 
                                                 className="counter-btn" 
                                                 onClick={() => setClientData(prev => ({ ...prev, drivers: Math.max(0, (prev.drivers || 0) - 1) }))}
-                                                aria-label="Diminuisci autisti"
+                                                aria-label={t('accessibility.decreaseDrivers')}
                                             >
                                                 -
                                             </button>
@@ -341,13 +363,13 @@ export default function VehicleForm() {
                                                     setClientData(prev => ({ ...prev, drivers: isNaN(val) ? 0 : Math.max(0, val) }));
                                                 }}
                                                 min="0"
-                                                aria-label="Numero Autisti"
+                                                aria-label={t('accessibility.driversCount')}
                                             />
                                             <button 
                                                 type="button" 
                                                 className="counter-btn" 
                                                 onClick={() => setClientData(prev => ({ ...prev, drivers: (prev.drivers || 0) + 1 }))}
-                                                aria-label="Aumenta autisti"
+                                                aria-label={t('accessibility.increaseDrivers')}
                                             >
                                                 +
                                             </button>
@@ -357,23 +379,23 @@ export default function VehicleForm() {
                             </div>
 
                             <div className="cf-section">
-                                <div className="cf-section-label"><span>📡</span><span>Servizi</span></div>
+                                <div className="cf-section-label"><span>📡</span><span>{t('sections.services')}</span></div>
                                 <div className="cf-fields row-layout">
                                     <div className="field-group flex-2">
-                                        <label htmlFor="notes">Note</label>
+                                        <label htmlFor="notes">{t('form.notes')}</label>
                                         <input
                                             type="text"
                                             id="notes"
                                             value={clientData.notes}
                                             onChange={handleTextChange}
-                                            placeholder="es. Flotta principalmente al Nord Italia"
+                                            placeholder={t('form.notesPlaceholder')}
                                         />
                                     </div>
                                     <div className="field-group flex-1">
-                                        <label>Traffico dati 4G</label>
-                                        <div className="toggle-group" role="group" aria-label="Ambito di traffico dati 4G">
-                                            <button type="button" className={`toggle-btn ${clientData.italia ? 'active' : ''}`} onClick={() => togglePlace('italia')} aria-pressed={clientData.italia}>🇮🇹 Italia</button>
-                                            <button type="button" className={`toggle-btn ${clientData.estero ? 'active' : ''}`} onClick={() => togglePlace('estero')} aria-pressed={clientData.estero}>🌍 Estero</button>
+                                        <label>{t('form.dataTraffic')}</label>
+                                        <div className="toggle-group" role="group" aria-label={t('accessibility.dataTrafficGroup')}>
+                                            <button type="button" className={`toggle-btn ${clientData.italia ? 'active' : ''}`} onClick={() => togglePlace('italia')} aria-pressed={clientData.italia}>🇮🇹 {t('form.italy')}</button>
+                                            <button type="button" className={`toggle-btn ${clientData.estero ? 'active' : ''}`} onClick={() => togglePlace('estero')} aria-pressed={clientData.estero}>🌍 {t('form.abroad')}</button>
                                         </div>
                                     </div>
                                 </div>
@@ -381,12 +403,12 @@ export default function VehicleForm() {
                         </div>
 
                         <div className="bottom-bar">
-                            <span className="step-info">Passo <strong>1</strong> di 3</span>
+                            <span className="step-info">{t('navigation.step')} <strong>1</strong> {t('navigation.of')} 3</span>
                             <button type="button" className="btn btn-primary" onClick={() => {
                                 if (validateStep1()) {
                                     setStep(2);
                                 }
-                            }}>Avanti: Inserisci Mezzi →</button>
+                            }}>{t('navigation.next')} →</button>
                         </div>
                     </div>
                 )}
@@ -396,21 +418,21 @@ export default function VehicleForm() {
                         {vehicleCategories.map((cat, i) => (
                             <div className="card" key={i}>
                                 <div className="card-header">
-                                    <h2>{cat.title}</h2>
+                                    <h2>{t('categories.' + cat.id)}</h2>
                                 </div>
                                 <table className="vehicle-table">
                                     <thead>
                                         <tr>
-                                            <th>Tipo Mezzo</th>
-                                            <th className="text-center">Immagine</th>
-                                            <th className="text-center">Quantità Mezzi</th>
+                                            <th>{t('step2.vehicleType')}</th>
+                                            <th className="text-center">{t('step2.image')}</th>
+                                            <th className="text-center">{t('step2.quantity')}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {cat.vehicles.map(v => (
                                             <tr key={v.id}>
-                                                <td className="mezzo-name">{v.name}</td>
-                                                <td className="text-center"><img src={v.img} height="38" alt={`Immagine ${v.name}`} /></td>
+                                                <td className="mezzo-name">{t('vehicles.' + v.id)}</td>
+                                                <td className="text-center"><img src={v.img} height="38" alt={`${t('accessibility.imageOf')} ${t('vehicles.' + v.id)}`} /></td>
                                                 <td className="text-center">
                                                     <input
                                                         type="number"
@@ -421,7 +443,7 @@ export default function VehicleForm() {
                                                         onChange={(e) => handleQtyChange(v.id, e.target.value)}
                                                         placeholder="0"
                                                         min="0"
-                                                        aria-label={`Quantità per ${v.name}`}
+                                                        aria-label={`${t('accessibility.quantityFor')} ${t('vehicles.' + v.id)}`}
                                                     />
                                                 </td>
                                             </tr>
@@ -431,10 +453,10 @@ export default function VehicleForm() {
                             </div>
                         ))}
                         <div className="bottom-bar">
-                            <div className="total-info">Totale: <strong>{totalVehicles}</strong> mezzi</div>
+                            <div className="total-info">{t('step2.total')}: <strong>{totalVehicles}</strong> {t('step2.vehicles')}</div>
                             <div style={{ display: 'flex', gap: '10px' }}>
-                                <button type="button" className="btn btn-ghost" onClick={() => setStep(1)}>← Indietro</button>
-                                <button type="button" className="btn btn-primary" onClick={() => setStep(3)}>Avanti: Riepilogo →</button>
+                                <button type="button" className="btn btn-ghost" onClick={() => setStep(1)}>← {t('navigation.back')}</button>
+                                <button type="button" className="btn btn-primary" onClick={() => setStep(3)}>{t('navigation.nextSummary')} →</button>
                             </div>
                         </div>
                     </div>
@@ -443,18 +465,18 @@ export default function VehicleForm() {
                 {step === 3 && (
                     <div className="fade-in">
                         <div className="card">
-                            <div className="card-header"><h2>Riepilogo finale</h2></div>
+                            <div className="card-header"><h2>{t('step3.title')}</h2></div>
                             <div className="card-body-padding">
                                 <div className="client-summary">
-                                    <div className="summary-item"><small>AZIENDA</small><strong>{clientData.company}</strong></div>
-                                    <div className="summary-item"><small>CONTATTO</small><strong>{clientData.contact} {clientData.lastname || ''}</strong></div>
-                                    <div className="summary-item"><small>EMAIL</small><strong>{clientData.email}</strong></div>
-                                    <div className="summary-item"><small>TELEFONO</small><strong>{clientData.phone || '—'}</strong></div>
-                                    <div className="summary-item"><small>AUTISTI</small><strong>{clientData.drivers || 0}</strong></div>
-                                    <div className="summary-item"><small>TRAFFICO 4G</small><strong>{[clientData.italia ? 'Italia' : '', clientData.estero ? 'Estero' : ''].filter(Boolean).join(', ') || '—'}</strong></div>
-                                    <div className="summary-item"><small>NOTE</small><strong>{clientData.notes || '—'}</strong></div>
+                                    <div className="summary-item"><small>{t('step3.company')}</small><strong>{clientData.company}</strong></div>
+                                    <div className="summary-item"><small>{t('step3.contact')}</small><strong>{clientData.contact} {clientData.lastname || ''}</strong></div>
+                                    <div className="summary-item"><small>{t('step3.email')}</small><strong>{clientData.email}</strong></div>
+                                    <div className="summary-item"><small>{t('step3.phone')}</small><strong>{clientData.phone || '—'}</strong></div>
+                                    <div className="summary-item"><small>{t('step3.drivers')}</small><strong>{clientData.drivers || 0}</strong></div>
+                                    <div className="summary-item"><small>{t('step3.traffic4g')}</small><strong>{[clientData.italia ? t('form.italy') : '', clientData.estero ? t('form.abroad') : ''].filter(Boolean).join(', ') || '—'}</strong></div>
+                                    <div className="summary-item"><small>{t('step3.notes')}</small><strong>{clientData.notes || '—'}</strong></div>
                                 </div>
-                                <p className="section-title">Mezzi selezionati:</p>
+                                <p className="section-title">{t('step3.selectedVehicles')}</p>
                                 <div className="summary-grid">
                                     {Object.entries(quantities).map(([id, q]) => {
                                         if (q <= 0) return null;
@@ -462,8 +484,8 @@ export default function VehicleForm() {
                                         if (!mezzo) return null;
                                         return (
                                             <div className="summary-card" key={id}>
-                                                <img src={mezzo.img} alt={`Immagine ${mezzo.name}`} />
-                                                <span className="mezzo-title">{mezzo.name}</span>
+                                                <img src={mezzo.img} alt={`${t('accessibility.imageOf')} ${t('vehicles.' + id)}`} />
+                                                <span className="mezzo-title">{t('vehicles.' + id)}</span>
                                                 <span className="mezzo-qty">{q}</span>
                                             </div>
                                         )
@@ -471,7 +493,7 @@ export default function VehicleForm() {
                                 </div>
                                 <div className="total-badge-container">
                                     <div className="final-total-badge">
-                                        TOTALE: {totalVehicles} MEZZI
+                                        {t('step3.totalLabel')}: {totalVehicles} {t('step3.vehiclesLabel')}
                                     </div>
                                 </div>
                             </div>
@@ -479,7 +501,7 @@ export default function VehicleForm() {
                         <div className="bottom-bar">
                             <span className="step-info"></span>
                             <div className="btn-group" style={{ display: 'flex', gap: '10px' }}>
-                                <button type="button" className="btn btn-ghost" onClick={() => setStep(2)}>← Modifica Mezzi</button>
+                                <button type="button" className="btn btn-ghost" onClick={() => setStep(2)}>← {t('navigation.editVehicles')}</button>
                                 <button
                                     type="button"
                                     className="btn btn-accent"
@@ -490,10 +512,10 @@ export default function VehicleForm() {
                                     {loading ? (
                                         <>
                                             <div className="spinner"></div>
-                                            Invio in corso...
+                                            {t('navigation.sending')}
                                         </>
                                     ) : (
-                                        <>Conferma e Invia</>
+                                        <>{t('navigation.confirmSend')}</>
                                     )}
                                 </button>
                             </div>
@@ -529,7 +551,7 @@ export default function VehicleForm() {
                                 }
                             }}
                         >
-                            {modalConfig.type === 'success' ? 'Nuova Configurazione' : 'Riprova'}
+                            {modalConfig.type === 'success' ? t('modal.newConfig') : t('modal.retry')}
                         </button>
                     </div>
                 </div>

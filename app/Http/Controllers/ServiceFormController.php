@@ -41,7 +41,7 @@ class ServiceFormController extends Controller
         $serviceRequests = $this->getServiceRequests($token);
 
         if ($serviceRequests->isEmpty() || !$serviceRequests->first()->isCompleted()) {
-            abort(404, 'PDF non disponibile.');
+            abort(404, __('PDF not available.'));
         }
 
         $pdf = Pdf::loadView('pdf.service-summary', [
@@ -174,7 +174,7 @@ class ServiceFormController extends Controller
 
         return response()->json([
             'status'  => 'success',
-            'message' => 'Configurazione servizi salvata con successo.',
+            'message' => __('Service configuration saved successfully.'),
         ]);
     }
 
@@ -189,7 +189,7 @@ class ServiceFormController extends Controller
             if ($single) {
                 $requests = collect([$single]);
             } else {
-                abort(404, 'Link non valido o scaduto.');
+                abort(404, __('Invalid or expired link.'));
             }
         }
         return $requests;

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="{{ app()->getLocale() }}">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Configurazione Completata - GT Fleet 365</title>
+    <title>{{ __('Configuration Completed - GT Fleet 365') }}</title>
     <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -114,10 +114,10 @@
 <body>
     <div class="success-card">
         <div class="success-icon">✅</div>
-        <h1 class="success-title">Configurazione Salvata!</h1>
+        <h1 class="success-title">{{ __('Configuration Saved!') }}</h1>
         <p class="success-message">
-            La configurazione dei servizi è stata salvata con successo.
-            I dati sono stati registrati nel sistema e il PDF è stato generato.
+            {{ __('The service configuration has been saved successfully.') }}
+            {{ __('Data has been recorded and PDF has been generated.') }}
         </p>
 
         @if(isset($serviceRequests) && $serviceRequests->isNotEmpty())
@@ -135,17 +135,17 @@
 
         @if(isset($groupToken))
             <a href="/servizi/{{ $groupToken }}/pdf" class="back-link" style="background: linear-gradient(135deg, #FF6B00 0%, #E55D00 100%); margin-bottom: 12px;">
-                📄 Scarica PDF Riepilogativo
+                📄 {{ __('Download Summary PDF') }}
             </a>
             <br><br>
             <a href="/servizi/{{ $groupToken }}" class="back-link">
-                Modifica Configurazione
+                {{ __('Edit Configuration') }}
             </a>
         @endif
     </div>
 
     <div class="footer">
-        © {{ date('Y') }} MacNil | GT Fleet 365. Tutti i diritti riservati.
+        © {{ date('Y') }} MacNil | GT Fleet 365. {{ __('All rights reserved.') }}
     </div>
 </body>
 

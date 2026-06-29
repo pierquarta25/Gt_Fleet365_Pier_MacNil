@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Nuovo Lead Configurato</title>
+    <title>{{ __('New Lead Configured') }}</title>
     <style>
         body {
             font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
@@ -156,43 +156,43 @@
 <body>
     <div class="container">
         <div class="header">
-            Riepilogo Finale
+            {{ __('Final Summary') }}
         </div>
         <div class="body">
             <div class="client-box">
                 <table class="client-table">
                     <tr>
                         <td>
-                            <span class="label">Azienda</span>
+                            <span class="label">{{ __('Company') }}</span>
                             <span class="value">{{ $client['company'] }}</span>
                         </td>
                         <td>
-                            <span class="label">Contatto</span>
+                            <span class="label">{{ __('Contact') }}</span>
                             <span class="value">{{ $client['contact'] }} {{ $client['lastname'] ?? '' }}</span>
                         </td>
                         <td>
-                            <span class="label">Email</span>
+                            <span class="label">{{ __('Email') }}</span>
                             <span class="value">{{ $client['email'] }}</span>
                         </td>
                     </tr>
                     <tr>
                         <td style="padding-top: 15px;">
-                            <span class="label">Telefono</span>
+                            <span class="label">{{ __('Phone') }}</span>
                             <span class="value">{{ $client['phone'] ?? '—' }}</span>
                         </td>
                         <td style="padding-top: 15px;">
-                            <span class="label">Autisti</span>
+                            <span class="label">{{ __('Drivers') }}</span>
                             <span class="value">{{ $client['drivers'] ?? '0' }}</span>
                         </td>
                         <td style="padding-top: 15px;">
-                            <span class="label">Traffico 4G</span>
+                            <span class="label">{{ __('4G Traffic') }}</span>
                             <span class="value">
                                 @php
                                     $traffico = [];
                                     if ($client['italia'] ?? false)
-                                        $traffico[] = 'Italia';
+                                        $traffico[] = __('Italy');
                                     if ($client['estero'] ?? false)
-                                        $traffico[] = 'Estero';
+                                        $traffico[] = __('International');
                                     echo implode(', ', $traffico) ?: '—';
                                 @endphp
                             </span>
@@ -200,14 +200,14 @@
                     </tr>
                     <tr>
                         <td colspan="3" style="padding-top: 15px;">
-                            <span class="label">Note</span>
+                            <span class="label">{{ __('Notes') }}</span>
                             <span class="value">{{ $client['notes'] ?? '—' }}</span>
                         </td>
                     </tr>
                 </table>
             </div>
 
-            <p class="section-title">Mezzi selezionati:</p>
+            <p class="section-title">{{ __('Selected vehicles:') }}</p>
 
             @foreach($vehicles as $item)
                 <div class="vehicle-card">
@@ -238,7 +238,7 @@
                     @php
                         $totaleMezzi = array_sum(array_column($vehicles, 'qty'));
                     @endphp
-                    Totale: {{ $totaleMezzi }} Mezzi
+                    {{ __('Total:') }} {{ $totaleMezzi }} {{ __('Vehicles') }}
                 </div>
             </div>
 
@@ -246,14 +246,14 @@
                 <div style="text-align: right; margin-top: 16px; margin-bottom: 8px; padding-right: 4px;">
                     <a href="{{ url('/servizi/' . $groupToken) }}"
                        style="color: #0052BD; text-decoration: none; font-size: 12px; font-weight: 600; border-bottom: 1px solid #0052BD; font-family: 'Inter', Arial, sans-serif;">
-                        Configura Servizi Preventivo →
+                        {{ __('Configure Quote Services') }} →
                     </a>
                 </div>
             @endif
         </div>
     </div>
     <div class="footer">
-        © {{ date('Y') }} MacNil | GT Fleet 365. Tutti i diritti riservati.
+        © {{ date('Y') }} MacNil | GT Fleet 365. {{ __('All rights reserved.') }}
     </div>
 </body>
 

@@ -101,33 +101,33 @@ return [
     'sections' => [
 
         [
-            'title' => 'Pacchetto Base',
+            'title' => 'Base Package',
             'icon'  => '📡',
             'type'  => 'radio', // Solo uno selezionabile
             'items' => [
                 [
                     'id'   => 'base_loc',
-                    'name' => 'GT FLEET 365 BASE (LOC) - Mezzi Aziendali, Pesanti, D\'Opera',
+                    'name' => 'GT FLEET 365 BASE (LOC) - Corporate, Heavy, Construction Vehicles',
                     'categories' => ['aziendali', 'pesanti', 'frigo', 'frigo_pesante', 'opera'],
                 ],
                 [
                     'id'   => 'plus_loc_sic',
-                    'name' => 'GT FLEET 365 PLUS (LOC + SIC) - Mezzi Aziendali, Pesanti',
+                    'name' => 'GT FLEET 365 PLUS (LOC + SEC) - Corporate, Heavy Vehicles',
                     'categories' => ['aziendali', 'pesanti', 'frigo', 'frigo_pesante'],
                 ],
                 [
                     'id'   => 'gold_loc_tel',
-                    'name' => 'GT FLEET 365 GOLD (LOC + TEL) - Mezzi Aziendali, Pesanti',
+                    'name' => 'GT FLEET 365 GOLD (LOC + TEL) - Corporate, Heavy Vehicles',
                     'categories' => ['aziendali', 'pesanti', 'frigo', 'frigo_pesante'],
                 ],
                 [
                     'id'   => 'premium_loc_tel_sic',
-                    'name' => 'GT FLEET 365 PREMIUM (LOC + TEL + SIC) - Mezzi Aziendali, Pesanti',
+                    'name' => 'GT FLEET 365 PREMIUM (LOC + TEL + SEC) - Corporate, Heavy Vehicles',
                     'categories' => ['aziendali', 'pesanti', 'frigo', 'frigo_pesante'],
                 ],
                 [
                     'id'   => 'plus_trattore',
-                    'name' => 'GT FLEET 365 PLUS - Trattore Agricolo, Mezzi D\'Opera',
+                    'name' => 'GT FLEET 365 PLUS - Agricultural Tractor, Construction Vehicles',
                     'categories' => ['opera'],
                 ],
                 [
@@ -137,7 +137,7 @@ return [
                 ],
                 [
                     'id'   => 'truck_crono_plus',
-                    'name' => 'GT FLEET 365 TRUCK CRONO PLUS (LOC + SIC + CRONO)',
+                    'name' => 'GT FLEET 365 TRUCK CRONO PLUS (LOC + SEC + CRONO)',
                     'categories' => ['pesanti', 'frigo_pesante'],
                 ],
                 [
@@ -147,119 +147,119 @@ return [
                 ],
                 [
                     'id'   => 'truck_crono_premium',
-                    'name' => 'GT FLEET 365 TRUCK CRONO PREMIUM (LOC + TEL + SIC + CRONO)',
+                    'name' => 'GT FLEET 365 TRUCK CRONO PREMIUM (LOC + TEL + SEC + CRONO)',
                     'categories' => ['pesanti', 'frigo_pesante'],
                 ],
                 [
                     'id'   => 'rimorchi_comodato',
-                    'name' => 'GT FLEET 365 RIMORCHI (dispositivo in comodato d\'uso)',
+                    'name' => 'GT FLEET 365 TRAILERS (loaned device)',
                     'categories' => ['rimorchi', 'frigo_rimorchio'],
                 ],
                 [
                     'id'   => 'rimorchi_vendita',
-                    'name' => 'GT FLEET 365 RIMORCHI (dispositivo in vendita)',
+                    'name' => 'GT FLEET 365 TRAILERS (purchased device)',
                     'categories' => ['rimorchi', 'frigo_rimorchio'],
                 ],
                 [
                     'id'   => 'asset',
-                    'name' => 'GT FLEET 365 ASSET - Pacco Civetta, Gruppi Elettrogeni',
+                    'name' => 'GT FLEET 365 ASSET - Dummy Packs, Power Generators',
                     'categories' => ['asset'],
                 ],
             ],
         ],
 
         [
-            'title' => 'App & Servizi Aggiuntivi',
+            'title' => 'App & Additional Services',
             'icon'  => '📱',
             'type'  => 'checkbox',
             'items' => [
                 [
                     'id'   => 'app_fleet_manager',
-                    'name' => 'APP GT FLEET 365 - FLEET MANAGER',
+                    'name' => 'GT FLEET 365 APP - FLEET MANAGER',
                     'input' => 'check',
                     'categories' => ['aziendali', 'pesanti', 'frigo', 'frigo_pesante', 'frigo_rimorchio', 'rimorchi', 'opera', 'asset'],
                 ],
                 [
                     'id'   => 'app_driver',
-                    'name' => 'APP GT FLEET 365 - DRIVER',
+                    'name' => 'GT FLEET 365 APP - DRIVER',
                     'input' => 'check',
                     'categories' => ['aziendali', 'pesanti', 'frigo', 'frigo_pesante', 'opera'],
                 ],
                 [
                     'id'   => 'manutenzioni_scadenze',
-                    'name' => 'GT FLEET 365 SERVIZIO MANUTENZIONI - SCADENZE',
+                    'name' => 'GT FLEET 365 MAINTENANCE SERVICE - DEADLINES',
                     'input' => 'check',
                     'categories' => ['aziendali', 'pesanti', 'frigo', 'frigo_pesante', 'opera'],
                 ],
                 [
                     'id'   => 'formazione_assistenza',
-                    'name' => 'FORMAZIONE + ASSISTENZA - GT FLEET 365 WEB E APP',
+                    'name' => 'TRAINING + SUPPORT - GT FLEET 365 WEB AND APP',
                     'input' => 'check',
                     'categories' => ['aziendali', 'pesanti', 'frigo', 'frigo_pesante', 'frigo_rimorchio', 'rimorchi', 'opera'],
                 ],
                 [
                     'id'   => 'missioni',
-                    'name' => 'GT FLEET 365 MISSIONI: PIANI DI VIAGGIO, ATTIVITÀ, VISITE',
+                    'name' => 'GT FLEET 365 MISSIONS: TRAVEL PLANS, ACTIVITIES, VISITS',
                     'input' => 'check',
                     'categories' => ['aziendali', 'pesanti', 'frigo', 'frigo_pesante'],
                 ],
                 [
                     'id'   => 'mappe_track',
-                    'name' => 'SERVIZIO MAPPE TRACK - Mezzi Pesanti',
+                    'name' => 'TRACK MAPS SERVICE - Heavy Vehicles',
                     'input' => 'check',
                     'categories' => ['pesanti', 'frigo_pesante'],
                 ],
                 [
                     'id'   => 'temperatura_controllata',
-                    'name' => 'SERVIZIO TEMPERATURA CONTROLLATA',
+                    'name' => 'CONTROLLED TEMPERATURE SERVICE',
                     'input' => 'check',
                     'categories' => ['frigo', 'frigo_pesante', 'frigo_rimorchio'],
                 ],
                 [
                     'id'   => 'gestione_portellone',
-                    'name' => 'SERVIZIO GESTIONE PORTELLONE',
+                    'name' => 'TAILGATE MANAGEMENT SERVICE',
                     'input' => 'check',
                     'categories' => ['frigo', 'frigo_pesante', 'frigo_rimorchio'],
                 ],
                 [
                     'id'   => 'riconoscimento_driver',
-                    'name' => 'SERVIZIO RICONOSCIMENTO DRIVER',
+                    'name' => 'DRIVER RECOGNITION SERVICE',
                     'input' => 'check',
                     'categories' => ['aziendali', 'pesanti', 'frigo', 'frigo_pesante'],
                 ],
                 [
                     'id'   => 'riconoscimento_driver_app',
-                    'name' => 'SERVIZIO RICONOSCIMENTO DRIVER CON APP',
+                    'name' => 'DRIVER RECOGNITION SERVICE WITH APP',
                     'input' => 'check',
                     'categories' => ['aziendali', 'pesanti', 'frigo', 'frigo_pesante'],
                 ],
                 [
                     'id'   => 'tempi_guida_realtime',
-                    'name' => 'TEMPI DI GUIDA REAL TIME - RICONOSCIMENTO DRIVER con CARTA TACHIGRAFICA',
+                    'name' => 'REAL TIME DRIVING TIMES - DRIVER RECOGNITION with TACHOGRAPH CARD',
                     'input' => 'check',
                     'categories' => ['pesanti', 'frigo_pesante'],
                 ],
                 [
                     'id'   => 'centrale_operativa_live',
-                    'name' => 'CENTRALE OPERATIVA LIVE (H24)',
+                    'name' => 'LIVE OPERATIONS CENTER (24/7)',
                     'input' => 'check',
                     'categories' => ['aziendali', 'pesanti', 'frigo', 'frigo_pesante'],
                 ],
                 [
                     'id'   => 'centrale_operativa_ondemand',
-                    'name' => 'CENTRALE OPERATIVA ON DEMAND',
+                    'name' => 'ON DEMAND OPERATIONS CENTER',
                     'input' => 'check',
                     'categories' => ['aziendali', 'pesanti', 'frigo', 'frigo_pesante'],
                 ],
                 [
                     'id'   => 'scorta_digitale',
-                    'name' => 'GT FLEET 365 SCORTA DIGITALE',
+                    'name' => 'GT FLEET 365 DIGITAL ESCORT',
                     'input' => 'check',
                     'categories' => ['aziendali', 'pesanti', 'frigo', 'frigo_pesante', 'frigo_rimorchio', 'rimorchi', 'opera', 'asset'],
                 ],
                 [
                     'id'   => 'app_gt5_app',
-                    'name' => 'APP GT FLEET 365 - GT 5.0.APP',
+                    'name' => 'GT FLEET 365 APP - GT 5.0.APP',
                     'input' => 'check',
                     'categories' => ['aziendali', 'pesanti', 'frigo', 'frigo_pesante', 'frigo_rimorchio', 'rimorchi', 'opera', 'asset'],
                 ],
@@ -267,13 +267,13 @@ return [
         ],
 
         [
-            'title' => 'Crono & Tachigrafo',
+            'title' => 'Crono & Tachograph',
             'icon'  => '⏱️',
             'type'  => 'checkbox',
             'items' => [
                 [
                     'id'   => 'carta_aziendale_crono',
-                    'name' => 'CARTA AZIENDALE CRONO (ogni 25 Mezzi)',
+                    'name' => 'COMPANY CRONO CARD (every 25 Vehicles)',
                     'input' => 'qty',
                     'categories' => ['pesanti', 'frigo_pesante'],
                 ],
@@ -299,43 +299,43 @@ return [
             'items' => [
                 [
                     'id'   => 'hw_gost_shadow',
-                    'name' => 'FORNITURA DISPOSITIVO GOST - SHADOW',
+                    'name' => 'GOST - SHADOW DEVICE SUPPLY',
                     'input' => 'qty',
                     'categories' => ['aziendali', 'frigo', 'opera'],
                 ],
                 [
                     'id'   => 'hw_dispositivo_bordo',
-                    'name' => 'FORNITURA DISPOSITIVO DI BORDO (per servizio Base)',
+                    'name' => 'ON-BOARD DEVICE SUPPLY (for Base service)',
                     'input' => 'qty',
                     'categories' => ['aziendali', 'pesanti', 'frigo', 'frigo_pesante'],
                 ],
                 [
                     'id'   => 'hw_dispositivo_rimorchio',
-                    'name' => 'FORNITURA DISPOSITIVO RIMORCHIO',
+                    'name' => 'TRAILER DEVICE SUPPLY',
                     'input' => 'qty',
                     'categories' => ['rimorchi', 'frigo_rimorchio'],
                 ],
                 [
                     'id'   => 'hw_dispositivo_trattore',
-                    'name' => 'FORNITURA DISPOSITIVO TRATTORE AGRICOLO, MEZZI D\'OPERA',
+                    'name' => 'AGRICULTURAL TRACTOR, CONSTRUCTION VEHICLE DEVICE SUPPLY',
                     'input' => 'qty',
                     'categories' => ['opera'],
                 ],
                 [
                     'id'   => 'hw_dispositivo_asset',
-                    'name' => 'FORNITURA DISPOSITIVO ASSET',
+                    'name' => 'ASSET DEVICE SUPPLY',
                     'input' => 'qty',
                     'categories' => ['asset'],
                 ],
                 [
                     'id'   => 'hw_sensore_portellone',
-                    'name' => 'SENSORE PORTELLONE (Furgone, Motrice, Rimorchio)',
+                    'name' => 'TAILGATE SENSOR (Van, Truck, Trailer)',
                     'input' => 'qty',
                     'categories' => ['frigo', 'frigo_pesante', 'frigo_rimorchio'],
                 ],
                 [
                     'id'   => 'hw_sensore_temperatura',
-                    'name' => 'SENSORE TEMPERATURA (Motrice o Rimorchio)',
+                    'name' => 'TEMPERATURE SENSOR (Truck or Trailer)',
                     'input' => 'qty',
                     'categories' => ['frigo', 'frigo_pesante', 'frigo_rimorchio'],
                 ],
@@ -347,31 +347,31 @@ return [
                 ],
                 [
                     'id'   => 'hw_chiave_dallas',
-                    'name' => 'CHIAVE DALLAS',
+                    'name' => 'DALLAS KEY',
                     'input' => 'qty',
                     'categories' => ['aziendali', 'pesanti', 'frigo', 'frigo_pesante', 'opera'],
                 ],
                 [
                     'id'   => 'hw_kit_lettore_dallas',
-                    'name' => 'KIT LETTORE + CHIAVE DALLAS',
+                    'name' => 'DALLAS READER + KEY KIT',
                     'input' => 'qty',
                     'categories' => ['aziendali', 'pesanti', 'frigo', 'frigo_pesante', 'opera'],
                 ],
                 [
                     'id'   => 'hw_tastierino',
-                    'name' => 'TASTIERINO',
+                    'name' => 'KEYPAD',
                     'input' => 'qty',
                     'categories' => ['aziendali', 'pesanti', 'frigo', 'frigo_pesante'],
                 ],
                 [
                     'id'   => 'hw_pedale_antirapina',
-                    'name' => 'PEDALE ANTIRAPINA / ANTIPANICO',
+                    'name' => 'ANTI-ROBBERY / PANIC PEDAL',
                     'input' => 'qty',
                     'categories' => ['aziendali', 'pesanti', 'frigo', 'frigo_pesante'],
                 ],
                 [
                     'id'   => 'hw_beacon_passeggero',
-                    'name' => 'BEACON (Riconoscimento Passeggero)',
+                    'name' => 'BEACON (Passenger Recognition)',
                     'input' => 'qty',
                     'categories' => ['pesanti'],
                 ],
@@ -379,13 +379,13 @@ return [
         ],
 
         [
-            'title' => 'Sviluppo & Personalizzazioni',
+            'title' => 'Development & Customizations',
             'icon'  => '🔧',
             'type'  => 'checkbox',
             'items' => [
                 [
                     'id'   => 'sviluppo_digital_transformation',
-                    'name' => 'ATTIVITÀ DI SVILUPPO - DIGITAL TRANSFORMATION',
+                    'name' => 'DEVELOPMENT - DIGITAL TRANSFORMATION',
                     'input' => 'check',
                     'categories' => ['aziendali', 'pesanti', 'frigo', 'frigo_pesante', 'frigo_rimorchio', 'rimorchi', 'opera', 'asset'],
                 ],

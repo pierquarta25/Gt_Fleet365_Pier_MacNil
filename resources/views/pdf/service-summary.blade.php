@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Riepilogo Servizi Globale - GT Fleet 365</title>
+    <title>{{ __('Global Services Summary - GT Fleet 365') }}</title>
     <style>
         body {
             font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
@@ -179,7 +179,7 @@
 <body>
     <div class="container">
         <div class="header">
-            Riepilogo Servizi Preventivo
+            {{ __('Quote Services Summary') }}
         </div>
         <div class="body">
             
@@ -191,19 +191,19 @@
                 <div class="client-info">
                     @if(!empty($firstReq->client_data['company']))
                         <div class="client-row">
-                            <span class="client-label">Azienda</span>
+                            <span class="client-label">{{ __('Company') }}</span>
                             <span class="client-value">{{ $firstReq->client_data['company'] }}</span>
                         </div>
                     @endif
                     @if(!empty($firstReq->client_data['contact']))
                         <div class="client-row">
-                            <span class="client-label">Contatto</span>
+                            <span class="client-label">{{ __('Contact') }}</span>
                             <span class="client-value">{{ $firstReq->client_data['contact'] }} {{ $firstReq->client_data['lastname'] ?? '' }}</span>
                         </div>
                     @endif
                     @if(!empty($firstReq->client_data['email']))
                         <div class="client-row">
-                            <span class="client-label">Email</span>
+                            <span class="client-label">{{ __('Email') }}</span>
                             <span class="client-value">{{ $firstReq->client_data['email'] }}</span>
                         </div>
                     @endif
@@ -223,7 +223,7 @@
                                 @endif
                                 <td style="vertical-align: middle;">
                                     <div class="vehicle-name">{{ $req->vehicle_name }}</div>
-                                    <div class="vehicle-qty">Quantità: {{ $req->vehicle_qty }}</div>
+                                    <div class="vehicle-qty">{{ __('Quantity:') }} {{ $req->vehicle_qty }}</div>
                                 </td>
                             </tr>
                         </table>
@@ -236,7 +236,7 @@
                         @endphp
 
                         @if($basePackage)
-                            <div class="section-title">PACCHETTO BASE</div>
+                            <div class="section-title">{{ __('BASE PACKAGE') }}</div>
                             <ul class="service-list">
                                 <li>
                                     <span>{{ $basePackage['name'] }}</span>
@@ -245,7 +245,7 @@
                         @endif
 
                         @if($addons->count() > 0)
-                            <div class="section-title">SERVIZI & HARDWARE SELEZIONATI</div>
+                            <div class="section-title">{{ __('SELECTED SERVICES & HARDWARE') }}</div>
                             <ul class="service-list">
                                 @foreach($addons as $addon)
                                     <li>
@@ -258,12 +258,12 @@
                             </ul>
                         @endif
                     @else
-                        <p style="color: #8A93B0; font-style: italic;">Nessun servizio selezionato per questo mezzo.</p>
+                        <p style="color: #8A93B0; font-style: italic;">{{ __('No service selected for this vehicle.') }}</p>
                     @endif
 
                     @if($req->notes)
                         <div class="notes-box">
-                            <div class="notes-title">Note Aggiuntive ({{ $req->vehicle_name }})</div>
+                            <div class="notes-title">{{ __('Additional Notes') }} ({{ $req->vehicle_name }})</div>
                             <div class="notes-text">{{ $req->notes }}</div>
                         </div>
                     @endif
@@ -271,12 +271,12 @@
             @endforeach
 
             <div class="timestamp">
-                Compilato il {{ now()->format('d/m/Y H:i') }}
+                {{ __('Compiled on') }} {{ now()->format('d/m/Y H:i') }}
             </div>
         </div>
 
         <div class="footer">
-            © {{ date('Y') }} MacNil | GT Fleet 365. Tutti i diritti riservati.
+            © {{ date('Y') }} MacNil | GT Fleet 365. {{ __('All rights reserved.') }}
         </div>
     </div>
 </body>
