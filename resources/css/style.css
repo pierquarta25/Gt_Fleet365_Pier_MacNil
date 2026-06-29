@@ -200,11 +200,15 @@ header {
   .step-line { width: 10px; margin: 0 3px; }
   .lang-switcher-text { gap: 6px; font-size: 12px; flex: 0 0 auto; }
   .logo-area { flex: 0 0 auto; }
-  .step-badges { flex: 1; justify-content: flex-end; padding-right: 15px; margin: 0; }
+  .step-badges { flex: 1; justify-content: flex-end; padding-right: 6px; margin: 0; }
 
-  /* Hero Banner: stack verticale */
-  .step1-hero { flex-direction: column; text-align: center; padding: 20px; }
-  .hero-text h1 { font-size: 18px; }
+  /* Hero Banner: compatto su mobile */
+  .step1-hero { flex-direction: row; text-align: left; padding: 12px 15px; gap: 12px; margin-bottom: 15px; }
+  .step1-hero-icon { width: 40px; height: 40px; }
+  .step1-hero-icon svg { width: 20px; height: 20px; }
+  .hero-text h1 { font-size: 15px; }
+  .hero-text p { font-size: 11px; margin-top: 2px; }
+  .btn-new { display: none; }
 
   /* Form: le sezioni diventano verticali */
   .cf-section { flex-direction: column; }
