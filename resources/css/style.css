@@ -441,25 +441,26 @@ header {
     font-size: 11px;
     font-weight: 600;
     font-family: 'Inter', sans-serif;
-    color: #8A93B0;
+    color: rgba(255, 255, 255, 0.5);
     cursor: pointer;
 }
 
 .lang-link {
-    transition: color 0.2s ease;
+    transition: color 0.2s ease, opacity 0.2s ease;
+    color: rgba(255, 255, 255, 0.5);
 }
 
 .lang-link:hover {
-    color: #4A5578;
+    color: rgba(255, 255, 255, 0.8);
 }
 
 .lang-link.active {
-    color: #0052BD;
+    color: #ffffff;
     font-weight: 800;
 }
 
 .lang-separator {
-    color: #DDE2EF;
+    color: rgba(255, 255, 255, 0.2);
     font-weight: 400;
 }
 
