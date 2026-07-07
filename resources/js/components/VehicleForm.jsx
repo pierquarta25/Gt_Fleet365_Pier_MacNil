@@ -424,7 +424,7 @@ export default function VehicleForm() {
                                         {cat.vehicles.map(v => (
                                             <tr key={v.id}>
                                                 <td className="mezzo-name">{t('vehicles.' + v.id)}</td>
-                                                <td className="text-center"><img src={v.img} height="38" alt={`${t('accessibility.imageOf')} ${t('vehicles.' + v.id)}`} /></td>
+                                                <td className="text-center"><img src={v.img} height="60" alt={`${t('accessibility.imageOf')} ${t('vehicles.' + v.id)}`} /></td>
                                                 <td className="text-center">
                                                     <input
                                                         type="number"
