@@ -153,6 +153,7 @@ class ServiceFormController extends Controller
 
             $req->services = $selectedServices;
             $req->notes = $data['notes'] ?? null;
+            $req->save(); // Salva services, notes e vehicle_qty nel DB
             $req->markAsCompleted();
         }
 

@@ -29,6 +29,7 @@ return [
         'furgone'                 => 'aziendali',
         'furgone_cassonato'       => 'aziendali',
         'moto'                    => 'aziendali',
+        'carro_funebre'           => 'aziendali',
 
         // Mezzi Frigo
         'furgone_frigo'           => 'frigo',
