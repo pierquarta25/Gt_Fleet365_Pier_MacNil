@@ -20,3 +20,13 @@ Route::get('/servizi/{token}', [ServiceFormController::class, 'show']);
 Route::get('/servizi/{token}/successo', [ServiceFormController::class, 'success']);
 Route::get('/servizi/{token}/pdf', [ServiceFormController::class, 'downloadPdf']);
 Route::post('/api/servizi/{token}', [ServiceFormController::class, 'store']);
+
+// Rotta temporanea per lanciare il seeder su Render (visto che la shell è a pagamento)
+Route::get('/setup-commerciali-render', function () {
+    try {
+        \Illuminate\Support\Facades\Artisan::call('db:seed', ['--class' => 'Database\Seeders\CommercialiSeeder']);
+        return "Seeder eseguito con successo! I commerciali sono stati importati. Output: " . \Illuminate\Support\Facades\Artisan::output();
+    } catch (\Exception $e) {
+        return "Errore durante il seeder: " . $e->getMessage();
+    }
+});
