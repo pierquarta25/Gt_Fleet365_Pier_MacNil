@@ -246,7 +246,6 @@ export default function VehicleForm() {
                             </div>
                             <div className="hero-text">
                                 <h2>{t('hero.title')}</h2>
-                                <p>{t('hero.subtitle')}</p>
                             </div>
                         </div>
 
