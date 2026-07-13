@@ -8,6 +8,7 @@ export default function VehicleForm() {
     const [step, setStep] = useState(1);
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
+    const [honeypot, setHoneypot] = useState(''); // Campo trappola anti-bot
     const [modalConfig, setModalConfig] = useState({
         isOpen: false,
         type: 'success',
@@ -138,7 +139,8 @@ export default function VehicleForm() {
                 client: clientData,
                 vehicles: quantities,
                 selectedVehicles: selectedVehiclesDetails,
-                language: language
+                language: language,
+                website_url: honeypot // Honeypot anti-bot: campo invisibile
             });
 
             // Pulisce il localStorage dopo l'invio con successo
@@ -174,6 +176,17 @@ export default function VehicleForm() {
 
     return (
         <div className="app-main">
+            {/* Honeypot anti-bot: campo invisibile, i bot lo compilano automaticamente */}
+            <input
+                type="text"
+                name="website_url"
+                value={honeypot}
+                onChange={(e) => setHoneypot(e.target.value)}
+                style={{ position: 'absolute', left: '-9999px', opacity: 0, height: 0, width: 0, tabIndex: -1 }}
+                tabIndex={-1}
+                autoComplete="off"
+                aria-hidden="true"
+            />
             {/* HEADER */}
             <header>
                 <div className="header-inner">

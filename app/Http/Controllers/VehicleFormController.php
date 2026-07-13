@@ -41,6 +41,16 @@ class VehicleFormController extends Controller
     // Riceve i dati del form e li invia a HubSpot ed email
     public function store(Request $request)
     {
+        // Honeypot anti-bot: se il campo nascosto è compilato, è un bot.
+        // Rispondiamo con un finto successo per non insospettirlo.
+        if ($request->filled('website_url')) {
+            return response()->json([
+                'status' => 'success',
+                'message' => __('Configuration saved successfully.'),
+                'deal_id' => null
+            ]);
+        }
+
         $request->validate([
             'client.company' => 'required|string|max:255',
             'client.email'   => 'required|email|max:255',
