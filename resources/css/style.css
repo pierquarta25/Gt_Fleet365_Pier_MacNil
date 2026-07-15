@@ -174,7 +174,7 @@ header {
   to { transform: rotate(360deg); }
 }
 
-.btn-accent { background: var(--orange); color: white; }
+.btn-accent { background: var(--orange); color: white; min-width: 160px; justify-content: center; }
 .btn-ghost { background: transparent; border: 1.5px solid var(--border-2); color: var(--text-sec); }
 
 .fade-in { animation: fadeIn 0.3s ease-in; }
@@ -330,8 +330,9 @@ header {
 
   /* Riepilogo */
   .client-summary { grid-template-columns: 1fr; gap: 10px; }
-  .bottom-bar { padding: 12px 20px; }
-  .btn { padding: 10px 16px; font-size: 12px; }
+  .bottom-bar { padding: 12px 15px; gap: 8px; }
+  .btn { padding: 8px 12px; font-size: 11px; }
+  .btn-accent { min-width: auto; }
   .step-info { font-size: 11px; }
 }
 

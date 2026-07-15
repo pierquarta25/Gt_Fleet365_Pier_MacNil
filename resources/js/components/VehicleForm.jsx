@@ -520,7 +520,6 @@ export default function VehicleForm() {
                                     className="btn btn-accent"
                                     onClick={handleSubmit}
                                     disabled={loading}
-                                    style={{ minWidth: '160px', justifyContent: 'center' }}
                                 >
                                     {loading ? (
                                         <>
