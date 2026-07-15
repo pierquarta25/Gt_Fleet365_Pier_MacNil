@@ -4,6 +4,7 @@
   "sections": { "company": "Azienda", "referent": "Referente", "drivers": "Autisti", "services": "Servizi" },
   "form": {
     "companyName": "Nome Azienda", "companyPlaceholder": "es. Logistica Sud S.r.l.",
+    "vatNumber": "Partita Iva", "vatPlaceholder": "es. 12345678901",
     "contactName": "Nome Contatto", "contactPlaceholder": "es. Mario",
     "contactLastname": "Cognome Contatto", "lastnamePlaceholder": "es. Rossi",
     "email": "Email", "emailPlaceholder": "es. mario@email.it",
@@ -16,6 +17,7 @@
   },
   "errors": {
     "companyRequired": "La ragione sociale è obbligatoria",
+    "vatRequired": "La Partita Iva è obbligatoria",
     "contactRequired": "Il nome contatto è obbligatorio",
     "lastnameRequired": "Il cognome contatto è obbligatorio",
     "emailRequired": "L'email è obbligatoria",
@@ -42,6 +44,7 @@
   "step3": {
     "title": "Riepilogo finale",
     "company": "AZIENDA",
+    "vatNumber": "PARTITA IVA",
     "contact": "CONTATTO",
     "email": "EMAIL",
     "phone": "TELEFONO",

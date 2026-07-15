@@ -28,7 +28,9 @@ class HubSpotService
         }
 
         $drivers = $client['drivers'] ?? 0;
-        $vehicleSummary .= "\nNumero Autisti: $drivers\n";
+        $vatNumber = $client['vatNumber'] ?? 'Non specificata';
+        $vehicleSummary .= "\nPartita Iva: $vatNumber\n";
+        $vehicleSummary .= "Numero Autisti: $drivers\n";
 
         return $this->createDeal($contactId, $client['company'], $vehicleSummary);
     }

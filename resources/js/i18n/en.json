@@ -4,6 +4,7 @@
   "sections": { "company": "Company", "referent": "Contact Person", "drivers": "Drivers", "services": "Services" },
   "form": {
     "companyName": "Company Name", "companyPlaceholder": "e.g. South Logistics Ltd.",
+    "vatNumber": "VAT Number", "vatPlaceholder": "e.g. 12345678901",
     "contactName": "First Name", "contactPlaceholder": "e.g. John",
     "contactLastname": "Last Name", "lastnamePlaceholder": "e.g. Smith",
     "email": "Email", "emailPlaceholder": "e.g. john@email.com",
@@ -16,6 +17,7 @@
   },
   "errors": {
     "companyRequired": "Company name is required",
+    "vatRequired": "VAT number is required",
     "contactRequired": "Contact first name is required",
     "lastnameRequired": "Contact last name is required",
     "emailRequired": "Email is required",
@@ -42,6 +44,7 @@
   "step3": {
     "title": "Final Summary",
     "company": "COMPANY",
+    "vatNumber": "VAT NUMBER",
     "contact": "CONTACT",
     "email": "EMAIL",
     "phone": "PHONE",

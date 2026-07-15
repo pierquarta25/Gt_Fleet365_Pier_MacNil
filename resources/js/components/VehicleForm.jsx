@@ -30,6 +30,7 @@ export default function VehicleForm() {
 
         const defaultData = {
             company: '',
+            vatNumber: '',
             contact: '',
             lastname: '',
             email: '',
@@ -89,6 +90,9 @@ export default function VehicleForm() {
 
         if (!clientData.company.trim()) {
             newErrors.company = t('errors.companyRequired');
+        }
+        if (!clientData.vatNumber.trim()) {
+            newErrors.vatNumber = t('errors.vatRequired');
         }
         if (!clientData.contact.trim()) {
             newErrors.contact = t('errors.contactRequired');
@@ -267,8 +271,8 @@ export default function VehicleForm() {
 
                             <div className="cf-section">
                                 <div className="cf-section-label"><span>🏢</span><span>{t('sections.company')}</span></div>
-                                <div className="cf-fields">
-                                    <div className="field-group">
+                                <div className="cf-fields row-layout">
+                                    <div className="field-group flex-1">
                                         <label htmlFor="company">{t('form.companyName')} {t('form.required')}</label>
                                         <input
                                             type="text"
@@ -282,6 +286,21 @@ export default function VehicleForm() {
                                             aria-describedby={errors.company ? "company-error" : undefined}
                                         />
                                         {errors.company && <span id="company-error" className="error-text">{errors.company}</span>}
+                                    </div>
+                                    <div className="field-group flex-1">
+                                        <label htmlFor="vatNumber">{t('form.vatNumber')} {t('form.required')}</label>
+                                        <input
+                                            type="text"
+                                            id="vatNumber"
+                                            className={errors.vatNumber ? 'input-error' : ''}
+                                            value={clientData.vatNumber}
+                                            onChange={handleTextChange}
+                                            placeholder={t('form.vatPlaceholder')}
+                                            aria-required="true"
+                                            aria-invalid={errors.vatNumber ? "true" : "false"}
+                                            aria-describedby={errors.vatNumber ? "vatNumber-error" : undefined}
+                                        />
+                                        {errors.vatNumber && <span id="vatNumber-error" className="error-text">{errors.vatNumber}</span>}
                                     </div>
                                 </div>
                             </div>
@@ -481,6 +500,7 @@ export default function VehicleForm() {
                             <div className="card-body-padding">
                                 <div className="client-summary">
                                     <div className="summary-item"><small>{t('step3.company')}</small><strong>{clientData.company}</strong></div>
+                                    <div className="summary-item"><small>{t('step3.vatNumber')}</small><strong>{clientData.vatNumber}</strong></div>
                                     <div className="summary-item"><small>{t('step3.contact')}</small><strong>{clientData.contact} {clientData.lastname || ''}</strong></div>
                                     <div className="summary-item"><small>{t('step3.email')}</small><strong>{clientData.email}</strong></div>
                                     <div className="summary-item"><small>{t('step3.phone')}</small><strong>{clientData.phone || '—'}</strong></div>
