@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\ServiceRequest;
 use App\Services\HubSpotService;
+use App\Services\QuoteGeneratorService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -36,7 +37,7 @@ class ServiceFormController extends Controller
      * Scarica il PDF di riepilogo servizi.
      * GET /servizi/{token}/pdf
      */
-    public function downloadPdf(string $token)
+    public function downloadPdf(string $token, QuoteGeneratorService $quoteGenerator)
     {
         $serviceRequests = $this->getServiceRequests($token);
 
@@ -44,15 +45,28 @@ class ServiceFormController extends Controller
             abort(404, __('PDF not available.'));
         }
 
-        $pdf = Pdf::loadView('pdf.service-summary', [
-            'serviceRequests' => $serviceRequests,
-        ]);
+        try {
+            // Genera il PDF ufficiale dal template Word usando il QuoteGeneratorService
+            $filePath = $quoteGenerator->generateQuote($serviceRequests, $token);
+            
+            // Il nome del file rifletterà se è stato convertito in PDF o se è ancora un DOCX
+            $fileName = basename($filePath);
 
-        // Se c'è l'azienda cliente usa quella per il nome file
-        $company = $serviceRequests->first()->client_data['company'] ?? 'Cliente';
-        $fileName = 'servizi-' . \Illuminate\Support\Str::slug($company) . '-' . now()->format('Y-m-d') . '.pdf';
+            return response()->download($filePath, $fileName);
+            
+        } catch (\Exception $e) {
+            Log::error("Errore generazione preventivo dal template DOCX: " . $e->getMessage());
+            
+            // Fallback sul vecchio metodo DomPDF se qualcosa va storto con il template Word
+            $pdf = Pdf::loadView('pdf.service-summary', [
+                'serviceRequests' => $serviceRequests,
+            ]);
 
-        return $pdf->download($fileName);
+            $company = $serviceRequests->first()->client_data['company'] ?? 'Cliente';
+            $fileName = 'servizi-' . \Illuminate\Support\Str::slug($company) . '-' . now()->format('Y-m-d') . '.pdf';
+
+            return $pdf->download($fileName);
+        }
     }
 
     /**
