@@ -174,6 +174,31 @@ export default function VehicleForm() {
 
     const totalVehicles = Object.values(quantities).reduce((acc, qty) => acc + qty, 0);
 
+    const renderStepBadges = (className = '') => (
+        <div className={`step-badges ${className}`}>
+            <div className="step-item">
+                <div className={`step-badge ${step >= 1 ? 'active' : ''} ${step > 1 ? 'done' : ''}`}>
+                    {step > 1 ? '✓' : '1'}
+                </div>
+                <span className="step-label">{t('header.step1')}</span>
+            </div>
+            <div className={`step-line ${step > 1 ? 'done' : ''}`}></div>
+
+            <div className="step-item">
+                <div className={`step-badge ${step === 2 ? 'active' : step > 2 ? 'done' : 'pending'}`}>
+                    {step > 2 ? '✓' : '2'}
+                </div>
+                <span className="step-label">{t('header.step2')}</span>
+            </div>
+            <div className={`step-line ${step > 2 ? 'done' : ''}`}></div>
+
+            <div className="step-item">
+                <div className={`step-badge ${step === 3 ? 'active' : 'pending'}`}>3</div>
+                <span className="step-label">{t('header.step3')}</span>
+            </div>
+        </div>
+    );
+
     return (
         <div className="app-main">
             {/* Honeypot anti-bot: campo invisibile, i bot lo compilano automaticamente */}
@@ -194,28 +219,7 @@ export default function VehicleForm() {
                         <img src="/media/logo.png" alt="GT Fleet 365 Logo" className="logo-img" />
                     </div>
 
-                    <div className="step-badges">
-                        <div className="step-item">
-                            <div className={`step-badge ${step >= 1 ? 'active' : ''} ${step > 1 ? 'done' : ''}`}>
-                                {step > 1 ? '✓' : '1'}
-                            </div>
-                            <span className="step-label">{t('header.step1')}</span>
-                        </div>
-                        <div className={`step-line ${step > 1 ? 'done' : ''}`}></div>
-
-                        <div className="step-item">
-                            <div className={`step-badge ${step === 2 ? 'active' : step > 2 ? 'done' : 'pending'}`}>
-                                {step > 2 ? '✓' : '2'}
-                            </div>
-                            <span className="step-label">{t('header.step2')}</span>
-                        </div>
-                        <div className={`step-line ${step > 2 ? 'done' : ''}`}></div>
-
-                        <div className="step-item">
-                            <div className={`step-badge ${step === 3 ? 'active' : 'pending'}`}>3</div>
-                            <span className="step-label">{t('header.step3')}</span>
-                        </div>
-                    </div>
+                    {renderStepBadges("desktop-step-badges")}
 
                     <div className="lang-switcher-text">
                         <span 
@@ -407,7 +411,8 @@ export default function VehicleForm() {
                         </div>
 
                         <div className="bottom-bar">
-                            <span className="step-info">{t('navigation.step')} <strong>1</strong> {t('navigation.of')} 3</span>
+                            <span className="step-info step-info-desktop">{t('navigation.step')} <strong>1</strong> {t('navigation.of')} 3</span>
+                            {renderStepBadges("mobile-step-badges")}
                             <button type="button" className="btn btn-primary" onClick={() => {
                                 if (validateStep1()) {
                                     setStep(2);
@@ -457,8 +462,11 @@ export default function VehicleForm() {
                             </div>
                         ))}
                         <div className="bottom-bar">
-                            <div className="total-info">{t('step2.total')}: <strong>{totalVehicles}</strong> {t('step2.vehicles')}</div>
-                            <div style={{ display: 'flex', gap: '10px' }}>
+                            <div className="bottom-bar-left">
+                                <div className="total-info">{t('step2.total')}: <strong>{totalVehicles}</strong> {t('step2.vehicles')}</div>
+                                {renderStepBadges("mobile-step-badges")}
+                            </div>
+                            <div className="btn-group" style={{ display: 'flex', gap: '10px' }}>
                                 <button type="button" className="btn btn-ghost" onClick={() => setStep(1)}>← {t('navigation.back')}</button>
                                 <button type="button" className="btn btn-primary" onClick={() => setStep(3)}>{t('navigation.nextSummary')} →</button>
                             </div>
@@ -503,7 +511,8 @@ export default function VehicleForm() {
                             </div>
                         </div>
                         <div className="bottom-bar">
-                            <span className="step-info"></span>
+                            <span className="step-info step-info-desktop"></span>
+                            {renderStepBadges("mobile-step-badges")}
                             <div className="btn-group" style={{ display: 'flex', gap: '10px' }}>
                                 <button type="button" className="btn btn-ghost" onClick={() => setStep(2)}>← {t('navigation.editVehicles')}</button>
                                 <button

@@ -180,6 +180,11 @@ header {
 .fade-in { animation: fadeIn 0.3s ease-in; }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
+.desktop-step-badges { display: flex; }
+.mobile-step-badges { display: none; }
+.step-info-desktop { display: block; }
+.bottom-bar-left { display: flex; flex-direction: column; gap: 4px; }
+
 /* ==========================================================================
    RESPONSIVITÀ (Mobile & Tablet)
    ========================================================================== */
@@ -201,6 +206,40 @@ header {
   .lang-switcher-text { gap: 6px; font-size: 12px; flex: 0 0 auto; }
   .logo-area { flex: 0 0 auto; }
   .step-badges { flex: 1; justify-content: flex-end; padding-right: 6px; margin: 0; }
+
+  /* Nuove regole per nascondere desktop badges e mostrare quelli mobile in basso */
+  .desktop-step-badges { display: none !important; }
+  .mobile-step-badges {
+      display: flex !important;
+      justify-content: flex-start;
+      margin: 0;
+      flex: 0 0 auto;
+      padding: 0;
+  }
+  .step-info-desktop { display: none !important; }
+  
+  /* Stili per le palline mobile sul fondo bianco */
+  .mobile-step-badges .step-badge {
+      background: var(--blue-light);
+      color: var(--blue);
+      border: 1.5px solid var(--border-2);
+  }
+  .mobile-step-badges .step-badge.active {
+      background: var(--orange);
+      color: white;
+      border: none;
+  }
+  .mobile-step-badges .step-badge.done {
+      background: var(--success);
+      color: white;
+      border: none;
+  }
+  .mobile-step-badges .step-line {
+      background: var(--border-2);
+  }
+  .mobile-step-badges .step-line.done {
+      background: var(--success);
+  }
 
   /* Hero Banner: compatto su mobile */
   .step1-hero { flex-direction: row; text-align: left; padding: 12px 15px; gap: 12px; margin-bottom: 15px; }
