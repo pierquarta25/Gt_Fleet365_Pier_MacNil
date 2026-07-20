@@ -187,19 +187,23 @@ class VehicleFormController extends Controller
             try {
                 $mail->send(new LeadSummaryMail($client, $formattedVehicles, $groupToken));
                 \Illuminate\Support\Facades\Log::info("Email inviata con successo.");
+                $emailError = null;
             } catch (\Exception $e) {
+                $emailError = $e->getMessage();
                 \Illuminate\Support\Facades\Log::error("Impossibile inviare l'email di riepilogo: " . $e->getMessage(), [
                     'exception' => $e
                 ]);
             }
         } else {
+            $emailError = 'Nessun destinatario configurato';
             \Illuminate\Support\Facades\Log::warning("Invio email saltato: nessun destinatario configurato.");
         }
 
         return response()->json([
             'status' => 'success',
             'message' => $dealId ? __('Configuration saved successfully.') : __('Configuration sent in test mode.'),
-            'deal_id' => $dealId
+            'deal_id' => $dealId,
+            'email_debug' => $emailError ?? null
         ]);
     }
 }
