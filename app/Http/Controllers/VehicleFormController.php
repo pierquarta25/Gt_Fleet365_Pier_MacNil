@@ -184,8 +184,14 @@ class VehicleFormController extends Controller
                 'cc' => $ccEmails
             ]);
 
-            $mail->send(new LeadSummaryMail($client, $formattedVehicles, $groupToken));
-            \Illuminate\Support\Facades\Log::info("Email inviata con successo.");
+            try {
+                $mail->send(new LeadSummaryMail($client, $formattedVehicles, $groupToken));
+                \Illuminate\Support\Facades\Log::info("Email inviata con successo.");
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error("Impossibile inviare l'email di riepilogo: " . $e->getMessage(), [
+                    'exception' => $e
+                ]);
+            }
         } else {
             \Illuminate\Support\Facades\Log::warning("Invio email saltato: nessun destinatario configurato.");
         }
