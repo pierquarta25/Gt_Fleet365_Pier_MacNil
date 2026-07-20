@@ -48,8 +48,8 @@ class QuoteGeneratorService
         $table = new \PhpOffice\PhpWord\Element\Table([
             'borderSize' => 6, 
             'borderColor' => '0052BD', 
-            'width' => 100 * 50, // 100% width
-            'unit' => \PhpOffice\PhpWord\Style\TablePosition::DIR_PCT,
+            'width' => 5000, // 100% width
+            'unit' => \PhpOffice\PhpWord\SimpleType\TblWidth::PERCENT,
             'alignment' => \PhpOffice\PhpWord\SimpleType\JcTable::CENTER
         ]);
         
