@@ -66,7 +66,8 @@ class QuoteGeneratorService
             $qty = $req->vehicle_qty ?? 1;
             $services = $req->services ?? [];
             
-            $lines[] = "Mezzo: " . strtoupper($req->vehicle_name) . " (Qtà: {$qty})";
+            $vehicleNameSafe = htmlspecialchars(strtoupper($req->vehicle_name));
+            $lines[] = "Mezzo: " . $vehicleNameSafe . " (Qtà: {$qty})";
             
             foreach ($services as $srv) {
                 $id = $srv['id'];
@@ -77,7 +78,8 @@ class QuoteGeneratorService
                 $costoUnitario = $priceInfo['price'];
                 $costoTotale = $costoUnitario * $totalQty;
                 
-                $lines[] = "  - {$priceInfo['name']} (Qtà: {$totalQty}) = €" . number_format($costoTotale, 2, ',', '.');
+                $serviceNameSafe = htmlspecialchars($priceInfo['name']);
+                $lines[] = "  - {$serviceNameSafe} (Qtà: {$totalQty}) = €" . number_format($costoTotale, 2, ',', '.');
                 
                 if ($priceInfo['period'] === 'annuale') {
                     $totaleServiziAnnuo += $costoTotale;
@@ -92,14 +94,7 @@ class QuoteGeneratorService
         $lines[] = "TOTALE CANONI ANNUALI: €" . number_format($totaleServiziAnnuo, 2, ',', '.');
         $lines[] = "TOTALE HARDWARE UNA TANTUM: €" . number_format($totaleHardwareUnaTantum, 2, ',', '.');
         
-        // Questo è un approccio basilare per iniettare testo "plain". 
-        // L'ideale sarebbe inserire una tabella formattata, ma PHPWord's TemplateProcessor supporta setValue con \n se configurato,
-        // o si deve usare un trucco XML per iniettare tabelle.
-        
         $testoFormattato = implode("</w:t><w:br/><w:t>", $lines);
-        
-        // Sostituisco "VALORIZZAZIONE ECONOMICA DELLA FORNITURA GT FLEET 365" con il titolo + i dati.
-        $templateProcessor->setValue('VALORIZZAZIONE ECONOMICA DELLA FORNITURA GT FLEET 365', "VALORIZZAZIONE ECONOMICA DELLA FORNITURA GT FLEET 365</w:t><w:br/><w:t>" . $testoFormattato);
 
         // Salva il file DOCX
         $fileNameDocx = 'preventivo-' . \Illuminate\Support\Str::slug($companyName) . '-' . time() . '.docx';
@@ -111,6 +106,39 @@ class QuoteGeneratorService
         }
 
         $templateProcessor->saveAs($pathDocx);
+
+        // --- POST-ELABORAZIONE ZIP ARCHIVE PER SOSTITUZIONI RAW TEXT ---
+        $zip = new \ZipArchive();
+        if ($zip->open($pathDocx) === TRUE) {
+            // Sostituisci in document.xml
+            $docXml = $zip->getFromName('word/document.xml');
+            if ($docXml !== false) {
+                // Sostituisce il nome azienda
+                $docXml = str_replace('Nome Azienda', htmlspecialchars($companyName), $docXml);
+                
+                // Inserisce la valorizzazione economica
+                $docXml = str_replace(
+                    'VALORIZZAZIONE ECONOMICA DELLA FORNITURA GT FLEET 365', 
+                    'VALORIZZAZIONE ECONOMICA DELLA FORNITURA GT FLEET 365</w:t><w:br/><w:t>' . $testoFormattato, 
+                    $docXml
+                );
+                
+                $zip->addFromString('word/document.xml', $docXml);
+            }
+            
+            // Sostituisci negli header (per RAGIONE SOCIALE, emesso da, data)
+            for ($i = 1; $i <= 5; $i++) {
+                $headerName = 'word/header' . $i . '.xml';
+                $headerXml = $zip->getFromName($headerName);
+                if ($headerXml !== false) {
+                    $headerXml = str_replace('RAGIONE SOCIALE', htmlspecialchars($companyName), $headerXml);
+                    $headerXml = str_replace('Emesso da: TEAM Sales', htmlspecialchars('Emesso da: GT Fleet 365'), $headerXml);
+                    $headerXml = str_replace('xx mese 2026', date('d/m/Y'), $headerXml);
+                    $zip->addFromString($headerName, $headerXml);
+                }
+            }
+            $zip->close();
+        }
 
         // PROVA CONVERSIONE IN PDF (usando LibreOffice headless se presente)
         $fileNamePdf = str_replace('.docx', '.pdf', $fileNameDocx);
