@@ -40,25 +40,24 @@ class QuoteGeneratorService
             throw new \Exception("Template Word non trovato.");
         }
 
-        $templateProcessor = new TemplateProcessor($templatePath);
-
-        // Prepara i dati dinamici
         $firstReq = $serviceRequests->first();
         $companyName = $firstReq->client_data['company'] ?? 'Cliente';
         $contactName = ($firstReq->client_data['contact'] ?? '') . ' ' . ($firstReq->client_data['lastname'] ?? '');
         
-        $templateProcessor->setValue('nome_azienda', htmlspecialchars($companyName));
-        $templateProcessor->setValue('data_offerta', date('d/m/Y'));
-        $templateProcessor->setValue('validita_offerta', date('d/m/Y', strtotime('+30 days')));
-
-        // Costruisci le righe per la tabella "VALORIZZAZIONE ECONOMICA"
-        // Poiché il file non ha una vera <w:tbl> con un id o tag, e usare cloneRow() richiede un placeholder strutturato,
-        // useremo un blocco dinamico o sostituiremo un blocco testuale con le info raggruppate.
-        // Un trucco semplice con TemplateProcessor è rimpiazzare una keyword (es. "VALORIZZAZIONE ECONOMICA DELLA FORNITURA GT FLEET 365")
-        // con un layout formattato.
+        // --- CREAZIONE TABELLA PREVENTIVO ---
+        $table = new \PhpOffice\PhpWord\Element\Table([
+            'borderSize' => 6, 
+            'borderColor' => '0052BD', 
+            'width' => 100 * 50, // 100% width
+            'unit' => \PhpOffice\PhpWord\Style\TablePosition::DIR_PCT,
+            'alignment' => \PhpOffice\PhpWord\SimpleType\JcTable::CENTER
+        ]);
         
-        // Raccogliamo i servizi
-        $lines = [];
+        $table->addRow();
+        $table->addCell(5000, ['bgColor' => '0052BD'])->addText('Servizio / Prodotto', ['color' => 'FFFFFF', 'bold' => true, 'name' => 'Arial']);
+        $table->addCell(2000, ['bgColor' => '0052BD'])->addText('Quantità', ['color' => 'FFFFFF', 'bold' => true, 'name' => 'Arial']);
+        $table->addCell(3000, ['bgColor' => '0052BD'])->addText('Totale', ['color' => 'FFFFFF', 'bold' => true, 'name' => 'Arial']);
+
         $totaleServiziAnnuo = 0;
         $totaleHardwareUnaTantum = 0;
 
@@ -67,7 +66,10 @@ class QuoteGeneratorService
             $services = $req->services ?? [];
             
             $vehicleNameSafe = htmlspecialchars(strtoupper($req->vehicle_name));
-            $lines[] = "Mezzo: " . $vehicleNameSafe . " (Qtà: {$qty})";
+            
+            // Riga Intestazione Veicolo
+            $table->addRow();
+            $table->addCell(10000, ['gridSpan' => 3, 'bgColor' => 'F0F0F0'])->addText("Mezzo: {$vehicleNameSafe} (Qtà: {$qty})", ['bold' => true, 'name' => 'Arial']);
             
             foreach ($services as $srv) {
                 $id = $srv['id'];
@@ -79,7 +81,11 @@ class QuoteGeneratorService
                 $costoTotale = $costoUnitario * $totalQty;
                 
                 $serviceNameSafe = htmlspecialchars($priceInfo['name']);
-                $lines[] = "  - {$serviceNameSafe} (Qtà: {$totalQty}) = €" . number_format($costoTotale, 2, ',', '.');
+                
+                $table->addRow();
+                $table->addCell(5000)->addText($serviceNameSafe, ['name' => 'Arial']);
+                $table->addCell(2000)->addText((string)$totalQty, ['name' => 'Arial']);
+                $table->addCell(3000)->addText('€ ' . number_format($costoTotale, 2, ',', '.'), ['name' => 'Arial']);
                 
                 if ($priceInfo['period'] === 'annuale') {
                     $totaleServiziAnnuo += $costoTotale;
@@ -87,41 +93,48 @@ class QuoteGeneratorService
                     $totaleHardwareUnaTantum += $costoTotale;
                 }
             }
-            $lines[] = ""; // Spazio
         }
-
-        $lines[] = "--------------------------------------------------";
-        $lines[] = "TOTALE CANONI ANNUALI: €" . number_format($totaleServiziAnnuo, 2, ',', '.');
-        $lines[] = "TOTALE HARDWARE UNA TANTUM: €" . number_format($totaleHardwareUnaTantum, 2, ',', '.');
         
-        $testoFormattato = implode("</w:t><w:br/><w:t>", $lines);
+        $table->addRow();
+        $table->addCell(10000, ['gridSpan' => 3])->addText('', ['name' => 'Arial']); // Spazio vuoto
 
-        // Salva il file DOCX
-        $fileNameDocx = 'preventivo-' . \Illuminate\Support\Str::slug($companyName) . '-' . time() . '.docx';
-        $pathDocx = storage_path('app/public/service-pdfs/' . $fileNameDocx);
-        
-        // Assicura directory
-        if (!file_exists(storage_path('app/public/service-pdfs'))) {
-            mkdir(storage_path('app/public/service-pdfs'), 0755, true);
+        $table->addRow();
+        $table->addCell(7000, ['gridSpan' => 2])->addText('TOTALE CANONI ANNUALI', ['bold' => true, 'name' => 'Arial']);
+        $table->addCell(3000)->addText('€ ' . number_format($totaleServiziAnnuo, 2, ',', '.'), ['bold' => true, 'name' => 'Arial']);
+
+        $table->addRow();
+        $table->addCell(7000, ['gridSpan' => 2])->addText('TOTALE HARDWARE UNA TANTUM', ['bold' => true, 'name' => 'Arial']);
+        $table->addCell(3000)->addText('€ ' . number_format($totaleHardwareUnaTantum, 2, ',', '.'), ['bold' => true, 'name' => 'Arial']);
+
+        // --- PRE-ELABORAZIONE ZIP ARCHIVE ---
+        $tempDocx = storage_path('app/public/temp-' . time() . '.docx');
+        if (!file_exists(storage_path('app/public'))) {
+            mkdir(storage_path('app/public'), 0755, true);
         }
+        copy($templatePath, $tempDocx);
 
-        $templateProcessor->saveAs($pathDocx);
-
-        // --- POST-ELABORAZIONE ZIP ARCHIVE PER SOSTITUZIONI RAW TEXT ---
         $zip = new \ZipArchive();
-        if ($zip->open($pathDocx) === TRUE) {
+        if ($zip->open($tempDocx) === TRUE) {
             // Sostituisci in document.xml
             $docXml = $zip->getFromName('word/document.xml');
             if ($docXml !== false) {
                 // Sostituisce il nome azienda
                 $docXml = str_replace('Nome Azienda', htmlspecialchars($companyName), $docXml);
                 
-                // Inserisce la valorizzazione economica
-                $docXml = str_replace(
-                    'VALORIZZAZIONE ECONOMICA DELLA FORNITURA GT FLEET 365', 
-                    'VALORIZZAZIONE ECONOMICA DELLA FORNITURA GT FLEET 365</w:t><w:br/><w:t>' . $testoFormattato, 
-                    $docXml
-                );
+                // Rimuove eventuali evidenziazioni gialle
+                $docXml = str_replace('<w:highlight w:val="yellow"/>', '', $docXml);
+                
+                // Inserisce il macro-placeholder per la tabella sotto la seconda occorrenza (quella nel corpo)
+                $search = 'VALORIZZAZIONE ECONOMICA DELLA FORNITURA GT FLEET 365';
+                $replace = 'VALORIZZAZIONE ECONOMICA DELLA FORNITURA GT FLEET 365</w:t></w:r></w:p><w:p><w:r><w:t>${quote_table}</w:t></w:r></w:p><w:p><w:r><w:t>';
+                
+                $pos = strpos($docXml, $search); // Prima occorrenza (nell'Indice)
+                if ($pos !== false) {
+                    $pos2 = strpos($docXml, $search, $pos + strlen($search)); // Seconda occorrenza (nel Corpo)
+                    if ($pos2 !== false) {
+                        $docXml = substr_replace($docXml, $replace, $pos2, strlen($search));
+                    }
+                }
                 
                 $zip->addFromString('word/document.xml', $docXml);
             }
@@ -134,32 +147,51 @@ class QuoteGeneratorService
                     $headerXml = str_replace('RAGIONE SOCIALE', htmlspecialchars($companyName), $headerXml);
                     $headerXml = str_replace('Emesso da: TEAM Sales', htmlspecialchars('Emesso da: GT Fleet 365'), $headerXml);
                     $headerXml = str_replace('xx mese 2026', date('d/m/Y'), $headerXml);
+                    
+                    // Rimuove eventuali evidenziazioni gialle
+                    $headerXml = str_replace('<w:highlight w:val="yellow"/>', '', $headerXml);
+                    
                     $zip->addFromString($headerName, $headerXml);
                 }
             }
             $zip->close();
         }
 
-        // PROVA CONVERSIONE IN PDF (usando LibreOffice headless se presente)
+        // --- INSERIMENTO TABELLA CON TEMPLATE PROCESSOR ---
+        $templateProcessor = new TemplateProcessor($tempDocx);
+        
+        // Questo setComplexBlock andrà a sostituire la riga ${quote_table} che abbiamo iniettato
+        $templateProcessor->setComplexBlock('quote_table', $table);
+
+        // Salva il file DOCX finale
+        $fileNameDocx = 'preventivo-' . \Illuminate\Support\Str::slug($companyName) . '-' . time() . '.docx';
+        $pathDocx = storage_path('app/public/service-pdfs/' . $fileNameDocx);
+        
+        if (!file_exists(storage_path('app/public/service-pdfs'))) {
+            mkdir(storage_path('app/public/service-pdfs'), 0755, true);
+        }
+
+        $templateProcessor->saveAs($pathDocx);
+        
+        // Pulisce il temp file
+        @unlink($tempDocx);
+
+        // PROVA CONVERSIONE IN PDF
         $fileNamePdf = str_replace('.docx', '.pdf', $fileNameDocx);
         $pathPdf = storage_path('app/public/service-pdfs/' . $fileNamePdf);
         $outdir = storage_path('app/public/service-pdfs');
 
-        // Execute LibreOffice command (soffice)
-        // Note: this assumes soffice is available in the server's PATH.
         $cmd = "soffice --headless --convert-to pdf --outdir " . escapeshellarg($outdir) . " " . escapeshellarg($pathDocx) . " 2>&1";
         $output = [];
         $returnVar = 0;
         exec($cmd, $output, $returnVar);
 
         if ($returnVar === 0 && file_exists($pathPdf)) {
-            // Conversione riuscita
             return $pathPdf;
         }
 
         Log::warning("Impossibile convertire in PDF con soffice. Output: " . implode("\n", $output));
         
-        // Se la conversione fallisce, ritorno il DOCX come fallback
         return $pathDocx;
     }
 }
