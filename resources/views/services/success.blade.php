@@ -135,7 +135,11 @@
 
         @if(isset($groupToken))
             <a href="/servizi/{{ $groupToken }}/pdf" class="back-link" style="background: linear-gradient(135deg, #FF6B00 0%, #E55D00 100%); margin-bottom: 12px;">
-                📄 {{ __('Download Summary PDF') }}
+                📄 {{ __('Download Complete Offer') }}
+            </a>
+            <br><br>
+            <a href="#" class="back-link" style="background: linear-gradient(135deg, #FF6B00 0%, #E55D00 100%); margin-bottom: 12px;">
+                📄 {{ __('Download Short Offer') }}
             </a>
             <br><br>
             <a href="/servizi/{{ $groupToken }}" class="back-link">
