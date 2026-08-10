@@ -14,6 +14,10 @@ php artisan db:monitor --max=1 2>&1 || echo "⚠️  ATTENZIONE: Connessione al 
 echo "Esecuzione delle migrazioni del database..."
 php artisan migrate --force
 
+# Seed dei dati iniziali (commerciali, ecc.) - sicuro grazie a updateOrCreate
+echo "Seed dei dati iniziali..."
+php artisan db:seed --force
+
 # Avvio del server Apache in foreground
 echo "Avvio di Apache..."
 exec apache2-foreground
