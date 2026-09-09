@@ -256,6 +256,12 @@ return [
                             'input' => 'qty',
                             'categories' => ['aziendali', 'pesanti', 'frigo', 'frigo_pesante', 'opera'],
                         ],
+                        [
+                            'id'   => 'hw_tastierino',
+                            'name' => 'KEYPAD',
+                            'input' => 'qty',
+                            'categories' => ['aziendali', 'pesanti', 'frigo', 'frigo_pesante'],
+                        ],
                     ],
                 ],
                 [
@@ -269,6 +275,12 @@ return [
                             'name' => 'BEACON',
                             'input' => 'qty',
                             'categories' => ['aziendali', 'pesanti', 'frigo', 'frigo_pesante', 'opera'],
+                        ],
+                        [
+                            'id'   => 'hw_beacon_passeggero',
+                            'name' => 'BEACON (Passenger Recognition)',
+                            'input' => 'qty',
+                            'categories' => ['pesanti'],
                         ],
                     ],
                 ],
@@ -303,6 +315,14 @@ return [
                     'name' => 'GT FLEET 365 DIGITAL ESCORT',
                     'input' => 'check',
                     'categories' => ['aziendali', 'pesanti', 'frigo', 'frigo_pesante', 'frigo_rimorchio', 'rimorchi', 'opera', 'asset'],
+                    'hardware' => [
+                        [
+                            'id'   => 'hw_gost_shadow',
+                            'name' => 'GOST - SHADOW DEVICE SUPPLY',
+                            'input' => 'qty',
+                            'categories' => ['aziendali', 'frigo', 'opera'],
+                        ],
+                    ],
                 ],
                 [
                     'id'   => 'app_gt5_app',
