@@ -330,6 +330,24 @@
             background: #F4F6FA;
         }
 
+        /* Hardware Sub-items */
+        .hardware-sub-items {
+            padding-left: 40px;
+            background-color: #FAFCFF;
+            border-left: 3px solid #C4DBFF;
+            display: none; /* hidden by default, shown via JS */
+        }
+
+        .hardware-item {
+            padding: 10px 20px 10px 12px;
+            border-top: 1px dashed #E3E8F4;
+            background-color: transparent !important;
+        }
+
+        .hardware-item:hover {
+            background-color: #F0F6FF !important;
+        }
+
         /* Notes */
         .notes-section {
             background: #ffffff;
@@ -531,39 +549,72 @@
                             </div>
                             <div class="section-body" id="body-{{ $req->id }}-{{ $sIndex }}">
                                 @foreach($section['items'] as $item)
-                                    <label class="service-item">
-                                        @if($section['type'] === 'radio')
-                                            <input type="radio"
-                                                   name="vehicles[{{ $req->id }}][base_package]"
-                                                   value="{{ $item['id'] }}"
-                                                   onchange="updateSelection(this)"
-                                                   {{ $alreadyCompleted && collect($req->services)->where('id', $item['id'])->isNotEmpty() ? 'checked' : '' }}>
-                                        @else
-                                            <input type="checkbox"
-                                                   name="vehicles[{{ $req->id }}][services][]"
-                                                   value="{{ $item['id'] }}"
-                                                   onchange="updateSelection(this)"
-                                                   {{ $alreadyCompleted && collect($req->services)->where('id', $item['id'])->isNotEmpty() ? 'checked' : '' }}>
-                                        @endif
+                                    <div class="service-item-wrapper">
+                                        <label class="service-item">
+                                            @if($section['type'] === 'radio')
+                                                <input type="radio"
+                                                       name="vehicles[{{ $req->id }}][base_package]"
+                                                       value="{{ $item['id'] }}"
+                                                       onchange="updateSelection(this)"
+                                                       {{ $alreadyCompleted && collect($req->services)->where('id', $item['id'])->isNotEmpty() ? 'checked' : '' }}>
+                                            @else
+                                                <input type="checkbox"
+                                                       name="vehicles[{{ $req->id }}][services][]"
+                                                       value="{{ $item['id'] }}"
+                                                       onchange="updateSelection(this)"
+                                                       {{ $alreadyCompleted && collect($req->services)->where('id', $item['id'])->isNotEmpty() ? 'checked' : '' }}>
+                                            @endif
 
-                                        <span class="service-name">{{ __($item['name']) }}</span>
+                                            <span class="service-name">{{ __($item['name']) }}</span>
 
-                                        @if(isset($item['input']) && $item['input'] === 'qty')
-                                            @php
-                                                $savedQty = 0;
-                                                if ($alreadyCompleted && $req->services) {
-                                                    $saved = collect($req->services)->firstWhere('id', $item['id']);
-                                                    $savedQty = $saved['qty'] ?? 0;
-                                                }
-                                            @endphp
-                                            <input type="number"
-                                                   name="vehicles[{{ $req->id }}][quantities][{{ $item['id'] }}]"
-                                                   class="service-qty"
-                                                   value="{{ $savedQty ?: $req->vehicle_qty }}"
-                                                   min="0"
-                                                   disabled>
+                                            @if(isset($item['input']) && $item['input'] === 'qty')
+                                                @php
+                                                    $savedQty = 0;
+                                                    if ($alreadyCompleted && $req->services) {
+                                                        $saved = collect($req->services)->firstWhere('id', $item['id']);
+                                                        $savedQty = $saved['qty'] ?? 0;
+                                                    }
+                                                @endphp
+                                                <input type="number"
+                                                       name="vehicles[{{ $req->id }}][quantities][{{ $item['id'] }}]"
+                                                       class="service-qty"
+                                                       value="{{ $savedQty ?: $req->vehicle_qty }}"
+                                                       min="0"
+                                                       disabled>
+                                            @endif
+                                        </label>
+
+                                        {{-- Hardware Sub-items --}}
+                                        @if(isset($item['hardware']) && count($item['hardware']) > 0)
+                                            <div class="hardware-sub-items" id="hw-{{ $req->id }}-{{ $item['id'] }}">
+                                                @foreach($item['hardware'] as $hw)
+                                                    <label class="service-item hardware-item">
+                                                        <input type="checkbox"
+                                                               name="vehicles[{{ $req->id }}][services][]"
+                                                               value="{{ $hw['id'] }}"
+                                                               onchange="updateSelection(this)"
+                                                               {{ $alreadyCompleted && collect($req->services)->where('id', $hw['id'])->isNotEmpty() ? 'checked' : '' }}>
+                                                        <span class="service-name">{{ __($hw['name']) }}</span>
+                                                        @if(isset($hw['input']) && $hw['input'] === 'qty')
+                                                            @php
+                                                                $savedQty = 0;
+                                                                if ($alreadyCompleted && $req->services) {
+                                                                    $saved = collect($req->services)->firstWhere('id', $hw['id']);
+                                                                    $savedQty = $saved['qty'] ?? 0;
+                                                                }
+                                                            @endphp
+                                                            <input type="number"
+                                                                   name="vehicles[{{ $req->id }}][quantities][{{ $hw['id'] }}]"
+                                                                   class="service-qty"
+                                                                   value="{{ $savedQty ?: $req->vehicle_qty }}"
+                                                                   min="0"
+                                                                   disabled>
+                                                        @endif
+                                                    </label>
+                                                @endforeach
+                                            </div>
                                         @endif
-                                    </label>
+                                    </div>
                                 @endforeach
                             </div>
                         </div>
@@ -631,6 +682,26 @@
                 item.classList.remove('selected');
                 const qtyInput = item.querySelector('.service-qty');
                 if (qtyInput) qtyInput.disabled = true;
+            }
+
+            // Handle hardware sub-items visibility
+            const wrapper = input.closest('.service-item-wrapper');
+            if (wrapper && !item.classList.contains('hardware-item')) {
+                const subItems = wrapper.querySelector('.hardware-sub-items');
+                if (subItems) {
+                    if (input.checked) {
+                        subItems.style.display = 'block';
+                    } else {
+                        subItems.style.display = 'none';
+                        // Deselect nested hardware when parent is deselected
+                        subItems.querySelectorAll('input[type="checkbox"]').forEach(hwInput => {
+                            if (hwInput.checked) {
+                                hwInput.checked = false;
+                                updateSelection(hwInput);
+                            }
+                        });
+                    }
+                }
             }
         }
 

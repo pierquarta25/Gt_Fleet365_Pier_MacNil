@@ -260,7 +260,7 @@
                         @endphp
 
                         @if($basePackage)
-                            <div class="section-title">{{ __('BASE PACKAGE') }}</div>
+                            <div class="section-title">{{ __('PACKAGE') }}</div>
                             <ul class="service-list">
                                 <li>
                                     <span>{{ $basePackage['name'] }}</span>

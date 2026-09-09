@@ -102,33 +102,33 @@ return [
     'sections' => [
 
         [
-            'title' => 'Base Package',
+            'title' => 'Package',
             'icon'  => '📡',
             'type'  => 'radio', // Solo uno selezionabile
             'items' => [
                 [
                     'id'   => 'base_loc',
-                    'name' => 'GT FLEET 365 BASE (LOC) - Corporate, Heavy, Construction Vehicles',
+                    'name' => 'GT FLEET 365 BASE (LOC)',
                     'categories' => ['aziendali', 'pesanti', 'frigo', 'frigo_pesante', 'opera'],
                 ],
                 [
                     'id'   => 'plus_loc_sic',
-                    'name' => 'GT FLEET 365 PLUS (LOC + SEC) - Corporate, Heavy Vehicles',
+                    'name' => 'GT FLEET 365 PLUS (LOC + SEC)',
                     'categories' => ['aziendali', 'pesanti', 'frigo', 'frigo_pesante'],
                 ],
                 [
                     'id'   => 'gold_loc_tel',
-                    'name' => 'GT FLEET 365 GOLD (LOC + TEL) - Corporate, Heavy Vehicles',
+                    'name' => 'GT FLEET 365 GOLD (LOC + TEL)',
                     'categories' => ['aziendali', 'pesanti', 'frigo', 'frigo_pesante'],
                 ],
                 [
                     'id'   => 'premium_loc_tel_sic',
-                    'name' => 'GT FLEET 365 PREMIUM (LOC + TEL + SEC) - Corporate, Heavy Vehicles',
+                    'name' => 'GT FLEET 365 PREMIUM (LOC + TEL + SEC)',
                     'categories' => ['aziendali', 'pesanti', 'frigo', 'frigo_pesante'],
                 ],
                 [
                     'id'   => 'plus_trattore',
-                    'name' => 'GT FLEET 365 PLUS - Agricultural Tractor, Construction Vehicles',
+                    'name' => 'GT FLEET 365 PLUS',
                     'categories' => ['opera'],
                 ],
                 [
@@ -163,7 +163,7 @@ return [
                 ],
                 [
                     'id'   => 'asset',
-                    'name' => 'GT FLEET 365 ASSET - Dummy Packs, Power Generators',
+                    'name' => 'GT FLEET 365 ASSET',
                     'categories' => ['asset'],
                 ],
             ],
@@ -215,24 +215,62 @@ return [
                     'name' => 'CONTROLLED TEMPERATURE SERVICE',
                     'input' => 'check',
                     'categories' => ['frigo', 'frigo_pesante', 'frigo_rimorchio'],
+                    'hardware' => [
+                        [
+                            'id'   => 'hw_sensore_temperatura',
+                            'name' => 'TEMPERATURE SENSOR (Truck or Trailer)',
+                            'input' => 'qty',
+                            'categories' => ['frigo', 'frigo_pesante', 'frigo_rimorchio'],
+                        ],
+                    ],
                 ],
                 [
                     'id'   => 'gestione_portellone',
                     'name' => 'TAILGATE MANAGEMENT SERVICE',
                     'input' => 'check',
                     'categories' => ['frigo', 'frigo_pesante', 'frigo_rimorchio'],
+                    'hardware' => [
+                        [
+                            'id'   => 'hw_sensore_portellone',
+                            'name' => 'TAILGATE SENSOR (Van, Truck, Trailer)',
+                            'input' => 'qty',
+                            'categories' => ['frigo', 'frigo_pesante', 'frigo_rimorchio'],
+                        ],
+                    ],
                 ],
                 [
                     'id'   => 'riconoscimento_driver',
                     'name' => 'DRIVER RECOGNITION SERVICE',
                     'input' => 'check',
                     'categories' => ['aziendali', 'pesanti', 'frigo', 'frigo_pesante'],
+                    'hardware' => [
+                        [
+                            'id'   => 'hw_chiave_dallas',
+                            'name' => 'DALLAS KEY',
+                            'input' => 'qty',
+                            'categories' => ['aziendali', 'pesanti', 'frigo', 'frigo_pesante', 'opera'],
+                        ],
+                        [
+                            'id'   => 'hw_kit_lettore_dallas',
+                            'name' => 'DALLAS READER + KEY KIT',
+                            'input' => 'qty',
+                            'categories' => ['aziendali', 'pesanti', 'frigo', 'frigo_pesante', 'opera'],
+                        ],
+                    ],
                 ],
                 [
                     'id'   => 'riconoscimento_driver_app',
                     'name' => 'DRIVER RECOGNITION SERVICE WITH APP',
                     'input' => 'check',
                     'categories' => ['aziendali', 'pesanti', 'frigo', 'frigo_pesante'],
+                    'hardware' => [
+                        [
+                            'id'   => 'hw_beacon',
+                            'name' => 'BEACON',
+                            'input' => 'qty',
+                            'categories' => ['aziendali', 'pesanti', 'frigo', 'frigo_pesante', 'opera'],
+                        ],
+                    ],
                 ],
                 [
                     'id'   => 'tempi_guida_realtime',
@@ -245,6 +283,14 @@ return [
                     'name' => 'LIVE OPERATIONS CENTER (24/7)',
                     'input' => 'check',
                     'categories' => ['aziendali', 'pesanti', 'frigo', 'frigo_pesante'],
+                    'hardware' => [
+                        [
+                            'id'   => 'hw_pedale_antirapina',
+                            'name' => 'ANTI-ROBBERY / PANIC PEDAL',
+                            'input' => 'qty',
+                            'categories' => ['aziendali', 'pesanti', 'frigo', 'frigo_pesante'],
+                        ],
+                    ],
                 ],
                 [
                     'id'   => 'centrale_operativa_ondemand',
@@ -264,40 +310,7 @@ return [
                     'input' => 'check',
                     'categories' => ['aziendali', 'pesanti', 'frigo', 'frigo_pesante', 'frigo_rimorchio', 'rimorchi', 'opera', 'asset'],
                 ],
-            ],
-        ],
-
-        [
-            'title' => 'Crono & Tachograph',
-            'icon'  => '⏱️',
-            'type'  => 'checkbox',
-            'items' => [
-                [
-                    'id'   => 'carta_aziendale_crono',
-                    'name' => 'COMPANY CRONO CARD (every 25 Vehicles)',
-                    'input' => 'qty',
-                    'categories' => ['pesanti', 'frigo_pesante'],
-                ],
-                [
-                    'id'   => 'crono_ddd_silver',
-                    'name' => 'CRONO - DDD MANAGER - SILVER',
-                    'input' => 'check',
-                    'categories' => ['pesanti', 'frigo_pesante'],
-                ],
-                [
-                    'id'   => 'crono_ddd_gold',
-                    'name' => 'CRONO - DDD MANAGER - GOLD',
-                    'input' => 'check',
-                    'categories' => ['pesanti', 'frigo_pesante'],
-                ],
-            ],
-        ],
-
-        [
-            'title' => 'Hardware',
-            'icon'  => '⚙️',
-            'type'  => 'checkbox',
-            'items' => [
+                // --- Hardware standalone (senza servizio specifico associato) ---
                 [
                     'id'   => 'hw_gost_shadow',
                     'name' => 'GOST - SHADOW DEVICE SUPPLY',
@@ -329,44 +342,8 @@ return [
                     'categories' => ['asset'],
                 ],
                 [
-                    'id'   => 'hw_sensore_portellone',
-                    'name' => 'TAILGATE SENSOR (Van, Truck, Trailer)',
-                    'input' => 'qty',
-                    'categories' => ['frigo', 'frigo_pesante', 'frigo_rimorchio'],
-                ],
-                [
-                    'id'   => 'hw_sensore_temperatura',
-                    'name' => 'TEMPERATURE SENSOR (Truck or Trailer)',
-                    'input' => 'qty',
-                    'categories' => ['frigo', 'frigo_pesante', 'frigo_rimorchio'],
-                ],
-                [
-                    'id'   => 'hw_beacon',
-                    'name' => 'BEACON',
-                    'input' => 'qty',
-                    'categories' => ['aziendali', 'pesanti', 'frigo', 'frigo_pesante', 'opera'],
-                ],
-                [
-                    'id'   => 'hw_chiave_dallas',
-                    'name' => 'DALLAS KEY',
-                    'input' => 'qty',
-                    'categories' => ['aziendali', 'pesanti', 'frigo', 'frigo_pesante', 'opera'],
-                ],
-                [
-                    'id'   => 'hw_kit_lettore_dallas',
-                    'name' => 'DALLAS READER + KEY KIT',
-                    'input' => 'qty',
-                    'categories' => ['aziendali', 'pesanti', 'frigo', 'frigo_pesante', 'opera'],
-                ],
-                [
                     'id'   => 'hw_tastierino',
                     'name' => 'KEYPAD',
-                    'input' => 'qty',
-                    'categories' => ['aziendali', 'pesanti', 'frigo', 'frigo_pesante'],
-                ],
-                [
-                    'id'   => 'hw_pedale_antirapina',
-                    'name' => 'ANTI-ROBBERY / PANIC PEDAL',
                     'input' => 'qty',
                     'categories' => ['aziendali', 'pesanti', 'frigo', 'frigo_pesante'],
                 ],
@@ -375,6 +352,32 @@ return [
                     'name' => 'BEACON (Passenger Recognition)',
                     'input' => 'qty',
                     'categories' => ['pesanti'],
+                ],
+            ],
+        ],
+
+        [
+            'title' => 'Chronotachograph',
+            'icon'  => '⏱️',
+            'type'  => 'checkbox',
+            'items' => [
+                [
+                    'id'   => 'carta_aziendale_crono',
+                    'name' => 'COMPANY CRONO CARD (every 25 Vehicles)',
+                    'input' => 'qty',
+                    'categories' => ['pesanti', 'frigo_pesante'],
+                ],
+                [
+                    'id'   => 'crono_ddd_silver',
+                    'name' => 'CRONO - DDD MANAGER - SILVER',
+                    'input' => 'check',
+                    'categories' => ['pesanti', 'frigo_pesante'],
+                ],
+                [
+                    'id'   => 'crono_ddd_gold',
+                    'name' => 'CRONO - DDD MANAGER - GOLD',
+                    'input' => 'check',
+                    'categories' => ['pesanti', 'frigo_pesante'],
                 ],
             ],
         ],
