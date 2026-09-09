@@ -310,49 +310,7 @@ return [
                     'input' => 'check',
                     'categories' => ['aziendali', 'pesanti', 'frigo', 'frigo_pesante', 'frigo_rimorchio', 'rimorchi', 'opera', 'asset'],
                 ],
-                // --- Hardware standalone (senza servizio specifico associato) ---
-                [
-                    'id'   => 'hw_gost_shadow',
-                    'name' => 'GOST - SHADOW DEVICE SUPPLY',
-                    'input' => 'qty',
-                    'categories' => ['aziendali', 'frigo', 'opera'],
-                ],
-                [
-                    'id'   => 'hw_dispositivo_bordo',
-                    'name' => 'ON-BOARD DEVICE SUPPLY (for Base service)',
-                    'input' => 'qty',
-                    'categories' => ['aziendali', 'pesanti', 'frigo', 'frigo_pesante'],
-                ],
-                [
-                    'id'   => 'hw_dispositivo_rimorchio',
-                    'name' => 'TRAILER DEVICE SUPPLY',
-                    'input' => 'qty',
-                    'categories' => ['rimorchi', 'frigo_rimorchio'],
-                ],
-                [
-                    'id'   => 'hw_dispositivo_trattore',
-                    'name' => 'AGRICULTURAL TRACTOR, CONSTRUCTION VEHICLE DEVICE SUPPLY',
-                    'input' => 'qty',
-                    'categories' => ['opera'],
-                ],
-                [
-                    'id'   => 'hw_dispositivo_asset',
-                    'name' => 'ASSET DEVICE SUPPLY',
-                    'input' => 'qty',
-                    'categories' => ['asset'],
-                ],
-                [
-                    'id'   => 'hw_tastierino',
-                    'name' => 'KEYPAD',
-                    'input' => 'qty',
-                    'categories' => ['aziendali', 'pesanti', 'frigo', 'frigo_pesante'],
-                ],
-                [
-                    'id'   => 'hw_beacon_passeggero',
-                    'name' => 'BEACON (Passenger Recognition)',
-                    'input' => 'qty',
-                    'categories' => ['pesanti'],
-                ],
+
             ],
         ],
 
