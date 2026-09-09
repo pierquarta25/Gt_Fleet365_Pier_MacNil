@@ -111,7 +111,7 @@ header {
 .field-group input { padding: 10px 13px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 14px; outline: none; transition: border-color 0.2s; }
 .field-group input.input-error { border-color: #ff4d4d !important; background-color: #fff5f5; }
 .error-text { color: #ff4d4d; font-size: 12px; font-weight: 600; margin-top: 4px; display: block; }
-.global-error { background: #fff5f5; color: #cc0000; border: 1px solid #ffcccc; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; font-weight: 600; text-align: center; }
+.global-error { background: #fff5f5; color: #cc0000; border: 1px solid #ffcccc; padding: 10px; border-radius: 8px; margin: 20px 22px 0 22px; font-size: 13px; font-weight: 600; text-align: center; }
 
 .flex-1 { flex: 1; }
 .flex-2 { flex: 2; }
@@ -514,5 +514,21 @@ header {
 .lang-separator {
     color: rgba(255, 255, 255, 0.2);
     font-weight: 400;
+}
+
+/* Card Header Icon */
+.card-header-icon {
+    color: white;
+}
+
+/* Field Group No Margin */
+.field-group--no-margin {
+    margin-bottom: 0;
+}
+
+/* Button Group Layout */
+.btn-group {
+    display: flex;
+    gap: 10px;
 }
 

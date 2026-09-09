@@ -409,6 +409,37 @@
         .completed-banner {
             background: linear-gradient(135deg, #10B981 0%, #059669 100%); color: #ffffff; padding: 16px 24px; border-radius: 12px; text-align: center; margin-bottom: 20px; font-weight: 600; font-size: 14px;
         }
+
+        /* Language Switcher */
+        .lang-switcher {
+            margin-top: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .lang-link {
+            text-decoration: none;
+            color: rgba(255, 255, 255, 0.5);
+            transition: color 0.2s ease;
+        }
+
+        .lang-link--active {
+            color: #ffffff;
+            font-weight: 800;
+        }
+
+        .lang-separator {
+            color: rgba(255, 255, 255, 0.2);
+            font-weight: 400;
+        }
+
+        .vehicle-emoji-fallback {
+            font-size: 32px;
+        }
     </style>
 </head>
 
@@ -416,10 +447,10 @@
     <div class="header">
         <div class="header-title">{{ __('Service Configuration') }}</div>
         <div class="header-subtitle">MacNil — GT Fleet 365</div>
-        <div style="margin-top: 12px; display: inline-flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600; font-family: 'Inter', sans-serif;">
-            <a href="?lang=it" style="text-decoration: none; {{ app()->getLocale() === 'it' ? 'color: #ffffff; font-weight: 800;' : 'color: rgba(255, 255, 255, 0.5);' }} transition: color 0.2s ease;">IT</a>
-            <span style="color: rgba(255, 255, 255, 0.2); font-weight: 400;">|</span>
-            <a href="?lang=en" style="text-decoration: none; {{ app()->getLocale() === 'en' ? 'color: #ffffff; font-weight: 800;' : 'color: rgba(255, 255, 255, 0.5);' }} transition: color 0.2s ease;">EN</a>
+        <div class="lang-switcher">
+            <a href="?lang=it" class="lang-link {{ app()->getLocale() === 'it' ? 'lang-link--active' : '' }}">IT</a>
+            <span class="lang-separator">|</span>
+            <a href="?lang=en" class="lang-link {{ app()->getLocale() === 'en' ? 'lang-link--active' : '' }}">EN</a>
         </div>
     </div>
 
@@ -475,7 +506,7 @@
                         @if($req->vehicle_img)
                             <img src="{{ asset($req->vehicle_img) }}" alt="{{ $req->vehicle_name }}" class="vehicle-img">
                         @else
-                            <span style="font-size: 32px;">🚛</span>
+                            <span class="vehicle-emoji-fallback">🚛</span>
                         @endif
                         <div class="vehicle-header-info">
                             <div class="vehicle-name">{{ $req->vehicle_name }}</div>

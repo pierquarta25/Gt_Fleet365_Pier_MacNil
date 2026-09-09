@@ -173,6 +173,30 @@
             text-align: right;
             margin-top: 16px;
         }
+
+        .vehicle-layout-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .vehicle-img-cell {
+            width: 80px;
+            vertical-align: middle;
+        }
+
+        .vehicle-img-thumb {
+            max-width: 70px;
+            max-height: 50px;
+        }
+
+        .vehicle-info-cell {
+            vertical-align: middle;
+        }
+
+        .no-service-msg {
+            color: #8A93B0;
+            font-style: italic;
+        }
     </style>
 </head>
 
@@ -214,14 +238,14 @@
             @foreach($serviceRequests as $req)
                 <div class="vehicle-section">
                     <div class="vehicle-box">
-                        <table style="width: 100%; border-collapse: collapse;">
+                        <table class="vehicle-layout-table">
                             <tr>
                                 @if($req->vehicle_img)
-                                    <td style="width: 80px; vertical-align: middle;">
-                                        <img src="{{ public_path($req->vehicle_img) }}" alt="{{ $req->vehicle_name }}" style="max-width: 70px; max-height: 50px;">
+                                    <td class="vehicle-img-cell">
+                                        <img src="{{ public_path($req->vehicle_img) }}" alt="{{ $req->vehicle_name }}" class="vehicle-img-thumb">
                                     </td>
                                 @endif
-                                <td style="vertical-align: middle;">
+                                <td class="vehicle-info-cell">
                                     <div class="vehicle-name">{{ $req->vehicle_name }}</div>
                                     <div class="vehicle-qty">{{ __('Quantity:') }} {{ $req->vehicle_qty }}</div>
                                 </td>
@@ -258,7 +282,7 @@
                             </ul>
                         @endif
                     @else
-                        <p style="color: #8A93B0; font-style: italic;">{{ __('No service selected for this vehicle.') }}</p>
+                        <p class="no-service-msg">{{ __('No service selected for this vehicle.') }}</p>
                     @endif
 
                     @if($req->notes)

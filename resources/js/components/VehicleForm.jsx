@@ -246,12 +246,12 @@ export default function VehicleForm() {
 
                         <div className="card">
                             <div className="card-header">
-                                <i className="fas fa-list-alt" style={{ color: 'white' }}></i>
+                                <i className="fas fa-list-alt card-header-icon"></i>
                                 <h2>{t('header.step1')}</h2>
                             </div>
 
                             {Object.keys(errors).length > 0 && (
-                                <div className="global-error" style={{ margin: '20px 22px 0 22px' }} role="alert">
+                                <div className="global-error" role="alert">
                                     ⚠️ {t('errors.globalAlert')}
                                 </div>
                             )}
@@ -356,7 +356,7 @@ export default function VehicleForm() {
                             <div className="cf-section">
                                 <div className="cf-section-label"><span>👥</span><span>{t('sections.drivers')}</span></div>
                                 <div className="cf-fields row-layout">
-                                    <div className="field-group" style={{ marginBottom: 0 }}>
+                                    <div className="field-group field-group--no-margin">
                                         <label htmlFor="drivers">{t('form.driversCount')}</label>
                                         <div className="counter-container">
                                             <button 
@@ -472,7 +472,7 @@ export default function VehicleForm() {
                                 <div className="total-info">{t('step2.total')}: <strong>{totalVehicles}</strong> {t('step2.vehicles')}</div>
                                 {renderStepBadges("mobile-step-badges")}
                             </div>
-                            <div className="btn-group" style={{ display: 'flex', gap: '10px' }}>
+                            <div className="btn-group">
                                 <button type="button" className="btn btn-ghost" onClick={() => setStep(1)}>← {t('navigation.back')}</button>
                                 <button type="button" className="btn btn-primary" onClick={() => setStep(3)}>{t('navigation.nextSummary')} →</button>
                             </div>
@@ -520,7 +520,7 @@ export default function VehicleForm() {
                         <div className="bottom-bar">
                             <span className="step-info step-info-desktop"></span>
                             {renderStepBadges("mobile-step-badges")}
-                            <div className="btn-group" style={{ display: 'flex', gap: '10px' }}>
+                            <div className="btn-group">
                                 <button type="button" className="btn btn-ghost" onClick={() => setStep(2)}>← {t('navigation.editVehicles')}</button>
                                 <button
                                     type="button"

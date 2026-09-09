@@ -108,6 +108,23 @@
             font-size: 11px;
             color: #8A93B0;
         }
+
+        .vehicle-badges-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 32px;
+        }
+
+        .vehicle-badge--inline {
+            margin-bottom: 0;
+        }
+
+        .back-link--download {
+            background: linear-gradient(135deg, #FF6B00 0%, #E55D00 100%);
+            margin-bottom: 12px;
+        }
     </style>
 </head>
 
@@ -121,9 +138,9 @@
         </p>
 
         @if(isset($serviceRequests) && $serviceRequests->isNotEmpty())
-            <div style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 32px;">
+            <div class="vehicle-badges-container">
                 @foreach($serviceRequests as $req)
-                    <div class="vehicle-badge" style="margin-bottom: 0;">
+                    <div class="vehicle-badge vehicle-badge--inline">
                         <span>🚛</span>
                         <span class="vehicle-badge-name">{{ $req->vehicle_name }} × {{ $req->vehicle_qty }}</span>
                     </div>
@@ -134,11 +151,11 @@
         <br>
 
         @if(isset($groupToken))
-            <a href="/servizi/{{ $groupToken }}/pdf" class="back-link" style="background: linear-gradient(135deg, #FF6B00 0%, #E55D00 100%); margin-bottom: 12px;">
+            <a href="/servizi/{{ $groupToken }}/pdf" class="back-link back-link--download">
                 📄 {{ __('Download Complete Offer') }}
             </a>
             <br><br>
-            <a href="#" class="back-link" style="background: linear-gradient(135deg, #FF6B00 0%, #E55D00 100%); margin-bottom: 12px;">
+            <a href="#" class="back-link back-link--download">
                 📄 {{ __('Download Short Offer') }}
             </a>
             <br><br>
