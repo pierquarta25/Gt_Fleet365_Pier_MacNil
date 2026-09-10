@@ -127,6 +127,9 @@ class ServiceFormController extends Controller
             'vehicles.*.quantities.*'         => 'integer|min:0',
             'vehicles.*.vehicle_qty'          => 'nullable|integer|min:1',
             'vehicles.*.notes'                => 'nullable|string|max:2000',
+            'vehicles.*.package_price'        => 'nullable|numeric',
+            'vehicles.*.package_discount'     => 'nullable|numeric',
+            'vehicles.*.package_final_price'  => 'nullable|numeric',
         ]);
 
         foreach ($serviceRequests as $req) {
@@ -137,11 +140,16 @@ class ServiceFormController extends Controller
 
             // Pacchetto base (radio)
             if (!empty($data['base_package'])) {
-                $selectedServices[] = [
+                $pkg = [
                     'id'   => $data['base_package'],
                     'name' => $this->getServiceName($data['base_package']),
                     'type' => 'base_package',
                 ];
+                if (isset($data['package_price'])) $pkg['price'] = $data['package_price'];
+                if (isset($data['package_discount'])) $pkg['discount'] = $data['package_discount'];
+                if (isset($data['package_final_price'])) $pkg['final_price'] = $data['package_final_price'];
+                
+                $selectedServices[] = $pkg;
             }
 
             // Servizi aggiuntivi (checkbox)

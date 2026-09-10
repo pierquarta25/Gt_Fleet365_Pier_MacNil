@@ -462,6 +462,30 @@
 </head>
 
 <body>
+@php
+    $packagePrices = [
+        "base_loc" => 200,
+        "plus_loc_sic" => 250,
+        "gold_loc_tel" => 300,
+        "premium_loc_tel_sic" => 350,
+        "plus" => 200,
+        "crono_base" => 250,
+        "crono_plus" => 300,
+        "crono_tel" => 350,
+        "crono_premium" => 400,
+        "trailers_comodato" => 200,
+        "trailers_proprieta" => 150,
+        "asset" => 150,
+        "app_fleet_manager" => 39,
+        "app_driver" => 100,
+        "manutenzioni" => 100,
+        "formazione" => 100,
+        "missioni" => 200,
+        "scorta" => 150,
+        "app_gt5" => 100,
+    ];
+@endphp
+
     <div class="header">
         <div class="header-title">{{ __('Service Configuration') }}</div>
         <div class="header-subtitle">MacNil — GT Fleet 365</div>
@@ -552,7 +576,7 @@
                                     <div class="service-item-wrapper">
                                         <label class="service-item">
                                             @if($section['type'] === 'radio')
-                                                <input type="radio"
+                                                <input type="radio" data-price="{{ $packagePrices[$item['id']] ?? 200 }}"
                                                        name="vehicles[{{ $req->id }}][base_package]"
                                                        value="{{ $item['id'] }}"
                                                        onchange="updateSelection(this)"
@@ -583,6 +607,40 @@
                                                        disabled>
                                             @endif
                                         </label>
+                                            @if($section['type'] === 'radio')
+                                                <div class="package-discount-box" style="display: none; background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 10px 20px 10px 45px; border: 1px solid #e3e8f4;">
+                                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                                                        <div>
+                                                            <small style="color: #666;">Prezzo Listino</small>
+                                                            <div style="font-size: 1.1rem; font-weight: bold;">€ <span class="base-price-display">0</span></div>
+                                                        </div>
+                                                        <div style="background: #e3f2fd; color: #0052BD; padding: 5px 15px; border-radius: 50px; font-weight: bold; border: 1px solid #bbdefb; font-size: 0.9rem;">
+                                                            Scontistica: <span class="discount-display">0</span>%
+                                                        </div>
+                                                    </div>
+                                                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                                                        <div style="display: flex; justify-content: space-between;">
+                                                            <label style="font-size: 0.9rem; font-weight: 600;">Sconto (%)</label>
+                                                            <label style="font-size: 0.8rem; color: #666; cursor: pointer;">
+                                                                <input type="checkbox" class="unlock-discount-chk" onchange="updateDiscountLimits(this)"> 🔓 Sblocca limite 50%
+                                                            </label>
+                                                        </div>
+                                                        <div style="display: flex; align-items: center; gap: 10px;">
+                                                            <input type="range" class="discount-slider" min="0" max="50" step="1" value="0" style="flex: 1;" oninput="updateDiscountFromSlider(this)">
+                                                            <input type="number" class="discount-input" min="0" max="50" value="0" style="width: 60px; padding: 5px; text-align: center; border-radius: 5px; border: 1px solid #ccc;" oninput="updateDiscountFromInput(this)">
+                                                        </div>
+                                                    </div>
+                                                    <div style="border-top: 1px solid #ddd; padding-top: 10px; margin-top: 15px; display: flex; justify-content: space-between; align-items: center;">
+                                                        <strong style="font-size: 1rem;">Prezzo Finale:</strong>
+                                                        <strong style="font-size: 1.2rem; color: #0052BD;">€ <span class="final-price-display">0</span></strong>
+                                                    </div>
+                                                    <!-- Hidden inputs for form submission -->
+                                                    <input type="hidden" name="vehicles[{{ $req->id }}][package_price]" class="hidden-price-input" value="0">
+                                                    <input type="hidden" name="vehicles[{{ $req->id }}][package_discount]" class="hidden-discount-input" value="0">
+                                                    <input type="hidden" name="vehicles[{{ $req->id }}][package_final_price]" class="hidden-final-price-input" value="0">
+                                                </div>
+                                            @endif
+
 
                                         {{-- Hardware Sub-items --}}
                                         @if(isset($item['hardware']) && count($item['hardware']) > 0)
@@ -666,6 +724,70 @@
         }
 
         // Aggiorna stile selezione e abilita/disabilita campi qty
+        
+        // Aggiorna prezzi e scontistica
+        function initPricing(radioInput) {
+            const wrapper = radioInput.closest('.service-item-wrapper');
+            const box = wrapper.querySelector('.package-discount-box');
+            if(!box) return;
+            
+            const section = radioInput.closest('.section-body');
+            section.querySelectorAll('.package-discount-box').forEach(b => b.style.display = 'none');
+            
+            if(radioInput.checked) {
+                box.style.display = 'block';
+                const basePrice = parseFloat(radioInput.getAttribute('data-price') || 0);
+                box.querySelector('.base-price-display').textContent = basePrice.toFixed(2);
+                box.querySelector('.hidden-price-input').value = basePrice;
+                recalcFinalPrice(box, basePrice);
+            }
+        }
+
+        function updateDiscountLimits(chk) {
+            const box = chk.closest('.package-discount-box');
+            const max = chk.checked ? 100 : 50;
+            const slider = box.querySelector('.discount-slider');
+            const input = box.querySelector('.discount-input');
+            slider.max = max;
+            input.max = max;
+            if(parseInt(slider.value) > max) {
+                slider.value = max;
+                input.value = max;
+                recalcFinalPrice(box);
+            }
+        }
+
+        function updateDiscountFromSlider(el) {
+            const box = el.closest('.package-discount-box');
+            box.querySelector('.discount-input').value = el.value;
+            recalcFinalPrice(box);
+        }
+
+        function updateDiscountFromInput(el) {
+            const box = el.closest('.package-discount-box');
+            let val = parseInt(el.value) || 0;
+            const max = parseInt(el.max);
+            if(val > max) { val = max; el.value = max; }
+            if(val < 0) { val = 0; el.value = 0; }
+            box.querySelector('.discount-slider').value = val;
+            recalcFinalPrice(box);
+        }
+
+        function recalcFinalPrice(box, forceBasePrice = null) {
+            let basePrice = forceBasePrice;
+            if (basePrice === null) {
+                basePrice = parseFloat(box.querySelector('.hidden-price-input').value);
+            }
+            const discount = parseInt(box.querySelector('.discount-slider').value) || 0;
+            const finalPrice = basePrice * (1 - discount/100);
+            
+            box.querySelector('.discount-display').textContent = discount;
+            box.querySelector('.final-price-display').textContent = finalPrice.toFixed(2);
+            
+            box.querySelector('.hidden-discount-input').value = discount;
+            box.querySelector('.hidden-final-price-input').value = finalPrice.toFixed(2);
+        }
+
         function updateSelection(input) {
             const item = input.closest('.service-item');
 
@@ -675,6 +797,7 @@
             }
 
             if (input.checked) {
+                if(input.type === 'radio') initPricing(input);
                 item.classList.add('selected');
                 const qtyInput = item.querySelector('.service-qty');
                 if (qtyInput) qtyInput.disabled = false;
@@ -690,6 +813,7 @@
                 const subItems = wrapper.querySelector('.hardware-sub-items');
                 if (subItems) {
                     if (input.checked) {
+                if(input.type === 'radio') initPricing(input);
                         subItems.style.display = 'block';
                     } else {
                         subItems.style.display = 'none';
@@ -708,6 +832,7 @@
         // Init selezioni
         document.addEventListener('DOMContentLoaded', function() {
             document.querySelectorAll('input[type="checkbox"]:checked, input[type="radio"]:checked').forEach(updateSelection);
+            document.querySelectorAll('input[type="radio"]:checked').forEach(initPricing);
         });
 
         // Toast
