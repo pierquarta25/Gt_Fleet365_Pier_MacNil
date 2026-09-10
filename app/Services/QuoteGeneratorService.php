@@ -77,7 +77,16 @@ class QuoteGeneratorService
                 $totalQty = $qty * $srvQty;
                 
                 $priceInfo = $this->pricing[$id] ?? ['name' => $srv['name'], 'price' => 0, 'type' => 'custom', 'period' => '-'];
-                $costoUnitario = $priceInfo['price'];
+                
+                if (isset($srv['final_price'])) {
+                    $costoUnitario = (float) $srv['final_price'];
+                    if (!isset($this->pricing[$id])) {
+                        $priceInfo['period'] = 'annuale'; 
+                    }
+                } else {
+                    $costoUnitario = $priceInfo['price'];
+                }
+                
                 $costoTotale = $costoUnitario * $totalQty;
                 
                 $serviceNameSafe = htmlspecialchars($priceInfo['name']);
