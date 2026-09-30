@@ -529,104 +529,121 @@ class QuoteGeneratorService
             $table->addCell($w[$i], $style)->addText($header, $headerFont);
         }
 
-        // --- RIGHE DATI ---
-        $totaleServiziAnnuo = 0;
-        $totaleHardwareUnaTantum = 0;
-
+        // --- AGGREGAZIONE SERVIZI (una riga per servizio unico) ---
+        $aggregated = [];
         foreach ($serviceRequests as $req) {
-            $qty = $req->vehicle_qty ?? 1;
+            $vehicleQty = $req->vehicle_qty ?? 1;
             $services = $req->services ?? [];
 
             foreach ($services as $srv) {
                 $id = $srv['id'];
                 $srvQty = $srv['qty'] ?? 1;
-                $totalQty = $qty * $srvQty;
+                $totalQtyForThis = $vehicleQty * $srvQty;
 
-                $priceInfo = $this->pricing[$id] ?? [
-                    'name' => $srv['name'],
-                    'list_price' => 0,
-                    'discounted_price' => 0,
-                    'offer_price' => 0,
-                    'description' => [],
-                    'type' => 'servizio',
-                    'period' => 'annuale',
-                    'contract_months' => 24
-                ];
-
-                // Se il commerciale ha inserito un prezzo finale, usiamo quello
-                $offerPrice = isset($srv['final_price']) ? (float) $srv['final_price'] : $priceInfo['offer_price'];
-                $listPrice = $priceInfo['list_price'];
-                $discountedPrice = $priceInfo['discounted_price'];
-                $contractMonths = $priceInfo['contract_months'] ?? 24;
-                $period = $priceInfo['period'] ?? 'annuale';
-                $type = $priceInfo['type'] ?? 'servizio';
-
-                // Calcoli
-                $costoTotaleOfferta = $offerPrice * $totalQty;
-                $prezzoMensile = ($period === 'annuale' && $offerPrice > 0) ? $offerPrice / 12 : 0;
-                $totaleAnnuale = ($period === 'annuale') ? $prezzoMensile * 12 : 0;
-
-                if ($period === 'annuale') {
-                    $totaleServiziAnnuo += $costoTotaleOfferta;
+                if (isset($aggregated[$id])) {
+                    // Servizio già presente, somma la quantità
+                    $aggregated[$id]['totalQty'] += $totalQtyForThis;
                 } else {
-                    $totaleHardwareUnaTantum += $costoTotaleOfferta;
+                    $aggregated[$id] = [
+                        'id' => $id,
+                        'srv' => $srv,
+                        'totalQty' => $totalQtyForThis,
+                    ];
                 }
-
-                // Formattazione prezzi (OMAGGIO se 0)
-                $fmtList = '€ ' . number_format($listPrice, 2, ',', '.');
-                $fmtDisc = '€ ' . number_format($discountedPrice, 2, ',', '.');
-                $fmtOffer = ($offerPrice == 0) ? 'OMAGGIO' : '€ ' . number_format($offerPrice, 2, ',', '.');
-                $fmtMensile = ($offerPrice == 0) ? 'OMAGGIO' : '€ ' . number_format($prezzoMensile, 2, ',', '.');
-                $fmtTotale = ($offerPrice == 0) ? 'OMAGGIO' : '€ ' . number_format($totaleAnnuale, 2, ',', '.');
-
-                $table->addRow();
-
-                // Col 1: Codice Servizio
-                $table->addCell($w[0], $cellStyle)->addText(htmlspecialchars($priceInfo['name']), $cellFont);
-
-                // Col 2: Hardware o Servizio
-                $table->addCell($w[1], $cellStyle)->addText($type, $cellFont);
-
-                // Col 3: Descrizione (con bullet list)
-                $descCell = $table->addCell($w[2], $cellStyle);
-                $descriptions = $priceInfo['description'] ?? [];
-                foreach ($descriptions as $desc) {
-                    $descCell->addListItem(
-                        htmlspecialchars($desc),
-                        0,
-                        ['name' => 'Arial', 'size' => 6],
-                        ['listType' => \PhpOffice\PhpWord\Style\ListItem::TYPE_BULLET_FILLED]
-                    );
-                }
-
-                // Col 4: Prezzo Listino
-                $table->addCell($w[3], $cellStyle)->addText($fmtList, $cellFont);
-
-                // Col 5: Prezzo Scontato
-                $table->addCell($w[4], $cellStyle)->addText($fmtDisc, $cellFont);
-
-                // Col 6: Prezzo Offerta (GIALLO)
-                $table->addCell($w[5], $yellowCellStyle)->addText($fmtOffer, $cellFontBold);
-
-                // Col 7: Periodicità
-                $table->addCell($w[6], $cellStyle)->addText($period, $cellFont);
-
-                // Col 8: Durata Contrattuale
-                $table->addCell($w[7], $cellStyle)->addText((string) $contractMonths, $cellFont);
-
-                // Col 9: Quantità
-                $table->addCell($w[8], $cellStyle)->addText((string) $totalQty, $cellFont);
-
-                // Col 10: Periodicità Pagamento
-                $periodicita = ($period === 'annuale') ? 'Canone Mensile con Pagamento Bimestrale Anticipato' : 'Una Tantum';
-                $table->addCell($w[9], $cellStyle)->addText($periodicita, ['name' => 'Arial', 'size' => 6]);
-
-                // Col 11: Prezzo Mensile Offerta (GIALLO)
-                $table->addCell($w[10], $yellowCellStyle)->addText($fmtMensile, $cellFontBold);
-
-                // Col 12: Totale Annuale
-                $table->addCell($w[11], $cellStyle)->addText($fmtTotale, $cellFontBold);
             }
+        }
+
+        // --- RIGHE DATI (una per servizio unico) ---
+        $totaleServiziAnnuo = 0;
+        $totaleHardwareUnaTantum = 0;
+
+        foreach ($aggregated as $id => $entry) {
+            $srv = $entry['srv'];
+            $totalQty = $entry['totalQty'];
+
+            $priceInfo = $this->pricing[$id] ?? [
+                'name' => $srv['name'],
+                'list_price' => 0,
+                'discounted_price' => 0,
+                'offer_price' => 0,
+                'description' => [],
+                'type' => 'servizio',
+                'period' => 'annuale',
+                'contract_months' => 24
+            ];
+
+            // Se il commerciale ha inserito un prezzo finale, usiamo quello
+            $offerPrice = isset($srv['final_price']) ? (float) $srv['final_price'] : $priceInfo['offer_price'];
+            $listPrice = $priceInfo['list_price'];
+            $discountedPrice = $priceInfo['discounted_price'];
+            $contractMonths = $priceInfo['contract_months'] ?? 24;
+            $period = $priceInfo['period'] ?? 'annuale';
+            $type = $priceInfo['type'] ?? 'servizio';
+
+            // Calcoli
+            $prezzoMensile = ($period === 'annuale' && $offerPrice > 0) ? $offerPrice / 12 : 0;
+            $totaleAnnualeSingolo = ($period === 'annuale') ? $prezzoMensile * 12 : $offerPrice;
+
+            if ($period === 'annuale') {
+                $totaleServiziAnnuo += $totaleAnnualeSingolo * $totalQty;
+            } else {
+                $totaleHardwareUnaTantum += $offerPrice * $totalQty;
+            }
+
+            // Formattazione prezzi (OMAGGIO se 0)
+            $fmtList = number_format($listPrice, 2, ',', '.') . ' ' . chr(0xE2) . chr(0x82) . chr(0xAC);
+            $fmtDisc = chr(0xE2) . chr(0x82) . chr(0xAC) . ' ' . number_format($discountedPrice, 2, ',', '.');
+            $fmtOffer = ($offerPrice == 0) ? 'OMAGGIO' : number_format($offerPrice, 2, ',', '.');
+            $fmtMensile = ($offerPrice == 0) ? 'OMAGGIO' : number_format($prezzoMensile, 2, ',', '.');
+            $fmtTotale = ($offerPrice == 0) ? 'OMAGGIO' : number_format($totaleAnnualeSingolo, 2, ',', '.');
+
+            $table->addRow();
+
+            // Col 1: Codice Servizio
+            $table->addCell($w[0], $cellStyle)->addText($priceInfo['name'], $cellFont);
+
+            // Col 2: Hardware o Servizio
+            $table->addCell($w[1], $cellStyle)->addText($type, $cellFont);
+
+            // Col 3: Descrizione (con bullet list)
+            $descCell = $table->addCell($w[2], $cellStyle);
+            $descriptions = $priceInfo['description'] ?? [];
+            foreach ($descriptions as $desc) {
+                $descCell->addListItem(
+                    $desc,
+                    0,
+                    ['name' => 'Arial', 'size' => 6],
+                    ['listType' => \PhpOffice\PhpWord\Style\ListItem::TYPE_BULLET_FILLED]
+                );
+            }
+
+            // Col 4: Prezzo Listino
+            $table->addCell($w[3], $cellStyle)->addText($fmtList, $cellFont);
+
+            // Col 5: Prezzo Scontato
+            $table->addCell($w[4], $cellStyle)->addText($fmtDisc, $cellFont);
+
+            // Col 6: Prezzo Offerta (GIALLO)
+            $table->addCell($w[5], $yellowCellStyle)->addText($fmtOffer, $cellFontBold);
+
+            // Col 7: Periodicita
+            $table->addCell($w[6], $cellStyle)->addText($period, $cellFont);
+
+            // Col 8: Durata Contrattuale
+            $table->addCell($w[7], $cellStyle)->addText((string) $contractMonths, $cellFont);
+
+            // Col 9: Quantita
+            $table->addCell($w[8], $cellStyle)->addText((string) $totalQty, $cellFont);
+
+            // Col 10: Periodicita Pagamento
+            $periodicita = ($period === 'annuale') ? 'Canone Mensile con Pagamento Bimestrale Anticipato' : 'Una Tantum';
+            $table->addCell($w[9], $cellStyle)->addText($periodicita, ['name' => 'Arial', 'size' => 6]);
+
+            // Col 11: Prezzo Mensile Offerta (GIALLO)
+            $table->addCell($w[10], $yellowCellStyle)->addText($fmtMensile, $cellFontBold);
+
+            // Col 12: Totale Annuale
+            $table->addCell($w[11], $cellStyle)->addText($fmtTotale, $cellFontBold);
         }
 
         // --- RIGHE TOTALI ---
@@ -637,12 +654,12 @@ class QuoteGeneratorService
         // Totale Canoni Annuali
         $table->addRow();
         $table->addCell(4500, ['gridSpan' => 11])->addText('TOTALE CANONI ANNUALI', $cellFontBold);
-        $table->addCell($w[11])->addText('€ ' . number_format($totaleServiziAnnuo, 2, ',', '.'), $cellFontBold);
+        $table->addCell($w[11])->addText(number_format($totaleServiziAnnuo, 2, ',', '.'), $cellFontBold);
 
         // Totale Hardware
         $table->addRow();
         $table->addCell(4500, ['gridSpan' => 11])->addText('TOTALE HARDWARE UNA TANTUM', $cellFontBold);
-        $table->addCell($w[11])->addText('€ ' . number_format($totaleHardwareUnaTantum, 2, ',', '.'), $cellFontBold);
+        $table->addCell($w[11])->addText(number_format($totaleHardwareUnaTantum, 2, ',', '.'), $cellFontBold);
 
         // --- PRE-ELABORAZIONE ZIP ARCHIVE ---
         $tempDocx = storage_path('app/public/temp-' . time() . '.docx');
