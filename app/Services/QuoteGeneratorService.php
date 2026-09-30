@@ -561,6 +561,7 @@ class QuoteGeneratorService
             $srv = $entry['srv'];
             $totalQty = $entry['totalQty'];
 
+            // Dati dal pricing array (solo per info aggiuntive: descrizione, tipo, periodo)
             $priceInfo = $this->pricing[$id] ?? [
                 'name' => $srv['name'],
                 'list_price' => 0,
@@ -572,10 +573,12 @@ class QuoteGeneratorService
                 'contract_months' => 24
             ];
 
-            // Se il commerciale ha inserito un prezzo finale, usiamo quello
+            // PREZZI: priorità ai dati inseriti dal commerciale nella configurazione
+            $listPrice = isset($srv['price']) ? (float) $srv['price'] : $priceInfo['list_price'];
+            $discount = isset($srv['discount']) ? (float) $srv['discount'] : 0;
+            $discountedPrice = ($discount > 0) ? ($listPrice - $discount) : ($priceInfo['discounted_price'] ?? $listPrice);
             $offerPrice = isset($srv['final_price']) ? (float) $srv['final_price'] : $priceInfo['offer_price'];
-            $listPrice = $priceInfo['list_price'];
-            $discountedPrice = $priceInfo['discounted_price'];
+            
             $contractMonths = $priceInfo['contract_months'] ?? 24;
             $period = $priceInfo['period'] ?? 'annuale';
             $type = $priceInfo['type'] ?? 'servizio';
@@ -590,12 +593,13 @@ class QuoteGeneratorService
                 $totaleHardwareUnaTantum += $offerPrice * $totalQty;
             }
 
-            // Formattazione prezzi (OMAGGIO se 0)
-            $fmtList = number_format($listPrice, 2, ',', '.') . ' ' . chr(0xE2) . chr(0x82) . chr(0xAC);
-            $fmtDisc = chr(0xE2) . chr(0x82) . chr(0xAC) . ' ' . number_format($discountedPrice, 2, ',', '.');
-            $fmtOffer = ($offerPrice == 0) ? 'OMAGGIO' : number_format($offerPrice, 2, ',', '.');
-            $fmtMensile = ($offerPrice == 0) ? 'OMAGGIO' : number_format($prezzoMensile, 2, ',', '.');
-            $fmtTotale = ($offerPrice == 0) ? 'OMAGGIO' : number_format($totaleAnnualeSingolo, 2, ',', '.');
+            // Formattazione prezzi come da listino MacNil
+            $euro = html_entity_decode('&euro;', ENT_COMPAT, 'UTF-8');
+            $fmtList = number_format($listPrice, 2, ',', '.') . ' ' . $euro;
+            $fmtDisc = $euro . ' ' . number_format($discountedPrice, 2, ',', '.');
+            $fmtOffer = ($offerPrice == 0) ? 'OMAGGIO' : $euro . ' ' . number_format($offerPrice, 2, ',', '.');
+            $fmtMensile = ($offerPrice == 0) ? 'OMAGGIO' : $euro . ' ' . number_format($prezzoMensile, 2, ',', '.');
+            $fmtTotale = ($offerPrice == 0) ? 'OMAGGIO' : $euro . ' ' . number_format($totaleAnnualeSingolo, 2, ',', '.');
 
             $table->addRow();
 
