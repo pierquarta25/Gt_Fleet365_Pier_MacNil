@@ -163,6 +163,25 @@ class QuoteGeneratorService
                     $zip->addFromString($headerName, $headerXml);
                 }
             }
+
+            // Ottieni il commerciale
+            $agentEmail = $firstReq->agent_email ?? null;
+            $agent = $agentEmail ? \App\Models\User::where('email', $agentEmail)->first() : null;
+            $agentName = $agent ? $agent->name : 'Commerciale';
+
+            // Sostituisci nei footer (per Nome e Cognome)
+            for ($i = 1; $i <= 5; $i++) {
+                $footerName = 'word/footer' . $i . '.xml';
+                $footerXml = $zip->getFromName($footerName);
+                if ($footerXml !== false) {
+                    $footerXml = str_replace('Nome e Cognome', htmlspecialchars($agentName), $footerXml);
+                    
+                    // Rimuove eventuali evidenziazioni gialle
+                    $footerXml = str_replace('<w:highlight w:val="yellow"/>', '', $footerXml);
+                    
+                    $zip->addFromString($footerName, $footerXml);
+                }
+            }
             $zip->close();
         }
 
