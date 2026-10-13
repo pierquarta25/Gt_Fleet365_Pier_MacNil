@@ -656,13 +656,14 @@ class QuoteGeneratorService
         $table->addCell(5000, ['gridSpan' => 12])->addText('', $cellFont);
 
         // Totale Canoni Annuali
+        // Larghezza = somma prime 11 colonne: 500+300+1100+350+350+400+300+250+200+400+400 = 4550
         $table->addRow();
-        $table->addCell(4500, ['gridSpan' => 11])->addText('TOTALE CANONI ANNUALI', $cellFontBold);
+        $table->addCell(4550, ['gridSpan' => 11])->addText('TOTALE CANONI ANNUALI', $cellFontBold);
         $table->addCell($w[11])->addText(number_format($totaleServiziAnnuo, 2, ',', '.'), $cellFontBold);
 
         // Totale Hardware
         $table->addRow();
-        $table->addCell(4500, ['gridSpan' => 11])->addText('TOTALE HARDWARE UNA TANTUM', $cellFontBold);
+        $table->addCell(4550, ['gridSpan' => 11])->addText('TOTALE HARDWARE UNA TANTUM', $cellFontBold);
         $table->addCell($w[11])->addText(number_format($totaleHardwareUnaTantum, 2, ',', '.'), $cellFontBold);
 
         // --- PRE-ELABORAZIONE ZIP ARCHIVE ---
@@ -682,18 +683,11 @@ class QuoteGeneratorService
                 
                 // Rimuove eventuali evidenziazioni gialle
                 $docXml = str_replace('<w:highlight w:val="yellow"/>', '', $docXml);
-                
-                // Inserisce il macro-placeholder per la tabella sotto la seconda occorrenza (quella nel corpo)
-                $search = 'VALORIZZAZIONE ECONOMICA DELLA FORNITURA GT FLEET 365';
-                $replace = 'VALORIZZAZIONE ECONOMICA DELLA FORNITURA GT FLEET 365</w:t></w:r></w:p><w:p><w:r><w:t>${quote_table}</w:t></w:r></w:p><w:p><w:r><w:t>';
-                
-                $pos = strpos($docXml, $search); // Prima occorrenza (nell'Indice)
-                if ($pos !== false) {
-                    $pos2 = strpos($docXml, $search, $pos + strlen($search)); // Seconda occorrenza (nel Corpo)
-                    if ($pos2 !== false) {
-                        $docXml = substr_replace($docXml, $replace, $pos2, strlen($search));
-                    }
-                }
+
+                // NOTA: il placeholder ${quote_table} è inserito direttamente nel template Word
+                // all'interno di un paragrafo dedicato nel punto esatto dove deve comparire la tabella.
+                // NON serve più iniettarlo via XML (approccio fragile: Word spezza il testo su più
+                // run XML e il strpos non lo trova mai).
                 
                 $zip->addFromString('word/document.xml', $docXml);
             }
