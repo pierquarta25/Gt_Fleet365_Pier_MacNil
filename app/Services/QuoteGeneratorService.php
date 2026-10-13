@@ -469,122 +469,79 @@ class QuoteGeneratorService
         ],
     ];
 
+
     /**
-     * Genera il file DOCX e tenta la conversione in PDF
-     * Restituisce il percorso del file finale (PDF se possibile, altrimenti DOCX)
+     * Genera il file DOCX e tenta la conversione in PDF.
+     * Restituisce il percorso del file finale (PDF se possibile, altrimenti DOCX).
      */
     public function generateQuote($serviceRequests, $token)
     {
         $templatePath = resource_path('templates/template_offerta.docx');
-        
+
         if (!file_exists($templatePath)) {
             Log::error("Template non trovato in {$templatePath}");
             throw new \Exception("Template Word non trovato.");
         }
 
-        $firstReq = $serviceRequests->first();
+        $firstReq    = $serviceRequests->first();
         $companyName = $firstReq->client_data['company'] ?? 'Cliente';
-        $contactName = ($firstReq->client_data['contact'] ?? '') . ' ' . ($firstReq->client_data['lastname'] ?? '');
-        
-        // --- CREAZIONE TABELLA PREVENTIVO (12 COLONNE) ---
-        $tableStyle = [
-            'borderSize' => 6,
-            'borderColor' => '000000',
-            'width' => 5000,
-            'unit' => \PhpOffice\PhpWord\SimpleType\TblWidth::PERCENT,
-            'alignment' => \PhpOffice\PhpWord\SimpleType\JcTable::CENTER,
-            'cellMargin' => 50
-        ];
-
-        $table = new \PhpOffice\PhpWord\Element\Table($tableStyle);
-
-        // Stili
-        $headerFont = ['bold' => true, 'name' => 'Arial', 'size' => 7, 'color' => '000000'];
-        $cellFont = ['name' => 'Arial', 'size' => 7];
-        $cellFontBold = ['name' => 'Arial', 'size' => 7, 'bold' => true];
-        $cellStyle = ['valign' => 'center'];
-        $yellowCellStyle = ['bgColor' => 'FFFF00', 'valign' => 'center'];
-
-        // Larghezze colonne proporzionali (somma = 5000)
-        $w = [500, 300, 1100, 350, 350, 400, 300, 250, 200, 400, 400, 450];
-
-        // --- HEADER (riga fissa, sempre uguale) ---
-        $table->addRow(null, ['tblHeader' => true]);
-        $headers = [
-            'Codice Servizio',
-            'Hardware o Servizio',
-            'Descrizione Prodotto e Servizi Forniti',
-            'Prezzo di Listino al Pubblico',
-            'Prezzo Servizio e Fornitura Scontato',
-            'Prezzo Servizio o Hardware Offerta LAST MINUTE 30/06/2026',
-            'Periodicità Pagamento',
-            'Durata Contrattuale in mesi',
-            'Quantità servizi',
-            'Periodicità Pagamento',
-            'Prezzo Servizio o Hardware Offerta LAST MINUTE 30/06/2026',
-            'Totale Annuale per Canoni Mensili'
-        ];
-        foreach ($headers as $i => $header) {
-            $style = ($i === 5 || $i === 10) ? $yellowCellStyle : $cellStyle;
-            $table->addCell($w[$i], $style)->addText($header, $headerFont);
-        }
 
         // --- AGGREGAZIONE SERVIZI (una riga per servizio unico) ---
         $aggregated = [];
         foreach ($serviceRequests as $req) {
             $vehicleQty = $req->vehicle_qty ?? 1;
-            $services = $req->services ?? [];
+            $services   = $req->services ?? [];
 
             foreach ($services as $srv) {
-                $id = $srv['id'];
-                $srvQty = $srv['qty'] ?? 1;
+                $id              = $srv['id'];
+                $srvQty          = $srv['qty'] ?? 1;
                 $totalQtyForThis = $vehicleQty * $srvQty;
 
                 if (isset($aggregated[$id])) {
-                    // Servizio già presente, somma la quantità
                     $aggregated[$id]['totalQty'] += $totalQtyForThis;
                 } else {
                     $aggregated[$id] = [
-                        'id' => $id,
-                        'srv' => $srv,
+                        'id'       => $id,
+                        'srv'      => $srv,
                         'totalQty' => $totalQtyForThis,
                     ];
                 }
             }
         }
 
-        // --- RIGHE DATI (una per servizio unico) ---
-        $totaleServiziAnnuo = 0;
+        // --- CALCOLO PREZZI E TOTALI ---
+        $totaleServiziAnnuo      = 0;
         $totaleHardwareUnaTantum = 0;
+        $rowsData                = [];
 
         foreach ($aggregated as $id => $entry) {
-            $srv = $entry['srv'];
+            $srv      = $entry['srv'];
             $totalQty = $entry['totalQty'];
 
-            // Dati dal pricing array (solo per info aggiuntive: descrizione, tipo, periodo)
             $priceInfo = $this->pricing[$id] ?? [
-                'name' => $srv['name'],
-                'list_price' => 0,
+                'name'             => $srv['name'] ?? $id,
+                'list_price'       => 0,
                 'discounted_price' => 0,
-                'offer_price' => 0,
-                'description' => [],
-                'type' => 'servizio',
-                'period' => 'annuale',
-                'contract_months' => 24
+                'offer_price'      => 0,
+                'description'      => [],
+                'type'             => 'servizio',
+                'period'           => 'annuale',
+                'contract_months'  => 24,
             ];
 
-            // PREZZI: priorità ai dati inseriti dal commerciale nella configurazione
-            $listPrice = isset($srv['price']) ? (float) $srv['price'] : $priceInfo['list_price'];
-            $discount = isset($srv['discount']) ? (float) $srv['discount'] : 0;
-            $discountedPrice = ($discount > 0) ? ($listPrice - $discount) : ($priceInfo['discounted_price'] ?? $listPrice);
-            $offerPrice = isset($srv['final_price']) ? (float) $srv['final_price'] : $priceInfo['offer_price'];
-            
-            $contractMonths = $priceInfo['contract_months'] ?? 24;
-            $period = $priceInfo['period'] ?? 'annuale';
-            $type = $priceInfo['type'] ?? 'servizio';
+            $listPrice       = isset($srv['price'])       ? (float) $srv['price']       : $priceInfo['list_price'];
+            $discount        = isset($srv['discount'])    ? (float) $srv['discount']    : 0;
+            $discountedPrice = ($discount > 0)
+                ? ($listPrice - $discount)
+                : ($priceInfo['discounted_price'] ?? $listPrice);
+            $offerPrice      = isset($srv['final_price']) ? (float) $srv['final_price'] : $priceInfo['offer_price'];
 
-            // Calcoli
-            $prezzoMensile = ($period === 'annuale' && $offerPrice > 0) ? $offerPrice / 12 : 0;
+            $contractMonths = $priceInfo['contract_months'] ?? 24;
+            $period         = $priceInfo['period']          ?? 'annuale';
+            $type           = $priceInfo['type']            ?? 'servizio';
+            $descriptions   = $priceInfo['description']    ?? [];
+
+            $prezzoMensile        = ($period === 'annuale' && $offerPrice > 0) ? $offerPrice / 12 : 0;
             $totaleAnnualeSingolo = ($period === 'annuale') ? $prezzoMensile * 12 : $offerPrice;
 
             if ($period === 'annuale') {
@@ -593,80 +550,40 @@ class QuoteGeneratorService
                 $totaleHardwareUnaTantum += $offerPrice * $totalQty;
             }
 
-            // Formattazione prezzi come da listino MacNil
-            $euro = html_entity_decode('&euro;', ENT_COMPAT, 'UTF-8');
-            $fmtList = number_format($listPrice, 2, ',', '.') . ' ' . $euro;
-            $fmtDisc = $euro . ' ' . number_format($discountedPrice, 2, ',', '.');
-            $fmtOffer = ($offerPrice == 0) ? 'OMAGGIO' : $euro . ' ' . number_format($offerPrice, 2, ',', '.');
-            $fmtMensile = ($offerPrice == 0) ? 'OMAGGIO' : $euro . ' ' . number_format($prezzoMensile, 2, ',', '.');
-            $fmtTotale = ($offerPrice == 0) ? 'OMAGGIO' : $euro . ' ' . number_format($totaleAnnualeSingolo, 2, ',', '.');
+            $euro        = "\xE2\x82\xAC";
+            $fmtList     = number_format($listPrice, 2, ',', '.') . ' ' . $euro;
+            $fmtDisc     = number_format($discountedPrice, 2, ',', '.') . ' ' . $euro;
+            $fmtOffer    = ($offerPrice == 0) ? 'OMAGGIO' : number_format($offerPrice, 2, ',', '.') . ' ' . $euro;
+            $fmtMensile  = ($period === 'annuale')
+                ? (($offerPrice == 0) ? 'OMAGGIO' : number_format($prezzoMensile, 2, ',', '.') . ' ' . $euro)
+                : '-';
+            $fmtTotale   = ($offerPrice == 0)
+                ? 'OMAGGIO'
+                : number_format($totaleAnnualeSingolo, 2, ',', '.') . ' ' . $euro;
+            $periodicita = ($period === 'annuale')
+                ? 'Bimestrale'
+                : 'Una Tantum';
 
-            $table->addRow();
-
-            // Col 1: Codice Servizio
-            $table->addCell($w[0], $cellStyle)->addText($priceInfo['name'], $cellFont);
-
-            // Col 2: Hardware o Servizio
-            $table->addCell($w[1], $cellStyle)->addText($type, $cellFont);
-
-            // Col 3: Descrizione (con bullet list)
-            $descCell = $table->addCell($w[2], $cellStyle);
-            $descriptions = $priceInfo['description'] ?? [];
-            foreach ($descriptions as $desc) {
-                $descCell->addListItem(
-                    $desc,
-                    0,
-                    ['name' => 'Arial', 'size' => 6],
-                    ['listType' => \PhpOffice\PhpWord\Style\ListItem::TYPE_BULLET_FILLED]
-                );
-            }
-
-            // Col 4: Prezzo Listino
-            $table->addCell($w[3], $cellStyle)->addText($fmtList, $cellFont);
-
-            // Col 5: Prezzo Scontato
-            $table->addCell($w[4], $cellStyle)->addText($fmtDisc, $cellFont);
-
-            // Col 6: Prezzo Offerta (GIALLO)
-            $table->addCell($w[5], $yellowCellStyle)->addText($fmtOffer, $cellFontBold);
-
-            // Col 7: Periodicita
-            $table->addCell($w[6], $cellStyle)->addText($period, $cellFont);
-
-            // Col 8: Durata Contrattuale
-            $table->addCell($w[7], $cellStyle)->addText((string) $contractMonths, $cellFont);
-
-            // Col 9: Quantita
-            $table->addCell($w[8], $cellStyle)->addText((string) $totalQty, $cellFont);
-
-            // Col 10: Periodicita Pagamento
-            $periodicita = ($period === 'annuale') ? 'Canone Mensile con Pagamento Bimestrale Anticipato' : 'Una Tantum';
-            $table->addCell($w[9], $cellStyle)->addText($periodicita, ['name' => 'Arial', 'size' => 6]);
-
-            // Col 11: Prezzo Mensile Offerta (GIALLO)
-            $table->addCell($w[10], $yellowCellStyle)->addText($fmtMensile, $cellFontBold);
-
-            // Col 12: Totale Annuale
-            $table->addCell($w[11], $cellStyle)->addText($fmtTotale, $cellFontBold);
+            $rowsData[] = [
+                'name'           => $priceInfo['name'],
+                'type'           => $type,
+                'descriptions'   => $descriptions,
+                'fmtList'        => $fmtList,
+                'fmtDisc'        => $fmtDisc,
+                'fmtOffer'       => $fmtOffer,
+                'period'         => $period,
+                'contractMonths' => (string) $contractMonths,
+                'qty'            => (string) $totalQty,
+                'periodicita'    => $periodicita,
+                'fmtMensile'     => $fmtMensile,
+                'fmtTotale'      => $fmtTotale,
+            ];
         }
 
-        // --- RIGHE TOTALI ---
-        // Riga vuota di separazione
-        $table->addRow();
-        $table->addCell(5000, ['gridSpan' => 12])->addText('', $cellFont);
+        // --- COSTRUZIONE XML OOXML DELLA TABELLA ---
+        $tableXml = $this->buildTableXml($rowsData, $totaleServiziAnnuo, $totaleHardwareUnaTantum);
 
-        // Totale Canoni Annuali
-        // Larghezza = somma prime 11 colonne: 500+300+1100+350+350+400+300+250+200+400+400 = 4550
-        $table->addRow();
-        $table->addCell(4550, ['gridSpan' => 11])->addText('TOTALE CANONI ANNUALI', $cellFontBold);
-        $table->addCell($w[11])->addText(number_format($totaleServiziAnnuo, 2, ',', '.'), $cellFontBold);
-
-        // Totale Hardware
-        $table->addRow();
-        $table->addCell(4550, ['gridSpan' => 11])->addText('TOTALE HARDWARE UNA TANTUM', $cellFontBold);
-        $table->addCell($w[11])->addText(number_format($totaleHardwareUnaTantum, 2, ',', '.'), $cellFontBold);
-
-        // --- PRE-ELABORAZIONE ZIP ARCHIVE ---
+        // --- MANIPOLAZIONE ZIP ---
         $tempDocx = storage_path('app/public/temp-' . time() . '.docx');
         if (!file_exists(storage_path('app/public'))) {
             mkdir(storage_path('app/public'), 0755, true);
@@ -675,86 +592,67 @@ class QuoteGeneratorService
 
         $zip = new \ZipArchive();
         if ($zip->open($tempDocx) === TRUE) {
-            // Sostituisci in document.xml
+
+            // DOCUMENT.XML
             $docXml = $zip->getFromName('word/document.xml');
             if ($docXml !== false) {
-                // Sostituisce il nome azienda
                 $docXml = str_replace('Nome Azienda', htmlspecialchars($companyName), $docXml);
-                
-                // Rimuove eventuali evidenziazioni gialle
                 $docXml = str_replace('<w:highlight w:val="yellow"/>', '', $docXml);
 
-                // NOTA: il placeholder ${quote_table} è inserito direttamente nel template Word
-                // all'interno di un paragrafo dedicato nel punto esatto dove deve comparire la tabella.
-                // NON serve più iniettarlo via XML (approccio fragile: Word spezza il testo su più
-                // run XML e il strpos non lo trova mai).
-                
+                // INIEZIONE TABELLA nella sezione 6 (VALORIZZAZIONE ECONOMICA)
+                $docXml = $this->injectTableIntoXml($docXml, $tableXml);
+
                 $zip->addFromString('word/document.xml', $docXml);
             }
-            
-            // Sostituisci negli header (per RAGIONE SOCIALE, emesso da, data)
+
+            // HEADER
             for ($i = 1; $i <= 5; $i++) {
                 $headerName = 'word/header' . $i . '.xml';
-                $headerXml = $zip->getFromName($headerName);
+                $headerXml  = $zip->getFromName($headerName);
                 if ($headerXml !== false) {
                     $headerXml = str_replace('RAGIONE SOCIALE', htmlspecialchars($companyName), $headerXml);
-                    $headerXml = str_replace('Emesso da: TEAM Sales', htmlspecialchars('Emesso da: GT Fleet 365'), $headerXml);
+                    $headerXml = str_replace('Emesso da: TEAM Sales', 'Emesso da: GT Fleet 365', $headerXml);
                     $headerXml = str_replace('xx mese 2026', date('d/m/Y'), $headerXml);
-                    
-                    // Rimuove eventuali evidenziazioni gialle
                     $headerXml = str_replace('<w:highlight w:val="yellow"/>', '', $headerXml);
-                    
                     $zip->addFromString($headerName, $headerXml);
                 }
             }
 
-            // Ottieni il commerciale
+            // FOOTER
             $agentEmail = $firstReq->agent_email ?? null;
-            $agent = $agentEmail ? \App\Models\User::where('email', $agentEmail)->first() : null;
-            $agentName = $agent ? $agent->name : 'Commerciale';
+            $agent      = $agentEmail ? \App\Models\User::where('email', $agentEmail)->first() : null;
+            $agentName  = $agent ? $agent->name : 'Commerciale';
 
-            // Sostituisci nei footer (per Nome e Cognome)
             for ($i = 1; $i <= 5; $i++) {
                 $footerName = 'word/footer' . $i . '.xml';
-                $footerXml = $zip->getFromName($footerName);
+                $footerXml  = $zip->getFromName($footerName);
                 if ($footerXml !== false) {
                     $footerXml = str_replace('Nome e Cognome', htmlspecialchars($agentName), $footerXml);
-                    
-                    // Rimuove eventuali evidenziazioni gialle
                     $footerXml = str_replace('<w:highlight w:val="yellow"/>', '', $footerXml);
-                    
                     $zip->addFromString($footerName, $footerXml);
                 }
             }
+
             $zip->close();
         }
 
-        // --- INSERIMENTO TABELLA CON TEMPLATE PROCESSOR ---
-        $templateProcessor = new TemplateProcessor($tempDocx);
-        
-        // Questo setComplexBlock andrà a sostituire la riga ${quote_table} che abbiamo iniettato
-        $templateProcessor->setComplexBlock('quote_table', $table);
-
-        // Salva il file DOCX finale
+        // --- SALVATAGGIO DOCX FINALE ---
         $fileNameDocx = 'preventivo-' . \Illuminate\Support\Str::slug($companyName) . '-' . time() . '.docx';
-        $pathDocx = storage_path('app/public/service-pdfs/' . $fileNameDocx);
-        
+        $pathDocx     = storage_path('app/public/service-pdfs/' . $fileNameDocx);
+
         if (!file_exists(storage_path('app/public/service-pdfs'))) {
             mkdir(storage_path('app/public/service-pdfs'), 0755, true);
         }
 
-        $templateProcessor->saveAs($pathDocx);
-        
-        // Pulisce il temp file
-        @unlink($tempDocx);
+        rename($tempDocx, $pathDocx);
 
-        // PROVA CONVERSIONE IN PDF
+        // --- CONVERSIONE IN PDF ---
         $fileNamePdf = str_replace('.docx', '.pdf', $fileNameDocx);
-        $pathPdf = storage_path('app/public/service-pdfs/' . $fileNamePdf);
-        $outdir = storage_path('app/public/service-pdfs');
+        $pathPdf     = storage_path('app/public/service-pdfs/' . $fileNamePdf);
+        $outdir      = storage_path('app/public/service-pdfs');
 
-        $cmd = "soffice --headless --convert-to pdf --outdir " . escapeshellarg($outdir) . " " . escapeshellarg($pathDocx) . " 2>&1";
-        $output = [];
+        $cmd       = "soffice --headless --convert-to pdf --outdir " . escapeshellarg($outdir) . " " . escapeshellarg($pathDocx) . " 2>&1";
+        $output    = [];
         $returnVar = 0;
         exec($cmd, $output, $returnVar);
 
@@ -763,7 +661,302 @@ class QuoteGeneratorService
         }
 
         Log::warning("Impossibile convertire in PDF con soffice. Output: " . implode("\n", $output));
-        
+
         return $pathDocx;
     }
+
+    /**
+     * Inietta la tabella OOXML nel document.xml in layout VERTICALE,
+     * rispettando fedelmente l'impaginazione del documento originale:
+     * - Nessun sectPr alterato (nessun accavallamento di pagine, header o footer)
+     * - Sostituisce i 34 paragrafi vuoti con la tabella compatta
+     * - Page break dopo la tabella per mantenere il Punto 7 sulla pagina corretta
+     */
+    protected function injectTableIntoXml(string $docXml, string $tableXml): string
+    {
+        $marker = 'VALORIZZAZIONE ECONOMICA DELLA FORNITURA GT FLEET 365';
+
+        // Cerca la seconda occorrenza (la sezione vera, non l'indice)
+        $idx1 = strpos($docXml, $marker);
+        if ($idx1 === false) {
+            Log::warning('QuoteGenerator: marker VALORIZZAZIONE non trovato nel template.');
+            return $docXml;
+        }
+        $idx2       = strpos($docXml, $marker, $idx1 + 1);
+        $searchFrom = ($idx2 !== false) ? $idx2 : $idx1;
+
+        // Fine del </w:p> del paragrafo titolo
+        $paraEnd = strpos($docXml, '</w:p>', $searchFrom);
+        if ($paraEnd === false) {
+            Log::warning('QuoteGenerator: fine paragrafo VALORIZZAZIONE non trovata.');
+            return $docXml;
+        }
+        $insertAfter = $paraEnd + strlen('</w:p>');
+
+        // Trova inizio del paragrafo con CONDIZIONI DI FORNITURA
+        $nextMarker = 'CONDIZIONI DI FORNITURA';
+        $idxCond    = strpos($docXml, $nextMarker, $insertAfter);
+
+        if ($idxCond === false) {
+            Log::warning('QuoteGenerator: marker CONDIZIONI non trovato, tabella inserita senza rimuovere paragrafi.');
+            return substr($docXml, 0, $insertAfter) . $tableXml . substr($docXml, $insertAfter);
+        }
+
+        // Risale all'inizio del <w:p che contiene CONDIZIONI
+        $beforeCond    = substr($docXml, 0, $idxCond);
+        $condParaStart = strrpos($beforeCond, '<w:p ');
+        if ($condParaStart === false) {
+            $condParaStart = strrpos($beforeCond, '<w:p>');
+        }
+        if ($condParaStart === false || $condParaStart < $insertAfter) {
+            $condParaStart = $insertAfter;
+        }
+
+        // Page break subito dopo la tabella per mandare le Condizioni di fornitura alla pagina successiva
+        $pageBreakAfterTable = '<w:p><w:pPr><w:spacing w:before="0" w:after="0"/></w:pPr><w:r><w:br w:type="page"/></w:r></w:p>';
+
+        $partBefore = substr($docXml, 0, $insertAfter);
+        $partAfter  = substr($docXml, $condParaStart);
+
+        // NESSUN sectPr toccato: il layout e le pagine originali rimangono intatti al 100%
+        return $partBefore . "\n"
+            . $tableXml . "\n"
+            . $pageBreakAfterTable . "\n"
+            . $partAfter;
+    }
+
+    /**
+     * Costruisce l'XML OOXML della tabella preventivo in formato VERTICALE (Portrait),
+     * esattamente nello stile del listino Excel:
+     * - w:tblLayout fixed a 9700 dxa (margine utile A4 Portrait è ~9923 dxa)
+     * - Rigorosamente su UN SOLO FOGLIO verticale (nessun overflow di pagina)
+     * - Colonne numeriche calibrate con w:noWrap per garantire che tutte le cifre siano ben visibili
+     * - Allineamento centrato con margini e rientri azzerati per evitare qualsiasi clipping in Word
+     */
+    protected function buildTableXml(array $rowsData, float $totaleServizi, float $totaleHardware): string
+    {
+        // 12 colonne verticali perfettamente proporzionate (somma = 9700 dxa)
+        // [0:Codice, 1:Tipo, 2:Descrizione, 3:Listino, 4:Scontato, 5:Offerta, 6:Periodo, 7:Mesi, 8:Qtà, 9:Pagamento, 10:Canone, 11:Tot.Anno]
+        $w = [1400, 500, 2000, 700, 700, 750, 550, 400, 400, 750, 750, 800];
+        $totalWidth = array_sum($w); // 9700 dxa
+
+        $borders =
+            '<w:tblBorders>' .
+            '<w:top    w:val="single" w:sz="4" w:space="0" w:color="000000"/>' .
+            '<w:left   w:val="single" w:sz="4" w:space="0" w:color="000000"/>' .
+            '<w:bottom w:val="single" w:sz="4" w:space="0" w:color="000000"/>' .
+            '<w:right  w:val="single" w:sz="4" w:space="0" w:color="000000"/>' .
+            '<w:insideH w:val="single" w:sz="4" w:space="0" w:color="000000"/>' .
+            '<w:insideV w:val="single" w:sz="4" w:space="0" w:color="000000"/>' .
+            '</w:tblBorders>';
+
+        $xml  = '<w:tbl>';
+        $xml .= '<w:tblPr>';
+        $xml .= '<w:tblW w:w="' . $totalWidth . '" w:type="dxa"/>';
+        $xml .= '<w:jc w:val="center"/>';
+        $xml .= '<w:tblLayout w:type="fixed"/>';
+        $xml .= $borders;
+        $xml .= '<w:tblCellMar>';
+        $xml .= '<w:top    w:w="25" w:type="dxa"/><w:left   w:w="15" w:type="dxa"/>';
+        $xml .= '<w:bottom w:w="25" w:type="dxa"/><w:right  w:w="15" w:type="dxa"/>';
+        $xml .= '</w:tblCellMar>';
+        $xml .= '</w:tblPr>';
+
+        // Definizione griglia fissa colonne
+        $xml .= '<w:tblGrid>';
+        foreach ($w as $cw) {
+            $xml .= '<w:gridCol w:w="' . $cw . '"/>';
+        }
+        $xml .= '</w:tblGrid>';
+
+        // --- RIGA INTESTAZIONE (Blu scuro MacNil con Offerta e Canone in Giallo) ---
+        $headers = [
+            'Codice Servizio',
+            'Hw/Srv',
+            'Descrizione Prodotto e Servizi',
+            'Listino',
+            'Scontato',
+            'Offerta',
+            'Periodo',
+            'Mesi',
+            'Qtà',
+            'Pagamento',
+            'Canone Mese',
+            'Tot. Anno',
+        ];
+
+        $xml .= '<w:tr><w:trPr><w:cantSplit/><w:tblHeader/></w:trPr>';
+        foreach ($headers as $i => $hdr) {
+            $isYellow = ($i === 5 || $i === 10);
+            $xml .= '<w:tc><w:tcPr>';
+            $xml .= '<w:tcW w:w="' . $w[$i] . '" w:type="dxa"/>';
+            $xml .= '<w:tcMar><w:top w:w="25" w:type="dxa"/><w:left w:w="10" w:type="dxa"/><w:bottom w:w="25" w:type="dxa"/><w:right w:w="10" w:type="dxa"/></w:tcMar>';
+            if ($i !== 0 && $i !== 2) {
+                $xml .= '<w:noWrap/>';
+            }
+            $xml .= $isYellow
+                ? '<w:shd w:val="clear" w:color="auto" w:fill="FFFF00"/>'
+                : '<w:shd w:val="clear" w:color="auto" w:fill="1F3864"/>';
+            $xml .= '<w:vAlign w:val="center"/></w:tcPr>';
+            $xml .= '<w:p><w:pPr><w:spacing w:before="15" w:after="15"/><w:ind w:left="0" w:right="0" w:firstLine="0" w:hanging="0"/><w:jc w:val="center"/></w:pPr>';
+            $xml .= '<w:r><w:rPr><w:b/><w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:cs="Arial"/>';
+            $xml .= $isYellow ? '<w:color w:val="000000"/>' : '<w:color w:val="FFFFFF"/>';
+            $xml .= '<w:sz w:val="11"/><w:szCs w:val="11"/></w:rPr>'; // 5.5pt bold
+            $xml .= '<w:t xml:space="preserve">' . htmlspecialchars($hdr, ENT_XML1, 'UTF-8') . '</w:t>';
+            $xml .= '</w:r></w:p></w:tc>';
+        }
+        $xml .= '</w:tr>';
+
+        // --- RIGHE DATI ---
+        foreach ($rowsData as $row) {
+            $xml .= '<w:tr><w:trPr><w:cantSplit/></w:trPr>';
+            // Col 0: Codice Servizio (allineato a sinistra)
+            $xml .= $this->buildCell($w[0],  $row['name'],           false, false, true,  5.5, 'left',  false);
+            // Col 1: Tipo Hw/Srv
+            $xml .= $this->buildCell($w[1],  $row['type'],           false, false, false, 5,   'center', true);
+            // Col 2: Descrizione dettagliata
+            $xml .= $this->buildDescriptionCell($w[2], $row['descriptions']);
+            // Col 3: Listino (cifre visibili e centrate)
+            $xml .= $this->buildCell($w[3],  $row['fmtList'],        false, false, false, 5.5, 'center', true);
+            // Col 4: Scontato
+            $xml .= $this->buildCell($w[4],  $row['fmtDisc'],        false, false, false, 5.5, 'center', true);
+            // Col 5: Offerta (sfondo GIALLO)
+            $xml .= $this->buildCell($w[5],  $row['fmtOffer'],       false, true,  true,  5.5, 'center', true);
+            // Col 6: Periodo
+            $xml .= $this->buildCell($w[6],  $row['period'],         false, false, false, 5,   'center', true);
+            // Col 7: Mesi
+            $xml .= $this->buildCell($w[7],  $row['contractMonths'], false, false, false, 5.5, 'center', true);
+            // Col 8: Qtà
+            $xml .= $this->buildCell($w[8],  $row['qty'],            false, false, true,  5.5, 'center', true);
+            // Col 9: Modalità Pagamento
+            $xml .= $this->buildCell($w[9],  $row['periodicita'],    false, false, false, 5,   'center', true);
+            // Col 10: Canone Mese (sfondo GIALLO)
+            $xml .= $this->buildCell($w[10], $row['fmtMensile'],     false, true,  true,  5.5, 'center', true);
+            // Col 11: Tot. Anno
+            $xml .= $this->buildCell($w[11], $row['fmtTotale'],      false, false, true,  5.5, 'center', true);
+            $xml .= '</w:tr>';
+        }
+
+        // --- RIGA SEPARATRICE ---
+        $xml .= '<w:tr><w:trPr><w:cantSplit/></w:trPr>';
+        $xml .= '<w:tc><w:tcPr><w:gridSpan w:val="12"/><w:tcW w:w="' . $totalWidth . '" w:type="dxa"/></w:tcPr>';
+        $xml .= '<w:p><w:pPr><w:spacing w:before="0" w:after="0"/></w:pPr></w:p></w:tc>';
+        $xml .= '</w:tr>';
+
+        $euro = "\xE2\x82\xAC";
+        $sumW = $totalWidth - $w[11]; // 9700 - 800 = 8900
+
+        // --- TOTALE CANONI ANNUALI ---
+        $xml .= '<w:tr><w:trPr><w:cantSplit/></w:trPr>';
+        $xml .= '<w:tc>';
+        $xml .= '<w:tcPr><w:gridSpan w:val="11"/><w:tcW w:w="' . $sumW . '" w:type="dxa"/>';
+        $xml .= '<w:tcMar><w:top w:w="30" w:type="dxa"/><w:left w:w="30" w:type="dxa"/><w:bottom w:w="30" w:type="dxa"/><w:right w:w="30" w:type="dxa"/></w:tcMar>';
+        $xml .= '<w:shd w:val="clear" w:color="auto" w:fill="D9E1F2"/></w:tcPr>';
+        $xml .= '<w:p><w:pPr><w:spacing w:before="20" w:after="20"/><w:ind w:left="0" w:right="0"/><w:jc w:val="right"/></w:pPr>';
+        $xml .= '<w:r><w:rPr><w:b/><w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:cs="Arial"/>';
+        $xml .= '<w:color w:val="000000"/>';
+        $xml .= '<w:sz w:val="12"/><w:szCs w:val="12"/></w:rPr>';
+        $xml .= '<w:t>TOTALE CANONI ANNUALI</w:t></w:r></w:p></w:tc>';
+        $xml .= $this->buildCell($w[11], number_format($totaleServizi, 2, ',', '.') . ' ' . $euro, false, true, true, 6, 'center', true);
+        $xml .= '</w:tr>';
+
+        // --- TOTALE HARDWARE UNA TANTUM ---
+        $xml .= '<w:tr><w:trPr><w:cantSplit/></w:trPr>';
+        $xml .= '<w:tc>';
+        $xml .= '<w:tcPr><w:gridSpan w:val="11"/><w:tcW w:w="' . $sumW . '" w:type="dxa"/>';
+        $xml .= '<w:tcMar><w:top w:w="30" w:type="dxa"/><w:left w:w="30" w:type="dxa"/><w:bottom w:w="30" w:type="dxa"/><w:right w:w="30" w:type="dxa"/></w:tcMar>';
+        $xml .= '<w:shd w:val="clear" w:color="auto" w:fill="D9E1F2"/></w:tcPr>';
+        $xml .= '<w:p><w:pPr><w:spacing w:before="20" w:after="20"/><w:ind w:left="0" w:right="0"/><w:jc w:val="right"/></w:pPr>';
+        $xml .= '<w:r><w:rPr><w:b/><w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:cs="Arial"/>';
+        $xml .= '<w:color w:val="000000"/>';
+        $xml .= '<w:sz w:val="12"/><w:szCs w:val="12"/></w:rPr>';
+        $xml .= '<w:t>TOTALE HARDWARE UNA TANTUM</w:t></w:r></w:p></w:tc>';
+        $xml .= $this->buildCell($w[11], number_format($totaleHardware, 2, ',', '.') . ' ' . $euro, false, true, true, 6, 'center', true);
+        $xml .= '</w:tr>';
+
+        $xml .= '</w:tbl>';
+
+        return $xml;
+    }
+
+    /**
+     * Costruisce una singola cella OOXML con margini dedicati, noWrap opzionale e font nitido.
+     */
+    protected function buildCell(int $width, string $text, bool $header = false, bool $yellow = false, bool $boldText = false, float $fontSize = 5.5, string $align = 'center', bool $noWrap = true): string
+    {
+        $szVal  = (int) round($fontSize * 2);
+        $isBold = ($header || $boldText) ? '<w:b/>' : '';
+
+        $xml  = '<w:tc>';
+        $xml .= '<w:tcPr>';
+        $xml .= '<w:tcW w:w="' . $width . '" w:type="dxa"/>';
+        $xml .= '<w:tcMar><w:top w:w="20" w:type="dxa"/><w:left w:w="10" w:type="dxa"/><w:bottom w:w="20" w:type="dxa"/><w:right w:w="10" w:type="dxa"/></w:tcMar>';
+        if ($noWrap) {
+            $xml .= '<w:noWrap/>';
+        }
+        if ($header) {
+            $xml .= '<w:shd w:val="clear" w:color="auto" w:fill="1F3864"/>';
+        } elseif ($yellow) {
+            $xml .= '<w:shd w:val="clear" w:color="auto" w:fill="FFFF00"/>';
+        }
+        $xml .= '<w:vAlign w:val="center"/>';
+        $xml .= '</w:tcPr>';
+        $xml .= '<w:p>';
+        $xml .= '<w:pPr><w:spacing w:before="15" w:after="15"/><w:ind w:left="0" w:right="0" w:firstLine="0" w:hanging="0"/><w:jc w:val="' . $align . '"/></w:pPr>';
+        $xml .= '<w:r>';
+        $xml .= '<w:rPr>';
+        $xml .= $isBold;
+        $xml .= '<w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:cs="Arial"/>';
+        if ($header) {
+            $xml .= '<w:color w:val="FFFFFF"/>';
+        } else {
+            $xml .= '<w:color w:val="000000"/>';
+        }
+        $xml .= '<w:sz w:val="' . $szVal . '"/>';
+        $xml .= '<w:szCs w:val="' . $szVal . '"/>';
+        $xml .= '</w:rPr>';
+        $xml .= '<w:t xml:space="preserve">' . htmlspecialchars($text, ENT_XML1, 'UTF-8') . '</w:t>';
+        $xml .= '</w:r>';
+        $xml .= '</w:p>';
+        $xml .= '</w:tc>';
+
+        return $xml;
+    }
+
+    /**
+     * Costruisce la cella descrizione con singoli paragrafi puliti e distanziati,
+     * garantendo che nessun testo si sovrapponga a schermo.
+     */
+    protected function buildDescriptionCell(int $width, array $descriptions): string
+    {
+        $xml  = '<w:tc>';
+        $xml .= '<w:tcPr>';
+        $xml .= '<w:tcW w:w="' . $width . '" w:type="dxa"/>';
+        $xml .= '<w:tcMar><w:top w:w="20" w:type="dxa"/><w:left w:w="15" w:type="dxa"/><w:bottom w:w="20" w:type="dxa"/><w:right w:w="15" w:type="dxa"/></w:tcMar>';
+        $xml .= '<w:vAlign w:val="center"/>';
+        $xml .= '</w:tcPr>';
+
+        if (empty($descriptions)) {
+            $xml .= '<w:p><w:pPr><w:spacing w:before="15" w:after="15"/><w:ind w:left="0" w:right="0" w:firstLine="0" w:hanging="0"/></w:pPr></w:p>';
+        } else {
+            foreach ($descriptions as $desc) {
+                $xml .= '<w:p>';
+                $xml .= '<w:pPr><w:spacing w:before="8" w:after="8"/><w:ind w:left="0" w:right="0" w:firstLine="0" w:hanging="0"/><w:jc w:val="left"/></w:pPr>';
+                $xml .= '<w:r>';
+                $xml .= '<w:rPr>';
+                $xml .= '<w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:cs="Arial"/>';
+                $xml .= '<w:color w:val="000000"/>';
+                $xml .= '<w:sz w:val="10"/><w:szCs w:val="10"/>'; // 5pt
+                $xml .= '</w:rPr>';
+                $xml .= '<w:t xml:space="preserve">• ' . htmlspecialchars($desc, ENT_XML1, 'UTF-8') . '</w:t>';
+                $xml .= '</w:r>';
+                $xml .= '</w:p>';
+            }
+        }
+
+        $xml .= '</w:tc>';
+        return $xml;
+    }
 }
+
+
