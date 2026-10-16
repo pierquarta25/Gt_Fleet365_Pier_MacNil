@@ -119,61 +119,72 @@ class ServiceFormController extends Controller
         $serviceRequests = $this->getServiceRequests($token);
 
         $validated = $request->validate([
-            'vehicles'                        => 'required|array',
-            'vehicles.*.base_package'         => 'nullable|string',
-            'vehicles.*.services'             => 'nullable|array',
-            'vehicles.*.services.*'           => 'string',
-            'vehicles.*.quantities'           => 'nullable|array',
-            'vehicles.*.quantities.*'         => 'integer|min:0',
-            'vehicles.*.vehicle_qty'          => 'nullable|integer|min:1',
-            'vehicles.*.notes'                => 'nullable|string|max:2000',
-            'vehicles.*.package_price'        => 'nullable|numeric',
-            'vehicles.*.package_discount'     => 'nullable|numeric',
-            'vehicles.*.package_final_price'  => 'nullable|numeric',
+            'vehicles'                                     => 'required|array',
+            'vehicles.*.groups'                            => 'nullable|array',
+            'vehicles.*.groups.*.qty'                      => 'nullable|integer|min:1',
+            'vehicles.*.groups.*.base_package'             => 'nullable|string',
+            'vehicles.*.groups.*.services'                 => 'nullable|array',
+            'vehicles.*.groups.*.services.*'               => 'string',
+            'vehicles.*.groups.*.quantities'               => 'nullable|array',
+            'vehicles.*.groups.*.quantities.*'             => 'integer|min:0',
+            'vehicles.*.groups.*.package_price'            => 'nullable|numeric',
+            'vehicles.*.groups.*.package_discount'         => 'nullable|numeric',
+            'vehicles.*.groups.*.package_final_price'      => 'nullable|numeric',
+            'vehicles.*.notes'                             => 'nullable|string|max:2000',
         ]);
 
         foreach ($serviceRequests as $req) {
             $data = $validated['vehicles'][$req->id] ?? null;
             if (!$data) continue;
 
-            $selectedServices = [];
+            $groups = $data['groups'] ?? [];
+            $allGroupsData = [];
 
-            // Pacchetto base (radio)
-            if (!empty($data['base_package'])) {
-                $pkg = [
-                    'id'   => $data['base_package'],
-                    'name' => $this->getServiceName($data['base_package']),
-                    'type' => 'base_package',
-                ];
-                if (isset($data['package_price'])) $pkg['price'] = $data['package_price'];
-                if (isset($data['package_discount'])) $pkg['discount'] = $data['package_discount'];
-                if (isset($data['package_final_price'])) $pkg['final_price'] = $data['package_final_price'];
-                
-                $selectedServices[] = $pkg;
-            }
+            foreach ($groups as $gIdx => $group) {
+                $groupServices = [];
 
-            // Servizi aggiuntivi (checkbox)
-            if (!empty($data['services'])) {
-                foreach ($data['services'] as $serviceId) {
-                    $entry = [
-                        'id'   => $serviceId,
-                        'name' => $this->getServiceName($serviceId),
-                        'type' => 'addon',
+                // Pacchetto base (radio)
+                if (!empty($group['base_package'])) {
+                    $pkg = [
+                        'id'   => $group['base_package'],
+                        'name' => $this->getServiceName($group['base_package']),
+                        'type' => 'base_package',
                     ];
-
-                    if (isset($data['quantities'][$serviceId])) {
-                        $entry['qty'] = $data['quantities'][$serviceId];
-                    }
-
-                    $selectedServices[] = $entry;
+                    if (isset($group['package_price'])) $pkg['price'] = $group['package_price'];
+                    if (isset($group['package_discount'])) $pkg['discount'] = $group['package_discount'];
+                    if (isset($group['package_final_price'])) $pkg['final_price'] = $group['package_final_price'];
+                    $groupServices[] = $pkg;
                 }
+
+                // Servizi aggiuntivi (checkbox)
+                if (!empty($group['services'])) {
+                    foreach ($group['services'] as $serviceId) {
+                        $entry = [
+                            'id'   => $serviceId,
+                            'name' => $this->getServiceName($serviceId),
+                            'type' => 'addon',
+                        ];
+                        if (isset($group['quantities'][$serviceId])) {
+                            $entry['qty'] = $group['quantities'][$serviceId];
+                        }
+                        $groupServices[] = $entry;
+                    }
+                }
+
+                $allGroupsData[] = [
+                    'group_idx' => (int) $gIdx,
+                    'qty'       => (int) ($group['qty'] ?? 1),
+                    'services'  => $groupServices,
+                ];
             }
 
-            if (!empty($data['vehicle_qty'])) {
-                $req->vehicle_qty = $data['vehicle_qty'];
+            // vehicle_qty totale come somma dei gruppi
+            $totalQty = array_sum(array_column($allGroupsData, 'qty'));
+            if ($totalQty > 0) {
+                $req->vehicle_qty = $totalQty;
             }
 
-            $req->services = $selectedServices;
+            $req->services = $allGroupsData;
             $req->notes = $data['notes'] ?? null;
             $req->save(); // Salva services, notes e vehicle_qty nel DB
             $req->markAsCompleted();

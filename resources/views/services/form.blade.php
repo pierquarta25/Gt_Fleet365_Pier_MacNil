@@ -458,6 +458,77 @@
         .vehicle-emoji-fallback {
             font-size: 32px;
         }
+
+        /* Group Cards */
+        .group-card {
+            border: 2px solid #E3E8F4;
+            border-radius: 16px;
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+
+        .group-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #EDF2FF 0%, #E8F0FF 100%);
+            border-bottom: 1px solid #E3E8F4;
+        }
+
+        .group-label {
+            font-family: 'Exo 2', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            color: #0052BD;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .group-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .group-controls label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #4A5578;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .remove-group-btn {
+            background: #fff0f0;
+            border: 1.5px solid #ffcccc;
+            color: #cc0000;
+            border-radius: 8px;
+            padding: 4px 10px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .add-group-btn {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 16px;
+            border: 2px dashed #0052BD;
+            border-radius: 12px;
+            background: transparent;
+            color: #0052BD;
+            font-family: 'Exo 2', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .add-group-btn:hover {
+            background: #EDF2FF;
+        }
     </style>
 </head>
 
@@ -544,10 +615,27 @@
                 @php
                     $req = $data['model'];
                     $sections = $data['sections'];
+
+                    // Prepare saved groups — support both new (group_idx) and legacy flat formats
+                    $savedGroups = [];
+                    if ($alreadyCompleted && $req->services) {
+                        $firstService = collect($req->services)->first();
+                        if ($firstService && isset($firstService['group_idx'])) {
+                            // New format: array of groups
+                            $savedGroups = $req->services;
+                        } else {
+                            // Legacy flat format: wrap in a single group 0
+                            $savedGroups = [['group_idx' => 0, 'qty' => $req->vehicle_qty, 'services' => $req->services ?? []]];
+                        }
+                    }
+                    if (empty($savedGroups)) {
+                        $savedGroups = [['group_idx' => 0, 'qty' => $req->vehicle_qty, 'services' => []]];
+                    }
+                    $groupCount = count($savedGroups);
                 @endphp
                 <div id="tab-{{ $req->id }}" class="tab-content {{ $index === 0 ? 'active' : '' }}">
-                    
-                    {{-- Vehicle Header --}}
+
+                    {{-- Vehicle Header (no qty here — qty is per group now) --}}
                     <div class="vehicle-header">
                         @if($req->vehicle_img)
                             <img src="{{ asset($req->vehicle_img) }}" alt="{{ $req->vehicle_name }}" class="vehicle-img">
@@ -556,133 +644,168 @@
                         @endif
                         <div class="vehicle-header-info">
                             <div class="vehicle-name">{{ $req->vehicle_name }}</div>
-                            <div class="qty-field">
-                                <label>{{ __('Quantity:') }}</label>
-                                <input type="number" 
-                                       name="vehicles[{{ $req->id }}][vehicle_qty]" 
-                                       class="qty-input" 
-                                       value="{{ $req->vehicle_qty }}" 
-                                       min="1">
-                            </div>
                         </div>
                     </div>
 
-                    {{-- Sections --}}
-                    @foreach($sections as $sIndex => $section)
-                        <div class="section">
-                            <div class="section-header" onclick="toggleSection('body-{{ $req->id }}-{{ $sIndex }}', 'toggle-{{ $req->id }}-{{ $sIndex }}')">
-                                <span class="section-icon">{{ $section['icon'] }}</span>
-                                <span class="section-title">{{ __($section['title']) }}</span>
-                                <span class="section-toggle" id="toggle-{{ $req->id }}-{{ $sIndex }}">▼</span>
-                            </div>
-                            <div class="section-body" id="body-{{ $req->id }}-{{ $sIndex }}">
-                                @foreach($section['items'] as $item)
-                                    <div class="service-item-wrapper">
-                                        <label class="service-item">
-                                            @if($section['type'] === 'radio')
-                                                <input type="radio" data-price="{{ $packagePrices[$item['id']] ?? 200 }}"
-                                                       name="vehicles[{{ $req->id }}][base_package]"
-                                                       value="{{ $item['id'] }}"
-                                                       onchange="updateSelection(this)"
-                                                       {{ $alreadyCompleted && collect($req->services)->where('id', $item['id'])->isNotEmpty() ? 'checked' : '' }}>
-                                            @else
-                                                <input type="checkbox"
-                                                       name="vehicles[{{ $req->id }}][services][]"
-                                                       value="{{ $item['id'] }}"
-                                                       onchange="updateSelection(this)"
-                                                       {{ $alreadyCompleted && collect($req->services)->where('id', $item['id'])->isNotEmpty() ? 'checked' : '' }}>
-                                            @endif
+                    {{-- Groups Container --}}
+                    <div class="groups-container" id="groups-{{ $req->id }}" data-req="{{ $req->id }}" data-count="{{ $groupCount }}">
 
-                                            <span class="service-name">{{ __($item['name']) }}</span>
+                        @foreach($savedGroups as $gIdx => $savedGroup)
+                            @php
+                                $gQty = $savedGroup['qty'] ?? $req->vehicle_qty ?? 1;
+                                $gServices = $savedGroup['services'] ?? [];
+                                $gServiceIds = collect($gServices)->pluck('id')->toArray();
+                            @endphp
+                            <div class="group-card" data-group="{{ $gIdx }}">
 
-                                            @if(isset($item['input']) && $item['input'] === 'qty')
-                                                @php
-                                                    $savedQty = 0;
-                                                    if ($alreadyCompleted && $req->services) {
-                                                        $saved = collect($req->services)->firstWhere('id', $item['id']);
-                                                        $savedQty = $saved['qty'] ?? 0;
-                                                    }
-                                                @endphp
-                                                <input type="number"
-                                                       name="vehicles[{{ $req->id }}][quantities][{{ $item['id'] }}]"
-                                                       class="service-qty"
-                                                       value="{{ $savedQty ?: $req->vehicle_qty }}"
-                                                       min="0"
-                                                       disabled>
-                                            @endif
+                                {{-- Group Header --}}
+                                <div class="group-card-header">
+                                    <span class="group-label">{{ __('Configurazione') }} {{ $gIdx + 1 }}</span>
+                                    <div class="group-controls">
+                                        <label>{{ __('Quantità:') }}
+                                            <input type="number"
+                                                   name="vehicles[{{ $req->id }}][groups][{{ $gIdx }}][qty]"
+                                                   class="qty-input"
+                                                   value="{{ $gQty }}"
+                                                   min="1">
                                         </label>
-                                            @if($section['type'] === 'radio')
-                                                <div class="package-discount-box" style="display: none; background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 10px 20px 10px 45px; border: 1px solid #e3e8f4;">
-                                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                                                        <div>
-                                                            <small style="color: #666;">Prezzo Listino</small>
-                                                            <div style="font-size: 1.1rem; font-weight: bold;">€ <span class="base-price-display">0</span></div>
-                                                        </div>
-                                                        <div style="background: #e3f2fd; color: #0052BD; padding: 5px 15px; border-radius: 50px; font-weight: bold; border: 1px solid #bbdefb; font-size: 0.9rem;">
-                                                            Scontistica: <span class="discount-display">0</span>%
-                                                        </div>
-                                                    </div>
-                                                    <div style="display: flex; flex-direction: column; gap: 8px;">
-                                                        <div style="display: flex; justify-content: space-between;">
-                                                            <label style="font-size: 0.9rem; font-weight: 600;">Sconto (%)</label>
-                                                            <label style="font-size: 0.8rem; color: #666; cursor: pointer;">
-                                                                <input type="checkbox" class="unlock-discount-chk" onchange="updateDiscountLimits(this)"> 🔓 Sblocca limite 50%
-                                                            </label>
-                                                        </div>
-                                                        <div style="display: flex; align-items: center; gap: 10px;">
-                                                            <input type="range" class="discount-slider" min="0" max="50" step="1" value="0" style="flex: 1;" oninput="updateDiscountFromSlider(this)">
-                                                            <input type="number" class="discount-input" min="0" max="50" value="0" style="width: 60px; padding: 5px; text-align: center; border-radius: 5px; border: 1px solid #ccc;" oninput="updateDiscountFromInput(this)">
-                                                        </div>
-                                                    </div>
-                                                    <div style="border-top: 1px solid #ddd; padding-top: 10px; margin-top: 15px; display: flex; justify-content: space-between; align-items: center;">
-                                                        <strong style="font-size: 1rem;">Prezzo Finale:</strong>
-                                                        <strong style="font-size: 1.2rem; color: #0052BD;">€ <span class="final-price-display">0</span></strong>
-                                                    </div>
-                                                    <!-- Hidden inputs for form submission -->
-                                                    <input type="hidden" name="vehicles[{{ $req->id }}][package_price]" class="hidden-price-input" value="0">
-                                                    <input type="hidden" name="vehicles[{{ $req->id }}][package_discount]" class="hidden-discount-input" value="0">
-                                                    <input type="hidden" name="vehicles[{{ $req->id }}][package_final_price]" class="hidden-final-price-input" value="0">
-                                                </div>
-                                            @endif
+                                        <button type="button"
+                                                class="remove-group-btn"
+                                                onclick="removeGroup(this)"
+                                                style="{{ ($gIdx === 0 && $groupCount === 1) ? 'display:none' : 'display:inline-flex' }}">✕</button>
+                                    </div>
+                                </div>
 
+                                {{-- Sections inside this group --}}
+                                @foreach($sections as $sIndex => $section)
+                                    <div class="section">
+                                        <div class="section-header" onclick="toggleSection('body-{{ $req->id }}-grp{{ $gIdx }}-{{ $sIndex }}', 'toggle-{{ $req->id }}-grp{{ $gIdx }}-{{ $sIndex }}')">
+                                            <span class="section-icon">{{ $section['icon'] }}</span>
+                                            <span class="section-title">{{ __($section['title']) }}</span>
+                                            <span class="section-toggle" id="toggle-{{ $req->id }}-grp{{ $gIdx }}-{{ $sIndex }}">▼</span>
+                                        </div>
+                                        <div class="section-body" id="body-{{ $req->id }}-grp{{ $gIdx }}-{{ $sIndex }}">
+                                            @foreach($section['items'] as $item)
+                                                <div class="service-item-wrapper">
+                                                    <label class="service-item">
+                                                        @if($section['type'] === 'radio')
+                                                            <input type="radio" data-price="{{ $packagePrices[$item['id']] ?? 200 }}"
+                                                                   name="vehicles[{{ $req->id }}][groups][{{ $gIdx }}][base_package]"
+                                                                   value="{{ $item['id'] }}"
+                                                                   onchange="updateSelection(this)"
+                                                                   {{ $alreadyCompleted && in_array($item['id'], $gServiceIds) ? 'checked' : '' }}>
+                                                        @else
+                                                            <input type="checkbox"
+                                                                   name="vehicles[{{ $req->id }}][groups][{{ $gIdx }}][services][]"
+                                                                   value="{{ $item['id'] }}"
+                                                                   onchange="updateSelection(this)"
+                                                                   {{ $alreadyCompleted && in_array($item['id'], $gServiceIds) ? 'checked' : '' }}>
+                                                        @endif
 
-                                        {{-- Hardware Sub-items --}}
-                                        @if(isset($item['hardware']) && count($item['hardware']) > 0)
-                                            <div class="hardware-sub-items" id="hw-{{ $req->id }}-{{ $item['id'] }}">
-                                                @foreach($item['hardware'] as $hw)
-                                                    <label class="service-item hardware-item">
-                                                        <input type="checkbox"
-                                                               name="vehicles[{{ $req->id }}][services][]"
-                                                               value="{{ $hw['id'] }}"
-                                                               onchange="updateSelection(this)"
-                                                               {{ $alreadyCompleted && collect($req->services)->where('id', $hw['id'])->isNotEmpty() ? 'checked' : '' }}>
-                                                        <span class="service-name">{{ __($hw['name']) }}</span>
-                                                        @if(isset($hw['input']) && $hw['input'] === 'qty')
+                                                        <span class="service-name">{{ __($item['name']) }}</span>
+
+                                                        @if(isset($item['input']) && $item['input'] === 'qty')
                                                             @php
                                                                 $savedQty = 0;
-                                                                if ($alreadyCompleted && $req->services) {
-                                                                    $saved = collect($req->services)->firstWhere('id', $hw['id']);
-                                                                    $savedQty = $saved['qty'] ?? 0;
+                                                                if ($alreadyCompleted && count($gServices) > 0) {
+                                                                    $savedSvc = collect($gServices)->firstWhere('id', $item['id']);
+                                                                    $savedQty = $savedSvc['qty'] ?? 0;
                                                                 }
                                                             @endphp
                                                             <input type="number"
-                                                                   name="vehicles[{{ $req->id }}][quantities][{{ $hw['id'] }}]"
+                                                                   name="vehicles[{{ $req->id }}][groups][{{ $gIdx }}][quantities][{{ $item['id'] }}]"
                                                                    class="service-qty"
-                                                                   value="{{ $savedQty ?: $req->vehicle_qty }}"
+                                                                   value="{{ $savedQty ?: $gQty }}"
                                                                    min="0"
                                                                    disabled>
                                                         @endif
                                                     </label>
-                                                @endforeach
-                                            </div>
-                                        @endif
+
+                                                    @if($section['type'] === 'radio')
+                                                        @php
+                                                            $savedPkg = collect($gServices)->firstWhere('type', 'base_package');
+                                                            $savedPkgPrice = $savedPkg['price'] ?? 0;
+                                                            $savedPkgDiscount = $savedPkg['discount'] ?? 0;
+                                                            $savedPkgFinal = $savedPkg['final_price'] ?? 0;
+                                                        @endphp
+                                                        <div class="package-discount-box" style="display: none; background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 10px 20px 10px 45px; border: 1px solid #e3e8f4;">
+                                                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                                                                <div>
+                                                                    <small style="color: #666;">Prezzo Listino</small>
+                                                                    <div style="font-size: 1.1rem; font-weight: bold;">€ <span class="base-price-display">0</span></div>
+                                                                </div>
+                                                                <div style="background: #e3f2fd; color: #0052BD; padding: 5px 15px; border-radius: 50px; font-weight: bold; border: 1px solid #bbdefb; font-size: 0.9rem;">
+                                                                    Scontistica: <span class="discount-display">0</span>%
+                                                                </div>
+                                                            </div>
+                                                            <div style="display: flex; flex-direction: column; gap: 8px;">
+                                                                <div style="display: flex; justify-content: space-between;">
+                                                                    <label style="font-size: 0.9rem; font-weight: 600;">Sconto (%)</label>
+                                                                    <label style="font-size: 0.8rem; color: #666; cursor: pointer;">
+                                                                        <input type="checkbox" class="unlock-discount-chk" onchange="updateDiscountLimits(this)"> 🔓 Sblocca limite 50%
+                                                                    </label>
+                                                                </div>
+                                                                <div style="display: flex; align-items: center; gap: 10px;">
+                                                                    <input type="range" class="discount-slider" min="0" max="50" step="1" value="0" style="flex: 1;" oninput="updateDiscountFromSlider(this)">
+                                                                    <input type="number" class="discount-input" min="0" max="50" value="0" style="width: 60px; padding: 5px; text-align: center; border-radius: 5px; border: 1px solid #ccc;" oninput="updateDiscountFromInput(this)">
+                                                                </div>
+                                                            </div>
+                                                            <div style="border-top: 1px solid #ddd; padding-top: 10px; margin-top: 15px; display: flex; justify-content: space-between; align-items: center;">
+                                                                <strong style="font-size: 1rem;">Prezzo Finale:</strong>
+                                                                <strong style="font-size: 1.2rem; color: #0052BD;">€ <span class="final-price-display">0</span></strong>
+                                                            </div>
+                                                            <!-- Hidden inputs for form submission -->
+                                                            <input type="hidden" name="vehicles[{{ $req->id }}][groups][{{ $gIdx }}][package_price]" class="hidden-price-input" value="{{ $savedPkgPrice }}">
+                                                            <input type="hidden" name="vehicles[{{ $req->id }}][groups][{{ $gIdx }}][package_discount]" class="hidden-discount-input" value="{{ $savedPkgDiscount }}">
+                                                            <input type="hidden" name="vehicles[{{ $req->id }}][groups][{{ $gIdx }}][package_final_price]" class="hidden-final-price-input" value="{{ $savedPkgFinal }}">
+                                                        </div>
+                                                    @endif
+
+                                                    {{-- Hardware Sub-items --}}
+                                                    @if(isset($item['hardware']) && count($item['hardware']) > 0)
+                                                        <div class="hardware-sub-items" id="hw-{{ $req->id }}-grp{{ $gIdx }}-{{ $item['id'] }}">
+                                                            @foreach($item['hardware'] as $hw)
+                                                                <label class="service-item hardware-item">
+                                                                    <input type="checkbox"
+                                                                           name="vehicles[{{ $req->id }}][groups][{{ $gIdx }}][services][]"
+                                                                           value="{{ $hw['id'] }}"
+                                                                           onchange="updateSelection(this)"
+                                                                           {{ $alreadyCompleted && in_array($hw['id'], $gServiceIds) ? 'checked' : '' }}>
+                                                                    <span class="service-name">{{ __($hw['name']) }}</span>
+                                                                    @if(isset($hw['input']) && $hw['input'] === 'qty')
+                                                                        @php
+                                                                            $savedHwQty = 0;
+                                                                            if ($alreadyCompleted && count($gServices) > 0) {
+                                                                                $savedHwSvc = collect($gServices)->firstWhere('id', $hw['id']);
+                                                                                $savedHwQty = $savedHwSvc['qty'] ?? 0;
+                                                                            }
+                                                                        @endphp
+                                                                        <input type="number"
+                                                                               name="vehicles[{{ $req->id }}][groups][{{ $gIdx }}][quantities][{{ $hw['id'] }}]"
+                                                                               class="service-qty"
+                                                                               value="{{ $savedHwQty ?: $gQty }}"
+                                                                               min="0"
+                                                                               disabled>
+                                                                    @endif
+                                                                </label>
+                                                            @endforeach
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                            @endforeach
+                                        </div>
                                     </div>
                                 @endforeach
-                            </div>
-                        </div>
-                    @endforeach
 
-                    {{-- Notes --}}
+                            </div>{{-- end .group-card --}}
+                        @endforeach
+
+                    </div>{{-- end .groups-container --}}
+
+                    {{-- Add Group Button --}}
+                    <button type="button" class="add-group-btn" onclick="addGroup('{{ $req->id }}')">+ {{ __('Aggiungi Configurazione') }}</button>
+
+                    {{-- Notes (one per vehicle type, outside groups) --}}
                     <div class="notes-section">
                         <div class="notes-label"><span>📝</span> {{ __('Notes for') }} {{ $req->vehicle_name }}</div>
                         <textarea class="notes-textarea"
@@ -711,10 +834,10 @@
         function switchTab(btn, tabId) {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            
+
             btn.classList.add('active');
             document.getElementById(tabId).classList.add('active');
-            
+
             // Scroll tab nav to show button if needed
             btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
         }
@@ -727,17 +850,15 @@
             toggle.classList.toggle('collapsed');
         }
 
-        // Aggiorna stile selezione e abilita/disabilita campi qty
-        
         // Aggiorna prezzi e scontistica
         function initPricing(radioInput) {
             const wrapper = radioInput.closest('.service-item-wrapper');
             const box = wrapper.querySelector('.package-discount-box');
             if(!box) return;
-            
+
             const section = radioInput.closest('.section-body');
             section.querySelectorAll('.package-discount-box').forEach(b => b.style.display = 'none');
-            
+
             if(radioInput.checked) {
                 box.style.display = 'block';
                 const basePrice = parseFloat(radioInput.getAttribute('data-price') || 0);
@@ -784,10 +905,10 @@
             }
             const discount = parseInt(box.querySelector('.discount-slider').value) || 0;
             const finalPrice = basePrice * (1 - discount/100);
-            
+
             box.querySelector('.discount-display').textContent = discount;
             box.querySelector('.final-price-display').textContent = finalPrice.toFixed(2);
-            
+
             box.querySelector('.hidden-discount-input').value = discount;
             box.querySelector('.hidden-final-price-input').value = finalPrice.toFixed(2);
         }
@@ -817,7 +938,7 @@
                 const subItems = wrapper.querySelector('.hardware-sub-items');
                 if (subItems) {
                     if (input.checked) {
-                if(input.type === 'radio') initPricing(input);
+                        if(input.type === 'radio') initPricing(input);
                         subItems.style.display = 'block';
                     } else {
                         subItems.style.display = 'none';
@@ -838,6 +959,65 @@
             document.querySelectorAll('input[type="checkbox"]:checked, input[type="radio"]:checked').forEach(updateSelection);
             document.querySelectorAll('input[type="radio"]:checked').forEach(initPricing);
         });
+
+        // ─── Group management ────────────────────────────────────────────────
+
+        function addGroup(reqId) {
+            const container = document.getElementById('groups-' + reqId);
+            const nextIdx = parseInt(container.dataset.count);
+
+            // Clone the first group card as template
+            const firstCard = container.querySelector('.group-card');
+            const clone = firstCard.cloneNode(true);
+
+            // Replace all occurrences of group index 0 with the new index in
+            // name/id/onclick attributes — do a full innerHTML replace
+            clone.innerHTML = clone.innerHTML
+                .replaceAll('[groups][0]', '[groups][' + nextIdx + ']')
+                .replaceAll('-grp0-', '-grp' + nextIdx + '-')
+                .replaceAll('-grp0"', '-grp' + nextIdx + '"')
+                .replaceAll("'body-" + reqId + "-grp0-", "'body-" + reqId + "-grp" + nextIdx + "-")
+                .replaceAll("'toggle-" + reqId + "-grp0-", "'toggle-" + reqId + "-grp" + nextIdx + "-");
+
+            // Reset all inputs
+            clone.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(i => { i.checked = false; });
+            clone.querySelectorAll('.service-item').forEach(el => el.classList.remove('selected'));
+            clone.querySelectorAll('.package-discount-box').forEach(b => b.style.display = 'none');
+            clone.querySelectorAll('.hardware-sub-items').forEach(el => el.style.display = 'none');
+            clone.querySelectorAll('.service-qty').forEach(i => { i.disabled = true; });
+            clone.querySelectorAll('.hidden-price-input, .hidden-discount-input, .hidden-final-price-input').forEach(i => i.value = 0);
+            clone.querySelectorAll('.discount-slider, .discount-input').forEach(i => i.value = 0);
+            clone.querySelectorAll('.base-price-display, .final-price-display, .discount-display').forEach(el => el.textContent = '0');
+
+            // Update group label and data attribute
+            clone.dataset.group = nextIdx;
+            clone.querySelector('.group-label').textContent = 'Configurazione ' + (nextIdx + 1);
+
+            // Always show remove button on new cards
+            clone.querySelector('.remove-group-btn').style.display = 'inline-flex';
+
+            container.appendChild(clone);
+            container.dataset.count = nextIdx + 1;
+
+            // Ensure all cards show the remove button (now there are at least 2)
+            container.querySelectorAll('.remove-group-btn').forEach(btn => btn.style.display = 'inline-flex');
+
+            // Smooth scroll to the new card
+            clone.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function removeGroup(btn) {
+            const card = btn.closest('.group-card');
+            const container = card.closest('.groups-container');
+            container.removeChild(card);
+
+            const remaining = container.querySelectorAll('.group-card');
+            if (remaining.length === 1) {
+                remaining[0].querySelector('.remove-group-btn').style.display = 'none';
+            }
+        }
+
+        // ─────────────────────────────────────────────────────────────────────
 
         // Toast
         function showToast(message, type) {
