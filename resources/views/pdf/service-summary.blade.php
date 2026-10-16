@@ -253,34 +253,42 @@
                         </table>
                     </div>
 
-                    @if($req->services && count($req->services) > 0)
-                        @php
-                            $basePackage = collect($req->services)->firstWhere('type', 'base_package');
-                            $addons = collect($req->services)->where('type', 'addon')->values();
-                        @endphp
+                    @php $serviceGroups = $req->getServiceGroups(); @endphp
+                    @if(count($serviceGroups) > 0)
+                        @foreach($serviceGroups as $gIdx => $group)
+                            @php
+                                $groupQty    = $group['qty'] ?? $req->vehicle_qty;
+                                $groupSrvs   = collect($group['services'] ?? []);
+                                $basePackage = $groupSrvs->firstWhere('type', 'base_package');
+                                $addons      = $groupSrvs->where('type', 'addon')->values();
+                                $showHeader  = count($serviceGroups) > 1;
+                            @endphp
 
-                        @if($basePackage)
-                            <div class="section-title">{{ __('PACKAGE') }}</div>
-                            <ul class="service-list">
-                                <li>
-                                    <span>{{ $basePackage['name'] }}</span>
-                                </li>
-                            </ul>
-                        @endif
+                            @if($showHeader)
+                                <div class="section-title">{{ __('Configuration') }} {{ $gIdx + 1 }} — {{ __('Quantity:') }} {{ $groupQty }}</div>
+                            @endif
 
-                        @if($addons->count() > 0)
-                            <div class="section-title">{{ __('SELECTED SERVICES & HARDWARE') }}</div>
-                            <ul class="service-list">
-                                @foreach($addons as $addon)
-                                    <li>
-                                        <span>{{ $addon['name'] }}</span>
-                                        @if(!empty($addon['qty']))
-                                            <span class="service-qty-badge">× {{ $addon['qty'] }}</span>
-                                        @endif
-                                    </li>
-                                @endforeach
-                            </ul>
-                        @endif
+                            @if($basePackage)
+                                <div class="section-title">{{ __('PACKAGE') }}</div>
+                                <ul class="service-list">
+                                    <li><span>{{ $basePackage['name'] }}</span></li>
+                                </ul>
+                            @endif
+
+                            @if($addons->count() > 0)
+                                <div class="section-title">{{ __('SELECTED SERVICES & HARDWARE') }}</div>
+                                <ul class="service-list">
+                                    @foreach($addons as $addon)
+                                        <li>
+                                            <span>{{ $addon['name'] }}</span>
+                                            @if(!empty($addon['qty']))
+                                                <span class="service-qty-badge">× {{ $addon['qty'] }}</span>
+                                            @endif
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            @endif
+                        @endforeach
                     @else
                         <p class="no-service-msg">{{ __('No service selected for this vehicle.') }}</p>
                     @endif

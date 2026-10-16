@@ -55,4 +55,39 @@ class ServiceRequest extends Model
             'completed_at' => now(),
         ]);
     }
+
+    /**
+     * Restituisce i services come array di gruppi normalizzato.
+     * Gestisce sia il vecchio formato flat che il nuovo formato con gruppi.
+     * Formato output: [['group_idx'=>0, 'qty'=>N, 'services'=>[...]], ...]
+     */
+    public function getServiceGroups(): array
+    {
+        $services = $this->services ?? [];
+        if (empty($services)) return [];
+
+        $first = reset($services);
+        if (isset($first['group_idx'])) {
+            return $services; // nuovo formato multi-gruppo
+        }
+
+        // vecchio formato flat → wrap in un gruppo singolo
+        return [['group_idx' => 0, 'qty' => $this->vehicle_qty, 'services' => $services]];
+    }
+
+    /**
+     * Restituisce tutti i services appiattiti (flat), indipendente dal formato.
+     * Utile per ricerche tipo firstWhere('type', 'base_package').
+     */
+    public function getFlatServices(): array
+    {
+        $groups = $this->getServiceGroups();
+        $flat = [];
+        foreach ($groups as $group) {
+            foreach ($group['services'] ?? [] as $srv) {
+                $flat[] = $srv;
+            }
+        }
+        return $flat;
+    }
 }

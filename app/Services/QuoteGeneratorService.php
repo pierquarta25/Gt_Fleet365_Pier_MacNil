@@ -489,22 +489,23 @@ class QuoteGeneratorService
         // --- AGGREGAZIONE SERVIZI (una riga per servizio unico) ---
         $aggregated = [];
         foreach ($serviceRequests as $req) {
-            $vehicleQty = $req->vehicle_qty ?? 1;
-            $services   = $req->services ?? [];
+            foreach ($req->getServiceGroups() as $group) {
+                $groupQty = $group['qty'] ?? ($req->vehicle_qty ?? 1);
 
-            foreach ($services as $srv) {
-                $id              = $srv['id'];
-                $srvQty          = $srv['qty'] ?? 1;
-                $totalQtyForThis = $vehicleQty * $srvQty;
+                foreach ($group['services'] ?? [] as $srv) {
+                    $id              = $srv['id'];
+                    $srvQty          = $srv['qty'] ?? 1;
+                    $totalQtyForThis = $groupQty * $srvQty;
 
-                if (isset($aggregated[$id])) {
-                    $aggregated[$id]['totalQty'] += $totalQtyForThis;
-                } else {
-                    $aggregated[$id] = [
-                        'id'       => $id,
-                        'srv'      => $srv,
-                        'totalQty' => $totalQtyForThis,
-                    ];
+                    if (isset($aggregated[$id])) {
+                        $aggregated[$id]['totalQty'] += $totalQtyForThis;
+                    } else {
+                        $aggregated[$id] = [
+                            'id'       => $id,
+                            'srv'      => $srv,
+                            'totalQty' => $totalQtyForThis,
+                        ];
+                    }
                 }
             }
         }
