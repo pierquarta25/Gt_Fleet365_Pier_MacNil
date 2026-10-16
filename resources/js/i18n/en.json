@@ -18,6 +18,8 @@
   "errors": {
     "companyRequired": "Company name is required",
     "vatRequired": "VAT number is required",
+    "vatInvalidLength": "The VAT number must be exactly 11 digits",
+    "vatInvalidChecksum": "The VAT number entered is not valid",
     "contactRequired": "Contact first name is required",
     "lastnameRequired": "Contact last name is required",
     "emailRequired": "Email is required",

@@ -82,6 +82,23 @@ export default function VehicleForm() {
         }
     };
 
+    // Valida la partita IVA italiana: 11 cifre + checksum
+    const validatePartitaIva = (piva) => {
+        const digits = piva.trim();
+        if (!/^\d{11}$/.test(digits)) return false;
+        let sum = 0;
+        for (let i = 0; i < 10; i++) {
+            let d = parseInt(digits[i], 10);
+            if (i % 2 === 1) {
+                d *= 2;
+                if (d > 9) d -= 9;
+            }
+            sum += d;
+        }
+        const check = (10 - (sum % 10)) % 10;
+        return check === parseInt(digits[10], 10);
+    };
+
     // Valida i campi obbligatori dello Step 1
     const validateStep1 = () => {
         const newErrors = {};
@@ -92,6 +109,10 @@ export default function VehicleForm() {
         }
         if (!clientData.vatNumber.trim()) {
             newErrors.vatNumber = t('errors.vatRequired');
+        } else if (!/^\d{11}$/.test(clientData.vatNumber.trim())) {
+            newErrors.vatNumber = t('errors.vatInvalidLength');
+        } else if (!validatePartitaIva(clientData.vatNumber)) {
+            newErrors.vatNumber = t('errors.vatInvalidChecksum');
         }
         if (!clientData.contact.trim()) {
             newErrors.contact = t('errors.contactRequired');

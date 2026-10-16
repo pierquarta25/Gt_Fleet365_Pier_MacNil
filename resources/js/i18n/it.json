@@ -18,6 +18,8 @@
   "errors": {
     "companyRequired": "La ragione sociale è obbligatoria",
     "vatRequired": "La Partita Iva è obbligatoria",
+    "vatInvalidLength": "La Partita IVA deve essere di esattamente 11 cifre",
+    "vatInvalidChecksum": "La Partita IVA inserita non è valida",
     "contactRequired": "Il nome contatto è obbligatorio",
     "lastnameRequired": "Il cognome contatto è obbligatorio",
     "emailRequired": "L'email è obbligatoria",
