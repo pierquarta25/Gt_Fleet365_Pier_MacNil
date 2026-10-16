@@ -11,7 +11,7 @@
     "phone": "Telefono", "phonePlaceholder": "es. +39...",
     "driversCount": "Numero Autisti",
     "notes": "Note", "notesPlaceholder": "es. Flotta principalmente al Nord Italia",
-    "dataTraffic": "Traffico dati 4G",
+    "dataTraffic": "Traffico Dati",
     "italy": "Italia", "abroad": "Estero",
     "required": "*"
   },

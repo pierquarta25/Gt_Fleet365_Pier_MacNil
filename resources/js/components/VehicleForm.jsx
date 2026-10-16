@@ -447,8 +447,8 @@ export default function VehicleForm() {
                                     <div className="field-group flex-1">
                                         <label>{t('form.dataTraffic')}</label>
                                         <div className="toggle-group" role="group" aria-label={t('accessibility.dataTrafficGroup')}>
-                                            <button type="button" className={`toggle-btn ${clientData.italia ? 'active' : ''}`} onClick={() => togglePlace('italia')} aria-pressed={clientData.italia}>🇮🇹 {t('form.italy')}</button>
-                                            <button type="button" className={`toggle-btn ${clientData.estero ? 'active' : ''}`} onClick={() => togglePlace('estero')} aria-pressed={clientData.estero}>🌍 {t('form.abroad')}</button>
+                                            <button type="button" className={`toggle-btn ${clientData.italia ? 'active' : ''}`} onClick={() => togglePlace('italia')} aria-pressed={clientData.italia}>{t('form.italy')}</button>
+                                            <button type="button" className={`toggle-btn ${clientData.estero ? 'active' : ''}`} onClick={() => togglePlace('estero')} aria-pressed={clientData.estero}>{t('form.abroad')}</button>
                                         </div>
                                     </div>
                                 </div>

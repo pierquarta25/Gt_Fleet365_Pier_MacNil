@@ -11,7 +11,7 @@
     "phone": "Phone", "phonePlaceholder": "e.g. +44...",
     "driversCount": "Number of Drivers",
     "notes": "Notes", "notesPlaceholder": "e.g. Fleet mainly in Northern Italy",
-    "dataTraffic": "4G Data Traffic",
+    "dataTraffic": "Data Traffic",
     "italy": "Italy", "abroad": "International",
     "required": "*"
   },
