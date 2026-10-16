@@ -463,26 +463,30 @@
 
 <body>
 @php
+    // Prezzi di listino pubblico — IDs allineati a config/vehicle_services.php
     $packagePrices = [
-        "base_loc" => 200,
-        "plus_loc_sic" => 250,
-        "gold_loc_tel" => 300,
-        "premium_loc_tel_sic" => 350,
-        "plus" => 200,
-        "crono_base" => 250,
-        "crono_plus" => 300,
-        "crono_tel" => 350,
-        "crono_premium" => 400,
-        "trailers_comodato" => 200,
-        "trailers_proprieta" => 150,
-        "asset" => 150,
-        "app_fleet_manager" => 39,
-        "app_driver" => 100,
-        "manutenzioni" => 100,
-        "formazione" => 100,
-        "missioni" => 200,
-        "scorta" => 150,
-        "app_gt5" => 100,
+        // Pacchetti base
+        "base_loc"              => 200,  // GT FLEET 365 BASE (LOC)
+        "plus_loc_sic"          => 250,  // GT FLEET 365 PLUS (LOC + SEC)
+        "gold_loc_tel"          => 300,  // GT FLEET 365 GOLD (LOC + TEL)
+        "premium_loc_tel_sic"   => 350,  // GT FLEET 365 PREMIUM (LOC + TEL + SEC)
+        "plus_trattore"         => 200,  // GT FLEET 365 PLUS (Trattori)
+        "truck_crono_base"      => 250,  // GT FLEET 365 TRUCK CRONO BASE
+        "truck_crono_plus"      => 300,  // GT FLEET 365 TRUCK CRONO PLUS
+        "truck_crono_tel"       => 350,  // GT FLEET 365 TRUCK CRONO TEL
+        "truck_crono_premium"   => 400,  // GT FLEET 365 TRUCK CRONO PREMIUM
+        "rimorchi_comodato"     => 200,  // GT FLEET 365 TRAILERS (dispositivo in comodato)
+        "rimorchi_vendita"      => 150,  // GT FLEET 365 TRAILERS (dispositivo in vendita)
+        "asset"                 => 150,  // GT FLEET 365 ASSET
+        // Servizi aggiuntivi
+        "app_fleet_manager"     => 39,   // APP GT FLEET 365 - FLEET MANAGER
+        "app_driver"            => 100,  // APP GT FLEET 365 - DRIVER
+        "manutenzioni_scadenze" => 100,  // GT FLEET 365 SERVIZIO MANUTENZIONI - SCADENZE
+        "formazione_assistenza" => 100,  // FORMAZIONE + ASSISTENZA
+        "missioni"              => 200,  // GT FLEET 365 MISSIONI
+        "mappe_track"           => 200,  // SERVIZIO MAPPE TRUCK - MEZZI PESANTI
+        "scorta_digitale"       => 150,  // GT FLEET 365 SCORTA DIGITALE
+        "app_gt5_app"           => 100,  // GT FLEET 365 APP - GT 5.0
     ];
 @endphp
 
