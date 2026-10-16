@@ -282,7 +282,7 @@ export default function VehicleForm() {
 
                             <div className="cf-section">
                                 <div className="cf-section-label"><span>🏢</span><span>{t('sections.company')}</span></div>
-                                <div className="cf-fields row-layout">
+                                <div className="cf-fields row-layout" style={{ alignItems: 'flex-end' }}>
                                     <div className="field-group flex-1">
                                         <label htmlFor="company">{t('form.companyName')} {t('form.required')}</label>
                                         <input
