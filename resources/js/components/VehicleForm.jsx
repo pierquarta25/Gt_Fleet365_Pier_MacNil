@@ -30,6 +30,7 @@ export default function VehicleForm() {
         const defaultData = {
             company: '',
             vatNumber: '',
+            vatForeign: false,
             contact: '',
             lastname: '',
             email: '',
@@ -109,10 +110,12 @@ export default function VehicleForm() {
         }
         if (!clientData.vatNumber.trim()) {
             newErrors.vatNumber = t('errors.vatRequired');
-        } else if (!/^\d{11}$/.test(clientData.vatNumber.trim())) {
-            newErrors.vatNumber = t('errors.vatInvalidLength');
-        } else if (!validatePartitaIva(clientData.vatNumber)) {
-            newErrors.vatNumber = t('errors.vatInvalidChecksum');
+        } else if (!clientData.vatForeign) {
+            if (!/^\d{11}$/.test(clientData.vatNumber.trim())) {
+                newErrors.vatNumber = t('errors.vatInvalidLength');
+            } else if (!validatePartitaIva(clientData.vatNumber)) {
+                newErrors.vatNumber = t('errors.vatInvalidChecksum');
+            }
         }
         if (!clientData.contact.trim()) {
             newErrors.contact = t('errors.contactRequired');
@@ -309,6 +312,14 @@ export default function VehicleForm() {
                                             aria-describedby={errors.vatNumber ? "vatNumber-error" : undefined}
                                         />
                                         {errors.vatNumber && <span id="vatNumber-error" className="error-text">{errors.vatNumber}</span>}
+                                        <label style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '6px', fontSize: '0.85rem', cursor: 'pointer', userSelect: 'none' }}>
+                                            <input
+                                                type="checkbox"
+                                                checked={clientData.vatForeign}
+                                                onChange={e => setClientData(prev => ({ ...prev, vatForeign: e.target.checked }))}
+                                            />
+                                            {t('form.vatForeign')}
+                                        </label>
                                     </div>
                                 </div>
                             </div>

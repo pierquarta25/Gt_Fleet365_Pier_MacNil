@@ -43,7 +43,12 @@ class VehicleFormController extends Controller
     {
         $request->validate([
             'client.company' => 'required|string|max:255',
-            'client.vatNumber' => ['required', 'string', 'regex:/^\d{11}$/', new \App\Rules\PartitaIva],
+            'client.vatNumber' => array_filter([
+                'required', 'string',
+                !($request->input('client.vatForeign')) ? 'regex:/^\d{11}$/' : null,
+                !($request->input('client.vatForeign')) ? new \App\Rules\PartitaIva : null,
+            ]),
+            'client.vatForeign' => 'nullable|boolean',
             'client.email'   => 'required|email|max:255',
             'client.contact' => 'required|string|max:255',
             'client.lastname'=> 'required|string|max:255',
