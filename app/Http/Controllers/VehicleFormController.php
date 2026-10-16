@@ -74,13 +74,6 @@ class VehicleFormController extends Controller
         $agentEmailFromClient = $client['agent_email'] ?? null;
         $sessionAgentEmail = session('agent_email');
 
-        \Illuminate\Support\Facades\Log::info('[AGENT DEBUG] Dati ricevuti per lookup commerciale', [
-            'agent_slug'    => $agentSlug,
-            'agent_email'   => $agentEmailFromClient,
-            'session_email' => $sessionAgentEmail,
-            'users_count'   => User::count(),
-        ]);
-
         if ($agentSlug) {
             $agent = User::where('slug', $agentSlug)->first();
         }
@@ -90,10 +83,6 @@ class VehicleFormController extends Controller
         if (!$agent && $sessionAgentEmail) {
             $agent = User::where('email', $sessionAgentEmail)->first();
         }
-
-        \Illuminate\Support\Facades\Log::info('[AGENT DEBUG] Risultato lookup', [
-            'agent_found' => $agent ? $agent->email : 'NULL - nessun commerciale trovato',
-        ]);
 
         $dealId = null;
         if (config('services.hubspot.token')) {
