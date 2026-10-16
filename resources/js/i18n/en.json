@@ -4,7 +4,7 @@
   "sections": { "company": "Company", "referent": "Contact Person", "drivers": "Drivers", "services": "Services" },
   "form": {
     "companyName": "Company Name", "companyPlaceholder": "e.g. South Logistics Ltd.",
-    "vatNumber": "VAT Number", "vatPlaceholder": "e.g. 12345678901", "vatForeign": "Foreign VAT number",
+    "vatNumber": "VAT Number", "vatPlaceholder": "e.g. 12345678901", "vatForeign": "Foreign", "vatForeignPlaceholder": "e.g. DE123456789",
     "contactName": "First Name", "contactPlaceholder": "e.g. John",
     "contactLastname": "Last Name", "lastnamePlaceholder": "e.g. Smith",
     "email": "Email", "emailPlaceholder": "e.g. john@email.com",

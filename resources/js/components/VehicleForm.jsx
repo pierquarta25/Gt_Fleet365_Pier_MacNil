@@ -299,27 +299,34 @@ export default function VehicleForm() {
                                         {errors.company && <span id="company-error" className="error-text">{errors.company}</span>}
                                     </div>
                                     <div className="field-group flex-1">
-                                        <label htmlFor="vatNumber">{t('form.vatNumber')} {t('form.required')}</label>
+                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                            <label htmlFor="vatNumber">{t('form.vatNumber')} {t('form.required')}</label>
+                                            <button
+                                                type="button"
+                                                onClick={() => setClientData(prev => ({ ...prev, vatForeign: !prev.vatForeign, vatNumber: '' }))}
+                                                style={{
+                                                    fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px',
+                                                    padding: '2px 8px', borderRadius: '20px', cursor: 'pointer', transition: 'all 0.2s',
+                                                    border: clientData.vatForeign ? '1.5px solid var(--orange)' : '1.5px solid var(--border)',
+                                                    background: clientData.vatForeign ? 'var(--orange-dim)' : 'transparent',
+                                                    color: clientData.vatForeign ? 'var(--orange)' : 'var(--text-muted)',
+                                                }}
+                                            >
+                                                🌍 {t('form.vatForeign')}
+                                            </button>
+                                        </div>
                                         <input
                                             type="text"
                                             id="vatNumber"
                                             className={errors.vatNumber ? 'input-error' : ''}
                                             value={clientData.vatNumber}
                                             onChange={handleTextChange}
-                                            placeholder={t('form.vatPlaceholder')}
+                                            placeholder={clientData.vatForeign ? t('form.vatForeignPlaceholder') : t('form.vatPlaceholder')}
                                             aria-required="true"
                                             aria-invalid={errors.vatNumber ? "true" : "false"}
                                             aria-describedby={errors.vatNumber ? "vatNumber-error" : undefined}
                                         />
                                         {errors.vatNumber && <span id="vatNumber-error" className="error-text">{errors.vatNumber}</span>}
-                                        <label style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '6px', fontSize: '0.85rem', cursor: 'pointer', userSelect: 'none' }}>
-                                            <input
-                                                type="checkbox"
-                                                checked={clientData.vatForeign}
-                                                onChange={e => setClientData(prev => ({ ...prev, vatForeign: e.target.checked }))}
-                                            />
-                                            {t('form.vatForeign')}
-                                        </label>
                                     </div>
                                 </div>
                             </div>
