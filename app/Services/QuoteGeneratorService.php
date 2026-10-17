@@ -497,10 +497,14 @@ class QuoteGeneratorService
                     $srvQty          = $srv['qty'] ?? 1;
                     $totalQtyForThis = $groupQty * $srvQty;
 
-                    if (isset($aggregated[$id])) {
-                        $aggregated[$id]['totalQty'] += $totalQtyForThis;
+                    // Stesso servizio con prezzo/sconto diversi (es. gruppi con sconti differenti)
+                    // => righe separate, altrimenti il prezzo del primo gruppo verrebbe applicato a tutti.
+                    $key = $id . '|' . ($srv['price'] ?? '') . '|' . ($srv['discount'] ?? '') . '|' . ($srv['final_price'] ?? '');
+
+                    if (isset($aggregated[$key])) {
+                        $aggregated[$key]['totalQty'] += $totalQtyForThis;
                     } else {
-                        $aggregated[$id] = [
+                        $aggregated[$key] = [
                             'id'       => $id,
                             'srv'      => $srv,
                             'totalQty' => $totalQtyForThis,
@@ -515,7 +519,8 @@ class QuoteGeneratorService
         $totaleHardwareUnaTantum = 0;
         $rowsData                = [];
 
-        foreach ($aggregated as $id => $entry) {
+        foreach ($aggregated as $entry) {
+            $id       = $entry['id'];
             $srv      = $entry['srv'];
             $totalQty = $entry['totalQty'];
 
@@ -533,7 +538,7 @@ class QuoteGeneratorService
             $listPrice       = isset($srv['price'])       ? (float) $srv['price']       : $priceInfo['list_price'];
             $discount        = isset($srv['discount'])    ? (float) $srv['discount']    : 0;
             $discountedPrice = ($discount > 0)
-                ? ($listPrice - $discount)
+                ? ($listPrice * (1 - $discount / 100))
                 : ($priceInfo['discounted_price'] ?? $listPrice);
             $offerPrice      = isset($srv['final_price']) ? (float) $srv['final_price'] : $priceInfo['offer_price'];
 

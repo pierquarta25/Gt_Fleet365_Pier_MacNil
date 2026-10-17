@@ -1038,6 +1038,14 @@
             spinner.style.display = 'block';
 
             const form = document.getElementById('serviceForm');
+
+            // I campi prezzo/sconto dei pacchetti non selezionati hanno lo stesso name di quello
+            // selezionato: li disabilitiamo per evitare che sovrascrivano i valori corretti.
+            form.querySelectorAll('.package-discount-box').forEach(box => {
+                const radio = box.closest('.service-item-wrapper').querySelector('input[type="radio"]');
+                box.querySelectorAll('input[type="hidden"]').forEach(h => { h.disabled = !(radio && radio.checked); });
+            });
+
             const formData = new FormData(form);
 
             try {
