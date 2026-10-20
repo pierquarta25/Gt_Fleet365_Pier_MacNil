@@ -9,6 +9,7 @@ use App\Services\QuoteGeneratorService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class ServiceFormController extends Controller
 {
@@ -52,7 +53,7 @@ class ServiceFormController extends Controller
             // Il nome del file rifletterà se è stato convertito in PDF o se è ancora un DOCX
             $fileName = basename($filePath);
 
-            return response()->download($filePath, $fileName);
+            return response()->download($filePath, $fileName)->deleteFileAfterSend(true);
             
         } catch (\Exception $e) {
             Log::error("Errore generazione preventivo dal template DOCX: " . $e->getMessage());
@@ -114,22 +115,22 @@ class ServiceFormController extends Controller
      * Salva la configurazione per tutti i mezzi.
      * POST /api/servizi/{token}
      */
-    public function store(Request $request, string $token)
+    public function store(Request $request, string $token, QuoteGeneratorService $quoteGenerator)
     {
         $serviceRequests = $this->getServiceRequests($token);
 
+        $validServiceIds = $this->validServiceIds();
+
         $validated = $request->validate([
-            'vehicles'                                     => 'required|array',
-            'vehicles.*.groups'                            => 'nullable|array',
-            'vehicles.*.groups.*.qty'                      => 'nullable|integer|min:1',
-            'vehicles.*.groups.*.base_package'             => 'nullable|string',
-            'vehicles.*.groups.*.services'                 => 'nullable|array',
-            'vehicles.*.groups.*.services.*'               => 'string',
-            'vehicles.*.groups.*.quantities'               => 'nullable|array',
-            'vehicles.*.groups.*.quantities.*'             => 'integer|min:0',
-            'vehicles.*.groups.*.package_price'            => 'nullable|numeric',
-            'vehicles.*.groups.*.package_discount'         => 'nullable|numeric',
-            'vehicles.*.groups.*.package_final_price'      => 'nullable|numeric',
+            'vehicles'                                     => 'required|array|max:100',
+            'vehicles.*.groups'                            => 'nullable|array|max:50',
+            'vehicles.*.groups.*.qty'                      => 'nullable|integer|min:1|max:9999',
+            'vehicles.*.groups.*.base_package'             => ['nullable', 'string', Rule::in($validServiceIds)],
+            'vehicles.*.groups.*.services'                 => 'nullable|array|max:100',
+            'vehicles.*.groups.*.services.*'               => ['string', Rule::in($validServiceIds)],
+            'vehicles.*.groups.*.quantities'               => 'nullable|array|max:100',
+            'vehicles.*.groups.*.quantities.*'             => 'integer|min:0|max:9999',
+            'vehicles.*.groups.*.package_discount'         => 'nullable|numeric|min:0|max:100',
             'vehicles.*.notes'                             => 'nullable|string|max:2000',
         ]);
 
@@ -150,9 +151,14 @@ class ServiceFormController extends Controller
                         'name' => $this->getServiceName($group['base_package']),
                         'type' => 'base_package',
                     ];
-                    if (isset($group['package_price'])) $pkg['price'] = $group['package_price'];
-                    if (isset($group['package_discount'])) $pkg['discount'] = $group['package_discount'];
-                    if (isset($group['package_final_price'])) $pkg['final_price'] = $group['package_final_price'];
+                    // Prezzi sempre dal listino server: dal client si accetta solo lo sconto %
+                    $listPrice = $quoteGenerator->listPrice($group['base_package']);
+                    if ($listPrice !== null) {
+                        $discount = (float) ($group['package_discount'] ?? 0);
+                        $pkg['price']       = $listPrice;
+                        $pkg['discount']    = $discount;
+                        $pkg['final_price'] = round($listPrice * (1 - $discount / 100), 2);
+                    }
                     $groupServices[] = $pkg;
                 }
 
@@ -227,6 +233,20 @@ class ServiceFormController extends Controller
             }
         }
         return $requests;
+    }
+
+    /**
+     * Elenco degli ID servizio ammessi (da config).
+     */
+    private function validServiceIds(): array
+    {
+        $ids = [];
+        foreach (config('vehicle_services.sections') as $section) {
+            foreach ($section['items'] as $item) {
+                $ids[] = $item['id'];
+            }
+        }
+        return $ids;
     }
 
     /**

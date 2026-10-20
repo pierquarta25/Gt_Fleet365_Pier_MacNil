@@ -56,7 +56,16 @@ class VehicleFormController extends Controller
             'client.drivers' => 'nullable|integer|min:0',
             'client.agent_email' => 'nullable|email|max:255',
             'client.agent_slug'  => 'nullable|string|max:255',
-            'vehicles'       => 'required|array'
+            'client.notes'   => 'nullable|string|max:2000',
+            'client.italia'  => 'nullable|boolean',
+            'client.estero'  => 'nullable|boolean',
+            'vehicles'       => 'required|array',
+            'vehicles.*'     => 'nullable|integer|min:0|max:9999',
+            'selectedVehicles'         => 'nullable|array|max:100',
+            'selectedVehicles.*.id'    => ['required_with:selectedVehicles', 'string', 'max:100', 'regex:/^[a-z0-9_]+$/'],
+            'selectedVehicles.*.name'  => 'nullable|string|max:255',
+            'selectedVehicles.*.qty'   => 'required_with:selectedVehicles|integer|min:1|max:9999',
+            'selectedVehicles.*.img'   => ['nullable', 'string', 'max:255', 'regex:#^/media/[A-Za-z0-9_\-]+\.png$#'],
         ], [
             'client.company.required' => __('Company name is required.'),
             'client.contact.required' => __('Contact first name is required.'),
@@ -64,7 +73,13 @@ class VehicleFormController extends Controller
             'client.email.email'      => __('Invalid email format.'),
         ]);
 
-        $client = $request->input('client');
+        // Solo i campi attesi: nessun dato arbitrario nel JSON salvato a DB
+        $client = $request->only([
+            'client.company', 'client.vatNumber', 'client.vatForeign', 'client.email',
+            'client.contact', 'client.lastname', 'client.phone', 'client.drivers',
+            'client.agent_email', 'client.agent_slug',
+            'client.italia', 'client.estero', 'client.notes',
+        ])['client'] ?? [];
 
         // Set locale from frontend language
         $locale = $request->input('language', 'it');
@@ -111,9 +126,9 @@ class VehicleFormController extends Controller
 
         \Illuminate\Support\Facades\Log::info("Debug invio email", [
             'default_mailer' => config('mail.default'),
-            'toEmails' => $toEmails,
-            'capi' => $capi,
-            'agent' => $agent ? $agent->email : null
+            'recipients' => count($toEmails),
+            'cc' => count($capi),
+            'has_agent' => (bool) $agent,
         ]);
 
         if (!empty($toEmails)) {
@@ -131,7 +146,7 @@ class VehicleFormController extends Controller
                 }
             } else {
                 foreach ($vehiclesInput as $id => $qty) {
-                    if ($qty > 0) {
+                    if ($qty > 0 && preg_match('/^[a-z0-9_]+$/', (string) $id)) {
                         $formattedVehicles[] = [
                             'name' => ucfirst(str_replace('_', ' ', $id)),
                             'qty' => $qty,
@@ -185,22 +200,19 @@ class VehicleFormController extends Controller
             }
 
             \Illuminate\Support\Facades\Log::info("Tentativo invio con mailer: " . config('mail.default'), [
-                'to' => $toEmails,
-                'cc' => $ccEmails
+                'recipients' => count($toEmails),
+                'cc' => count($ccEmails),
             ]);
 
             try {
                 $mail->send(new LeadSummaryMail($client, $formattedVehicles, $groupToken));
                 \Illuminate\Support\Facades\Log::info("Email inviata con successo.");
-                $emailError = null;
             } catch (\Exception $e) {
-                $emailError = $e->getMessage();
                 \Illuminate\Support\Facades\Log::error("Impossibile inviare l'email di riepilogo: " . $e->getMessage(), [
                     'exception' => $e
                 ]);
             }
         } else {
-            $emailError = 'Nessun destinatario configurato';
             \Illuminate\Support\Facades\Log::warning("Invio email saltato: nessun destinatario configurato.");
         }
 
@@ -208,7 +220,6 @@ class VehicleFormController extends Controller
             'status' => 'success',
             'message' => $dealId ? __('Configuration saved successfully.') : __('Configuration sent in test mode.'),
             'deal_id' => $dealId,
-            'email_debug' => $emailError ?? null
         ]);
     }
 }

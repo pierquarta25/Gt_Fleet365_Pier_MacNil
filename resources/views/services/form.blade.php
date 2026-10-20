@@ -533,33 +533,6 @@
 </head>
 
 <body>
-@php
-    // Prezzi di listino pubblico — IDs allineati a config/vehicle_services.php
-    $packagePrices = [
-        // Pacchetti base
-        "base_loc"              => 200,  // GT FLEET 365 BASE (LOC)
-        "plus_loc_sic"          => 250,  // GT FLEET 365 PLUS (LOC + SEC)
-        "gold_loc_tel"          => 300,  // GT FLEET 365 GOLD (LOC + TEL)
-        "premium_loc_tel_sic"   => 350,  // GT FLEET 365 PREMIUM (LOC + TEL + SEC)
-        "plus_trattore"         => 200,  // GT FLEET 365 PLUS (Trattori)
-        "truck_crono_base"      => 250,  // GT FLEET 365 TRUCK CRONO BASE
-        "truck_crono_plus"      => 300,  // GT FLEET 365 TRUCK CRONO PLUS
-        "truck_crono_tel"       => 350,  // GT FLEET 365 TRUCK CRONO TEL
-        "truck_crono_premium"   => 400,  // GT FLEET 365 TRUCK CRONO PREMIUM
-        "rimorchi_comodato"     => 200,  // GT FLEET 365 TRAILERS (dispositivo in comodato)
-        "rimorchi_vendita"      => 150,  // GT FLEET 365 TRAILERS (dispositivo in vendita)
-        "asset"                 => 150,  // GT FLEET 365 ASSET
-        // Servizi aggiuntivi
-        "app_fleet_manager"     => 39,   // APP GT FLEET 365 - FLEET MANAGER
-        "app_driver"            => 100,  // APP GT FLEET 365 - DRIVER
-        "manutenzioni_scadenze" => 100,  // GT FLEET 365 SERVIZIO MANUTENZIONI - SCADENZE
-        "formazione_assistenza" => 100,  // FORMAZIONE + ASSISTENZA
-        "missioni"              => 200,  // GT FLEET 365 MISSIONI
-        "mappe_track"           => 200,  // SERVIZIO MAPPE TRUCK - MEZZI PESANTI
-        "scorta_digitale"       => 150,  // GT FLEET 365 SCORTA DIGITALE
-        "app_gt5_app"           => 100,  // GT FLEET 365 APP - GT 5.0
-    ];
-@endphp
 
     <div class="header">
         <div class="header-title">{{ __('Service Configuration') }}</div>
@@ -689,7 +662,7 @@
                                                 <div class="service-item-wrapper">
                                                     <label class="service-item">
                                                         @if($section['type'] === 'radio')
-                                                            <input type="radio" data-price="{{ $packagePrices[$item['id']] ?? 200 }}"
+                                                            <input type="radio" data-price="{{ config('vehicle_services.package_prices.' . $item['id'], 200) }}"
                                                                    name="vehicles[{{ $req->id }}][groups][{{ $gIdx }}][base_package]"
                                                                    value="{{ $item['id'] }}"
                                                                    onchange="updateSelection(this)"

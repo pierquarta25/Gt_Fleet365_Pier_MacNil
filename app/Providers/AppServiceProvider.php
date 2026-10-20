@@ -30,5 +30,15 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('vehicle-form', function (Request $request) {
             return Limit::perMinutes(10, 5)->by($request->ip());
         });
+
+        // Pagine servizi: sfogliare / compilare
+        RateLimiter::for('service-form', function (Request $request) {
+            return Limit::perMinute(60)->by($request->ip());
+        });
+
+        // Operazioni costose (generazione PDF con soffice): limite più stretto
+        RateLimiter::for('service-pdf', function (Request $request) {
+            return Limit::perMinute(10)->by($request->ip());
+        });
     }
 }

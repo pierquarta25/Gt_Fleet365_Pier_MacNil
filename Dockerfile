@@ -32,7 +32,7 @@ COPY docker/apache.conf /etc/apache2/sites-available/000-default.conf
 WORKDIR /var/www/html
 
 # Copia di Composer dall'immagine ufficiale
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 # Copia del codice sorgente del progetto
 COPY . .
@@ -41,7 +41,7 @@ COPY . .
 COPY --from=build-frontend /app/public/build ./public/build
 
 # Installazione delle dipendenze di Composer per la produzione
-ENV COMPOSER_ALLOW_SUPERUSER=1
+ENV APP_ENV=production APP_DEBUG=false COMPOSER_ALLOW_SUPERUSER=1
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
 # Configurazione dei permessi per le cartelle di storage e cache di Laravel

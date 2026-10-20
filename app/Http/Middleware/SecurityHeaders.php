@@ -22,8 +22,21 @@ class SecurityHeaders
         // Impedisce che il sito venga caricato in un iframe (anti-clickjacking)
         $response->headers->set('X-Frame-Options', 'DENY');
 
-        // Attiva il filtro XSS integrato nei browser
-        $response->headers->set('X-XSS-Protection', '1; mode=block');
+        // Content Security Policy: solo risorse proprie + CDN usate dalle viste (non in locale: Vite dev server)
+        if (!app()->environment('local')) {
+            $response->headers->set('Content-Security-Policy', implode('; ', [
+                "default-src 'self'",
+                "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net",
+                "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net",
+                "font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com",
+                "img-src 'self' data:",
+                "connect-src 'self'",
+                "object-src 'none'",
+                "base-uri 'self'",
+                "form-action 'self'",
+                "frame-ancestors 'none'",
+            ]));
+        }
 
         // Limita le informazioni inviate nell'header Referrer verso siti esterni
         $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');

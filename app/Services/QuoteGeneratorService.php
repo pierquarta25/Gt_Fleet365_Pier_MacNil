@@ -471,6 +471,16 @@ class QuoteGeneratorService
 
 
     /**
+     * Prezzo di listino di un pacchetto, o null se sconosciuto.
+     */
+    public function listPrice(string $id): ?float
+    {
+        $price = config('vehicle_services.package_prices.' . $id);
+
+        return $price !== null ? (float) $price : null;
+    }
+
+    /**
      * Genera il file DOCX e tenta la conversione in PDF.
      * Restituisce il percorso del file finale (PDF se possibile, altrimenti DOCX).
      */
@@ -590,10 +600,12 @@ class QuoteGeneratorService
         $tableXml = $this->buildTableXml($rowsData, $totaleServiziAnnuo, $totaleHardwareUnaTantum);
 
         // --- MANIPOLAZIONE ZIP ---
-        $tempDocx = storage_path('app/public/temp-' . time() . '.docx');
-        if (!file_exists(storage_path('app/public'))) {
-            mkdir(storage_path('app/public'), 0755, true);
+        $workDir = storage_path('app/private/service-pdfs');
+        if (!is_dir($workDir)) {
+            mkdir($workDir, 0750, true);
         }
+        $uid      = \Illuminate\Support\Str::uuid()->toString();
+        $tempDocx = $workDir . '/temp-' . $uid . '.docx';
         copy($templatePath, $tempDocx);
 
         $zip = new \ZipArchive();
@@ -643,26 +655,29 @@ class QuoteGeneratorService
         }
 
         // --- SALVATAGGIO DOCX FINALE ---
-        $fileNameDocx = 'preventivo-' . \Illuminate\Support\Str::slug($companyName) . '-' . time() . '.docx';
-        $pathDocx     = storage_path('app/public/service-pdfs/' . $fileNameDocx);
-
-        if (!file_exists(storage_path('app/public/service-pdfs'))) {
-            mkdir(storage_path('app/public/service-pdfs'), 0755, true);
-        }
+        $fileNameDocx = 'preventivo-' . \Illuminate\Support\Str::slug($companyName) . '-' . $uid . '.docx';
+        $pathDocx     = $workDir . '/' . $fileNameDocx;
 
         rename($tempDocx, $pathDocx);
 
         // --- CONVERSIONE IN PDF ---
         $fileNamePdf = str_replace('.docx', '.pdf', $fileNameDocx);
-        $pathPdf     = storage_path('app/public/service-pdfs/' . $fileNamePdf);
-        $outdir      = storage_path('app/public/service-pdfs');
+        $pathPdf     = $workDir . '/' . $fileNamePdf;
+        $outdir      = $workDir;
+        $profileDir  = sys_get_temp_dir() . '/lo_' . $uid;
 
-        $cmd       = "soffice --headless --convert-to pdf --outdir " . escapeshellarg($outdir) . " " . escapeshellarg($pathDocx) . " 2>&1";
+        $cmd       = "timeout 60 soffice -env:UserInstallation=" . escapeshellarg('file://' . $profileDir)
+            . " --headless --convert-to pdf --outdir " . escapeshellarg($outdir) . " " . escapeshellarg($pathDocx) . " 2>&1";
         $output    = [];
         $returnVar = 0;
         exec($cmd, $output, $returnVar);
 
+        if (is_dir($profileDir)) {
+            \Illuminate\Support\Facades\File::deleteDirectory($profileDir);
+        }
+
         if ($returnVar === 0 && file_exists($pathPdf)) {
+            @unlink($pathDocx);
             return $pathPdf;
         }
 

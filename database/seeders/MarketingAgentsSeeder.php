@@ -49,22 +49,19 @@ class MarketingAgentsSeeder extends Seeder
                 'slug' => 'daniele-gandini', // /c/daniele-gandini
             ],
             [
-                'name' => 'Beppe Vero',
+                'name' => 'Giuseppe Vero',
                 'email' => 'giuseppe.vero@macnil.it',
-                'slug' => 'beppe-vero', // /c/beppe-vero
+                'slug' => 'giuseppe-vero', // /c/giuseppe-vero
             ],
         ];
 
         foreach ($commerciali as $persona) {
-            User::updateOrCreate(
-                ['email' => $persona['email']],
-                [
-                    'name' => $persona['name'],
-                    'slug' => $persona['slug'],
-                    'password' => Hash::make('password_segreta'),
-                    'role' => 'agent',
-                ]
-            );
+            $user = User::firstOrNew(['email' => $persona['email']]);
+            $user->fill(['name' => $persona['name'], 'slug' => $persona['slug'], 'role' => 'agent']);
+            if (!$user->exists) {
+                $user->password = Hash::make(Str::random(40));
+            }
+            $user->save();
         }
     }
 }

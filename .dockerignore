@@ -12,3 +12,12 @@ npm-debug.log
 yarn-error.log
 .phpunit.result.cache
 tests
+.agents
+.claude
+docs
+@docs
+test_*.php
+patch_quote.py
+temp_test_offerta.docx
+.env.*
+!.env.example

@@ -16,7 +16,7 @@ Route::get('/', [VehicleFormController::class, 'index']);
 Route::post('/api/vehicle-form', [VehicleFormController::class, 'store'])->middleware('throttle:vehicle-form');
 
 // Rotte per il form di configurazione servizi (accessibile via link nella mail)
-Route::get('/servizi/{token}', [ServiceFormController::class, 'show']);
-Route::get('/servizi/{token}/successo', [ServiceFormController::class, 'success']);
-Route::get('/servizi/{token}/pdf', [ServiceFormController::class, 'downloadPdf']);
-Route::post('/api/servizi/{token}', [ServiceFormController::class, 'store']);
+Route::get('/servizi/{token}', [ServiceFormController::class, 'show'])->middleware('throttle:service-form');
+Route::get('/servizi/{token}/successo', [ServiceFormController::class, 'success'])->middleware('throttle:service-form');
+Route::get('/servizi/{token}/pdf', [ServiceFormController::class, 'downloadPdf'])->middleware('throttle:service-pdf');
+Route::post('/api/servizi/{token}', [ServiceFormController::class, 'store'])->middleware('throttle:service-pdf');

@@ -27,3 +27,7 @@ Thumbs.db
 .DS_Store
 GEMINI.md
 .gemini
+# File di debug locali
+/test_*.php
+/patch_quote.py
+/temp_test_offerta.docx

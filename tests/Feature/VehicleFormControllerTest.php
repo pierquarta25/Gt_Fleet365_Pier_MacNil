@@ -68,7 +68,7 @@ class VehicleFormControllerTest extends TestCase
         // 3. Esegui il post al form
         $payload = [
             'client' => [
-                'company' => 'Azienda Test S.r.l.',
+                'company' => 'Azienda Test S.r.l.', 'vatNumber' => '12345678903',
                 'email' => 'cliente@test.com',
                 'contact' => 'John',
                 'lastname' => 'Doe',
@@ -122,7 +122,7 @@ class VehicleFormControllerTest extends TestCase
         // 2. Esegui il post al form passando agent_slug direttamente nel payload client
         $payload = [
             'client' => [
-                'company' => 'Azienda Test S.r.l.',
+                'company' => 'Azienda Test S.r.l.', 'vatNumber' => '12345678903',
                 'email' => 'cliente@test.com',
                 'contact' => 'John',
                 'lastname' => 'Doe',
@@ -169,7 +169,7 @@ class VehicleFormControllerTest extends TestCase
         // 2. Esegui il post al form passando agent_email direttamente nel payload client
         $payload = [
             'client' => [
-                'company' => 'Azienda Test S.r.l.',
+                'company' => 'Azienda Test S.r.l.', 'vatNumber' => '12345678903',
                 'email' => 'cliente@test.com',
                 'contact' => 'John',
                 'lastname' => 'Doe',
@@ -207,7 +207,7 @@ class VehicleFormControllerTest extends TestCase
         // 1. Esegui il post al form senza prima passare dalla rotta dell'agente (/c/{slug})
         $payload = [
             'client' => [
-                'company' => 'Azienda Test S.r.l.',
+                'company' => 'Azienda Test S.r.l.', 'vatNumber' => '12345678903',
                 'email' => 'cliente@test.com',
                 'contact' => 'John',
                 'lastname' => 'Doe',

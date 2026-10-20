@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class CommercialiSeeder extends Seeder
 {
@@ -23,15 +24,13 @@ class CommercialiSeeder extends Seeder
         ];
 
         foreach ($commerciali as $c) {
-            User::updateOrCreate(
-                ['email' => $c['email']], // Condizione di unicità
-                [
-                    'name' => $c['name'],
-                    'slug' => $c['slug'],
-                    // Password fittizia (non devono per forza fare login se usano solo il link)
-                    'password' => Hash::make('password_temporanea_123!')
-                ]
-            );
+            $user = User::firstOrNew(['email' => $c['email']]);
+            $user->fill(['name' => $c['name'], 'slug' => $c['slug']]);
+            if (!$user->exists) {
+                // Non fanno login (usano solo il link): password casuale, mai resettata ai deploy successivi
+                $user->password = Hash::make(Str::random(40));
+            }
+            $user->save();
         }
     }
 }
