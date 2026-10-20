@@ -244,6 +244,9 @@ class ServiceFormController extends Controller
         foreach (config('vehicle_services.sections') as $section) {
             foreach ($section['items'] as $item) {
                 $ids[] = $item['id'];
+                foreach ($item['hardware'] ?? [] as $hw) {
+                    $ids[] = $hw['id'];
+                }
             }
         }
         return $ids;

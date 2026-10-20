@@ -42,6 +42,20 @@ class ServiceFormControllerTest extends TestCase
         $this->assertSame(180.0, (float) $pkg['final_price']);
     }
 
+    public function test_hardware_sub_items_are_accepted(): void
+    {
+        $req = $this->makeRequest();
+
+        $this->postJson('/api/servizi/tok-group', [
+            'vehicles' => [$req->id => ['groups' => [[
+                'qty' => 1,
+                'base_package' => 'base_loc',
+                'services' => ['temperatura_controllata', 'hw_sensore_temperatura'],
+                'quantities' => ['hw_sensore_temperatura' => 2],
+            ]]]],
+        ])->assertOk();
+    }
+
     public function test_unknown_service_ids_are_rejected(): void
     {
         $req = $this->makeRequest();
