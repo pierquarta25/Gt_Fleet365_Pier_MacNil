@@ -382,6 +382,9 @@ return [
     | Fonte unica per form servizi e validazione lato server.
     |--------------------------------------------------------------------------
     */
+    // Maggiorazione sul prezzo offerta per il pagamento mensile (listino Rel 7: 112 annuale -> 140 mensile)
+    'monthly_surcharge' => 0.25,
+
     'package_prices' => [
         // Pacchetti base
         "base_loc"              => 200,  // GT FLEET 365 BASE (LOC)

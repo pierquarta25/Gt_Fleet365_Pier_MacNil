@@ -741,8 +741,12 @@
                                                                 </div>
                                                             </div>
                                                             <div style="border-top: 1px solid #ddd; padding-top: 10px; margin-top: 15px; display: flex; justify-content: space-between; align-items: center;">
-                                                                <strong style="font-size: 1rem;">Prezzo Finale:</strong>
+                                                                <strong style="font-size: 1rem;">Prezzo Finale (annuo):</strong>
                                                                 <strong style="font-size: 1.2rem; color: #0052BD;">€ <span class="final-price-display">0</span></strong>
+                                                            </div>
+                                                            <div class="monthly-price-line" style="display: none; margin-top: 8px; justify-content: space-between; align-items: center;">
+                                                                <strong style="font-size: 1rem;">{{ __('Monthly fee') }}:</strong>
+                                                                <strong style="font-size: 1.2rem; color: #0052BD;">€ <span class="monthly-price-display">0</span> / {{ __('month') }}</strong>
                                                             </div>
                                                             <!-- Hidden inputs for form submission -->
                                                             <input type="hidden" name="vehicles[{{ $req->id }}][groups][{{ $gIdx }}][package_price]" class="hidden-price-input" value="{{ $savedPkgPrice }}">
@@ -907,10 +911,15 @@
                 basePrice = parseFloat(box.querySelector('.hidden-price-input').value);
             }
             const discount = parseInt(box.querySelector('.discount-slider').value) || 0;
-            const finalPrice = basePrice * (1 - discount/100);
+            const billing = box.closest('.section-body').querySelector('.billing-input');
+            const surcharge = (billing && billing.value === 'mensile') ? {{ (float) config('vehicle_services.monthly_surcharge', 0) }} : 0;
+            const finalPrice = basePrice * (1 - discount/100) * (1 + surcharge);
 
             box.querySelector('.discount-display').textContent = discount;
             box.querySelector('.final-price-display').textContent = finalPrice.toFixed(2);
+            const monthlyLine = box.querySelector('.monthly-price-line');
+            monthlyLine.style.display = surcharge > 0 || (billing && billing.value === 'mensile') ? 'flex' : 'none';
+            box.querySelector('.monthly-price-display').textContent = (finalPrice / 12).toFixed(2);
 
             box.querySelector('.hidden-discount-input').value = discount;
             box.querySelector('.hidden-final-price-input').value = finalPrice.toFixed(2);
@@ -992,7 +1001,7 @@
             clone.querySelectorAll('.service-qty').forEach(i => { i.disabled = true; });
             clone.querySelectorAll('.hidden-price-input, .hidden-discount-input, .hidden-final-price-input').forEach(i => i.value = 0);
             clone.querySelectorAll('.discount-slider, .discount-input').forEach(i => i.value = 0);
-            clone.querySelectorAll('.base-price-display, .final-price-display, .discount-display').forEach(el => el.textContent = '0');
+            clone.querySelectorAll('.base-price-display, .final-price-display, .discount-display, .monthly-price-display').forEach(el => el.textContent = '0');
 
             // Update group label and data attribute
             clone.dataset.group = nextIdx;

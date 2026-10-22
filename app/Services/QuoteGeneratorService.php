@@ -554,6 +554,11 @@ class QuoteGeneratorService
 
             $contractMonths = $priceInfo['contract_months'] ?? 24;
             $period         = $priceInfo['period']          ?? 'annuale';
+
+            // Pagamento mensile: il canone costa di piu' dell'annuale (maggiorazione da config)
+            if ($period === 'annuale' && ($srv['billing'] ?? 'annuale') === 'mensile') {
+                $offerPrice = round($offerPrice * (1 + (float) config('vehicle_services.monthly_surcharge', 0)), 2);
+            }
             $type           = $priceInfo['type']            ?? 'servizio';
             $descriptions   = $priceInfo['description']    ?? [];
 
