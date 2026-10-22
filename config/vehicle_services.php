@@ -382,41 +382,56 @@ return [
     | Fonte unica per form servizi e validazione lato server.
     |--------------------------------------------------------------------------
     */
-    // Prezzi per pagamento mensile dal listino Rel 7 (Canone Mensile con Pagamento Bimestrale Anticipato).
+    // Prezzi per pagamento mensile dal listino Rel 9 (Canone Mensile con Pagamento Bimestrale Anticipato).
     // 'monthly' = prezzo al mese, 'year' = totale annuale per canoni mensili. Se un servizio non e' qui, il mensile non e' disponibile.
     'monthly_prices' => [
-        'base_loc'              => ['monthly' => 11.666666666666666, 'year' => 140.0],
-        'rimorchi_comodato'     => ['monthly' => 11.666666666666666, 'year' => 140.0],
-        'app_driver'            => ['monthly' => 6.25,               'year' => 75.0],
-        'missioni'              => ['monthly' => 11.666666666666666, 'year' => 140.0],
-        'mappe_track'           => ['monthly' => 10.0,               'year' => 120.0],
-        'app_fleet_manager'     => ['monthly' => 0.0,                'year' => 0.0],
-        'manutenzioni_scadenze' => ['monthly' => 0.0,                'year' => 0.0],
-        'formazione_assistenza' => ['monthly' => 0.0,                'year' => 0.0],
+        'base_loc'                        => ['monthly' => 12.0, 'year' => 144.0],
+        'plus_loc_sic'                    => ['monthly' => 14.666666666666666, 'year' => 176.0],
+        'gold_loc_tel'                    => ['monthly' => 16.666666666666668, 'year' => 200.0],
+        'premium_loc_tel_sic'             => ['monthly' => 18.0, 'year' => 216.0],
+        'truck_crono_base'                => ['monthly' => 18.0, 'year' => 216.0],
+        'truck_crono_plus'                => ['monthly' => 23.333333333333332, 'year' => 280.0],
+        'truck_crono_tel'                 => ['monthly' => 28.666666666666668, 'year' => 344.0],
+        'truck_crono_premium'             => ['monthly' => 35.333333333333336, 'year' => 424.0],
+        'tempi_guida_realtime'            => ['monthly' => 6.666666666666667, 'year' => 80.0],
+        'app_fleet_manager'               => ['monthly' => 2.6, 'year' => 31.2],
+        'manutenzioni_scadenze'           => ['monthly' => 5.0, 'year' => 60.0],
+        'formazione_assistenza'           => ['monthly' => 5.0, 'year' => 60.0],
+        'app_driver'                      => ['monthly' => 5.0, 'year' => 60.0],
+        'rimorchi_comodato'               => ['monthly' => 14.666666666666666, 'year' => 176.0],
+        'missioni'                        => ['monthly' => 13.333333333333334, 'year' => 160.0],
+        'mappe_track'                     => ['monthly' => 13.333333333333334, 'year' => 160.0],
+        'gestione_portellone'             => ['monthly' => 7.399999999999999, 'year' => 88.8],
+        'temperatura_controllata'         => ['monthly' => 7.333333333333333, 'year' => 88.0],
+        'riconoscimento_driver'           => ['monthly' => 7.399999999999999, 'year' => 88.8],
+        'centrale_operativa_live'         => ['monthly' => 13.333333333333334, 'year' => 160.0],
+        'plus_trattore'                   => ['monthly' => 16.333333333333336, 'year' => 196.0],
+        'centrale_operativa_ondemand'     => ['monthly' => 6.666666666666667, 'year' => 80.0],
+        'scorta_digitale'                 => ['monthly' => 60.0, 'year' => 720.0],
     ],
 
     'package_prices' => [
         // Pacchetti base
-        "base_loc"              => 200,  // GT FLEET 365 BASE (LOC)
-        "plus_loc_sic"          => 250,  // GT FLEET 365 PLUS (LOC + SEC)
-        "gold_loc_tel"          => 300,  // GT FLEET 365 GOLD (LOC + TEL)
-        "premium_loc_tel_sic"   => 350,  // GT FLEET 365 PREMIUM (LOC + TEL + SEC)
-        "plus_trattore"         => 200,  // GT FLEET 365 PLUS (Trattori)
-        "truck_crono_base"      => 250,  // GT FLEET 365 TRUCK CRONO BASE
-        "truck_crono_plus"      => 300,  // GT FLEET 365 TRUCK CRONO PLUS
-        "truck_crono_tel"       => 350,  // GT FLEET 365 TRUCK CRONO TEL
-        "truck_crono_premium"   => 400,  // GT FLEET 365 TRUCK CRONO PREMIUM
-        "rimorchi_comodato"     => 200,  // GT FLEET 365 TRAILERS (dispositivo in comodato)
+        "base_loc"              => 180,  // GT FLEET 365 BASE (LOC)
+        "plus_loc_sic"          => 220,  // GT FLEET 365 PLUS (LOC + SEC)
+        "gold_loc_tel"          => 250,  // GT FLEET 365 GOLD (LOC + TEL)
+        "premium_loc_tel_sic"   => 270,  // GT FLEET 365 PREMIUM (LOC + TEL + SEC)
+        "plus_trattore"         => 245,  // GT FLEET 365 PLUS (Trattori)
+        "truck_crono_base"      => 270,  // GT FLEET 365 TRUCK CRONO BASE
+        "truck_crono_plus"      => 350,  // GT FLEET 365 TRUCK CRONO PLUS
+        "truck_crono_tel"       => 430,  // GT FLEET 365 TRUCK CRONO TEL
+        "truck_crono_premium"   => 530,  // GT FLEET 365 TRUCK CRONO PREMIUM
+        "rimorchi_comodato"     => 220,  // GT FLEET 365 TRAILERS (dispositivo in comodato)
         "rimorchi_vendita"      => 150,  // GT FLEET 365 TRAILERS (dispositivo in vendita)
         "asset"                 => 150,  // GT FLEET 365 ASSET
         // Servizi aggiuntivi
         "app_fleet_manager"     => 39,   // APP GT FLEET 365 - FLEET MANAGER
-        "app_driver"            => 100,  // APP GT FLEET 365 - DRIVER
-        "manutenzioni_scadenze" => 100,  // GT FLEET 365 SERVIZIO MANUTENZIONI - SCADENZE
-        "formazione_assistenza" => 100,  // FORMAZIONE + ASSISTENZA
+        "app_driver"            => 75,  // APP GT FLEET 365 - DRIVER
+        "manutenzioni_scadenze" => 75,  // GT FLEET 365 SERVIZIO MANUTENZIONI - SCADENZE
+        "formazione_assistenza" => 75,  // FORMAZIONE + ASSISTENZA
         "missioni"              => 200,  // GT FLEET 365 MISSIONI
         "mappe_track"           => 200,  // SERVIZIO MAPPE TRUCK - MEZZI PESANTI
-        "scorta_digitale"       => 150,  // GT FLEET 365 SCORTA DIGITALE
+        "scorta_digitale"       => 900,  // GT FLEET 365 SCORTA DIGITALE
         "app_gt5_app"           => 100,  // GT FLEET 365 APP - GT 5.0
     ],
 

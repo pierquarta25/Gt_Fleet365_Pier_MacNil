@@ -17,9 +17,9 @@ class QuoteGeneratorService
         // --- BASE PACKAGES ---
         'base_loc' => [
             'name' => "GT FLEET 365 BASE (LOC)",
-            'list_price' => 200.00,
-            'discounted_price' => 160.00,
-            'offer_price' => 112.00,
+            'list_price' => 180.00,
+            'discounted_price' => 144.00,
+            'offer_price' => 115.20,
             'description' => [
                 'Piattaforma Multi Tasking, User Friendly, Multi Utente',
                 'Localizzazione - Real Time - Percorsi - Soste via WEB',
@@ -31,93 +31,93 @@ class QuoteGeneratorService
             ],
             'type' => 'servizio',
             'period' => 'annuale',
-            'contract_months' => 24
+            'contract_months' => 36
         ],
         'plus_loc_sic' => [
             'name' => "GT FLEET 365 PLUS (LOC + SEC)",
-            'list_price' => 240.00,
-            'discounted_price' => 192.00,
-            'offer_price' => 134.40,
+            'list_price' => 220.00,
+            'discounted_price' => 176.00,
+            'offer_price' => 140.80,
             'description' => ['Tutti i servizi BASE', 'Sicurezza avanzata e blocco motore'],
             'type' => 'servizio',
             'period' => 'annuale',
-            'contract_months' => 24
+            'contract_months' => 36
         ],
         'gold_loc_tel' => [
             'name' => "GT FLEET 365 GOLD (LOC + TEL)",
-            'list_price' => 260.00,
-            'discounted_price' => 208.00,
-            'offer_price' => 145.60,
+            'list_price' => 250.00,
+            'discounted_price' => 200.00,
+            'offer_price' => 160.00,
             'description' => ['Tutti i servizi BASE', 'Telemetria avanzata'],
             'type' => 'servizio',
             'period' => 'annuale',
-            'contract_months' => 24
+            'contract_months' => 36
         ],
         'premium_loc_tel_sic' => [
             'name' => "GT FLEET 365 PREMIUM (LOC + TEL + SEC)",
-            'list_price' => 300.00,
-            'discounted_price' => 240.00,
-            'offer_price' => 168.00,
+            'list_price' => 270.00,
+            'discounted_price' => 216.00,
+            'offer_price' => 172.80,
             'description' => ['Pacchetto completo: Localizzazione, Sicurezza e Telemetria'],
             'type' => 'servizio',
             'period' => 'annuale',
-            'contract_months' => 24
+            'contract_months' => 36
         ],
         'plus_trattore' => [
             'name' => "GT FLEET 365 PLUS",
-            'list_price' => 240.00,
-            'discounted_price' => 192.00,
-            'offer_price' => 134.40,
+            'list_price' => 245.00,
+            'discounted_price' => 196.00,
+            'offer_price' => 156.80,
             'description' => ['Servizi specifici per mezzi d\'opera e trattori'],
             'type' => 'servizio',
             'period' => 'annuale',
-            'contract_months' => 24
+            'contract_months' => 36
         ],
         'truck_crono_base' => [
             'name' => "GT FLEET 365 TRUCK CRONO BASE (LOC + CRONO)",
-            'list_price' => 250.00,
-            'discounted_price' => 200.00,
-            'offer_price' => 140.00,
+            'list_price' => 270.00,
+            'discounted_price' => 216.00,
+            'offer_price' => 172.80,
             'description' => ['Localizzazione per mezzi pesanti', 'Lettura dati Cronotachigrafo'],
             'type' => 'servizio',
             'period' => 'annuale',
-            'contract_months' => 24
+            'contract_months' => 36
         ],
         'truck_crono_plus' => [
             'name' => "GT FLEET 365 TRUCK CRONO PLUS (LOC + SEC + CRONO)",
-            'list_price' => 290.00,
-            'discounted_price' => 232.00,
-            'offer_price' => 162.40,
+            'list_price' => 350.00,
+            'discounted_price' => 280.00,
+            'offer_price' => 224.00,
             'description' => ['Integrazione sicurezza e cronotachigrafo'],
             'type' => 'servizio',
             'period' => 'annuale',
-            'contract_months' => 24
+            'contract_months' => 36
         ],
         'truck_crono_tel' => [
             'name' => "GT FLEET 365 TRUCK CRONO TEL (LOC + TEL + CRONO)",
-            'list_price' => 310.00,
-            'discounted_price' => 248.00,
-            'offer_price' => 173.60,
+            'list_price' => 430.00,
+            'discounted_price' => 344.00,
+            'offer_price' => 275.20,
             'description' => ['Telemetria avanzata e cronotachigrafo'],
             'type' => 'servizio',
             'period' => 'annuale',
-            'contract_months' => 24
+            'contract_months' => 36
         ],
         'truck_crono_premium' => [
             'name' => "GT FLEET 365 TRUCK CRONO PREMIUM (LOC + TEL + SEC + CRONO)",
-            'list_price' => 350.00,
-            'discounted_price' => 280.00,
-            'offer_price' => 196.00,
+            'list_price' => 530.00,
+            'discounted_price' => 424.00,
+            'offer_price' => 339.20,
             'description' => ['Pacchetto completo per mezzi pesanti'],
             'type' => 'servizio',
             'period' => 'annuale',
-            'contract_months' => 24
+            'contract_months' => 36
         ],
         'rimorchi_comodato' => [
             'name' => "GT FLEET 365 RIMORCHI (dispositivo in comodato d'uso)",
-            'list_price' => 200.00,
-            'discounted_price' => 160.00,
-            'offer_price' => 112.00,
+            'list_price' => 220.00,
+            'discounted_price' => 176.00,
+            'offer_price' => 140.80,
             'description' => [
                 'Localizzazione - Real Time per rimorchio sganciato',
                 'Notifica aggancio/sgancio dalla motrice',
@@ -126,7 +126,7 @@ class QuoteGeneratorService
             ],
             'type' => 'servizio',
             'period' => 'annuale',
-            'contract_months' => 24
+            'contract_months' => 36
         ],
         'rimorchi_vendita' => [
             'name' => "GT FLEET 365 TRAILERS (purchased device)",
@@ -153,7 +153,7 @@ class QuoteGeneratorService
             'name' => "APP GT FLEET 365 - FLEET MANAGER",
             'list_price' => 39.00,
             'discounted_price' => 31.20,
-            'offer_price' => 0.00,
+            'offer_price' => 24.96,
             'description' => [
                 'App GT FLEET 365 su store iOS e Android - Fleet Manager',
                 'Gestione Sotto Accessi ai Servizi via App per il Cliente',
@@ -161,13 +161,13 @@ class QuoteGeneratorService
             ],
             'type' => 'servizio',
             'period' => 'annuale',
-            'contract_months' => 24
+            'contract_months' => 36
         ],
         'app_driver' => [
             'name' => "APP GT FLEET 365 - DRIVER",
-            'list_price' => 100.00,
-            'discounted_price' => 80.00,
-            'offer_price' => 60.00,
+            'list_price' => 75.00,
+            'discounted_price' => 60.00,
+            'offer_price' => 48.00,
             'description' => [
                 'App GT FLEET 365 DRIVER su store iOS e Android',
                 'Inserimento Attività',
@@ -177,13 +177,13 @@ class QuoteGeneratorService
             ],
             'type' => 'servizio',
             'period' => 'annuale',
-            'contract_months' => 24
+            'contract_months' => 36
         ],
         'manutenzioni_scadenze' => [
             'name' => "GT FLEET 365 SERVIZIO MANUTENZIONI - SCADENZE",
-            'list_price' => 100.00,
-            'discounted_price' => 80.00,
-            'offer_price' => 0.00,
+            'list_price' => 75.00,
+            'discounted_price' => 60.00,
+            'offer_price' => 48.00,
             'description' => [
                 'Gestione Avvisi Scadenze (Bolli, Assicurazioni, Patenti, Documenti)',
                 'Gestione Manutenzioni (per KM, per DATA, per Ore Lavoro Motore)',
@@ -191,26 +191,26 @@ class QuoteGeneratorService
             ],
             'type' => 'servizio',
             'period' => 'annuale',
-            'contract_months' => 24
+            'contract_months' => 36
         ],
         'formazione_assistenza' => [
             'name' => "FORMAZIONE + ASSISTENZA - GT FLEET 365 WEB E APP",
-            'list_price' => 100.00,
-            'discounted_price' => 80.00,
-            'offer_price' => 0.00,
+            'list_price' => 75.00,
+            'discounted_price' => 60.00,
+            'offer_price' => 48.00,
             'description' => [
                 'Numero 6 ore di Formazione in un Anno con Operatore Customer Care',
                 'Assistenza di 1° e 2° Livello con Apertura Ticket'
             ],
             'type' => 'servizio',
             'period' => 'annuale',
-            'contract_months' => 24
+            'contract_months' => 36
         ],
         'missioni' => [
             'name' => "GT FLEET 365 MISSIONI: PIANI DI VIAGGIO, ATTIVITA', VISITE",
             'list_price' => 200.00,
             'discounted_price' => 160.00,
-            'offer_price' => 112.00,
+            'offer_price' => 128.00,
             'description' => [
                 'Predisposizione MISSIONI: Piano di Viaggio, Piano Attività, Piano Visite',
                 'Trasmissione MISSIONI dal Web all\'App Driver',
@@ -219,50 +219,50 @@ class QuoteGeneratorService
             ],
             'type' => 'servizio',
             'period' => 'annuale',
-            'contract_months' => 24
+            'contract_months' => 36
         ],
         'mappe_track' => [
             'name' => "SERVIZIO MAPPE TRUCK",
             'list_price' => 200.00,
             'discounted_price' => 160.00,
-            'offer_price' => 96.00,
+            'offer_price' => 128.00,
             'description' => [
                 'Funzione Calcolo e Ottimizzazione Percorsi utilizzando Mappe Truck',
                 'Gestione Ponti Bassi, Strettoie e Ponti con limitazione di Peso'
             ],
             'type' => 'servizio',
             'period' => 'annuale',
-            'contract_months' => 24
+            'contract_months' => 36
         ],
         'temperatura_controllata' => [
             'name' => "CONTROLLED TEMPERATURE SERVICE",
-            'list_price' => 150.00,
-            'discounted_price' => 120.00,
-            'offer_price' => 84.00,
+            'list_price' => 110.00,
+            'discounted_price' => 88.00,
+            'offer_price' => 70.40,
             'description' => ['Monitoraggio continuo della temperatura in cella'],
             'type' => 'servizio',
             'period' => 'annuale',
-            'contract_months' => 24
+            'contract_months' => 36
         ],
         'gestione_portellone' => [
             'name' => "TAILGATE MANAGEMENT SERVICE",
-            'list_price' => 100.00,
-            'discounted_price' => 80.00,
-            'offer_price' => 56.00,
+            'list_price' => 111.00,
+            'discounted_price' => 88.80,
+            'offer_price' => 71.04,
             'description' => ['Sensore di apertura/chiusura portellone'],
             'type' => 'servizio',
             'period' => 'annuale',
-            'contract_months' => 24
+            'contract_months' => 36
         ],
         'riconoscimento_driver' => [
             'name' => "DRIVER RECOGNITION SERVICE",
-            'list_price' => 120.00,
-            'discounted_price' => 96.00,
-            'offer_price' => 67.20,
+            'list_price' => 111.00,
+            'discounted_price' => 88.80,
+            'offer_price' => 71.04,
             'description' => ['Identificazione autista tramite chiave o tastierino'],
             'type' => 'servizio',
             'period' => 'annuale',
-            'contract_months' => 24
+            'contract_months' => 36
         ],
         'riconoscimento_driver_app' => [
             'name' => "DRIVER RECOGNITION SERVICE WITH APP",
@@ -276,43 +276,43 @@ class QuoteGeneratorService
         ],
         'tempi_guida_realtime' => [
             'name' => "REAL TIME DRIVING TIMES",
-            'list_price' => 180.00,
-            'discounted_price' => 144.00,
-            'offer_price' => 100.80,
+            'list_price' => 100.00,
+            'discounted_price' => 80.00,
+            'offer_price' => 64.00,
             'description' => ['Tempi di guida in tempo reale da scheda tachigrafica'],
             'type' => 'servizio',
             'period' => 'annuale',
-            'contract_months' => 24
+            'contract_months' => 36
         ],
         'centrale_operativa_live' => [
             'name' => "LIVE OPERATIONS CENTER (24/7)",
-            'list_price' => 360.00,
-            'discounted_price' => 288.00,
-            'offer_price' => 201.60,
+            'list_price' => 200.00,
+            'discounted_price' => 160.00,
+            'offer_price' => 128.00,
             'description' => ['Centrale operativa di sicurezza H24'],
             'type' => 'servizio',
             'period' => 'annuale',
-            'contract_months' => 24
+            'contract_months' => 36
         ],
         'centrale_operativa_ondemand' => [
             'name' => "ON DEMAND OPERATIONS CENTER",
-            'list_price' => 180.00,
-            'discounted_price' => 144.00,
-            'offer_price' => 100.80,
+            'list_price' => 100.00,
+            'discounted_price' => 80.00,
+            'offer_price' => 64.00,
             'description' => ['Attivazione centrale operativa su richiesta'],
             'type' => 'servizio',
             'period' => 'annuale',
-            'contract_months' => 24
+            'contract_months' => 36
         ],
         'scorta_digitale' => [
             'name' => "GT FLEET 365 DIGITAL ESCORT",
-            'list_price' => 250.00,
-            'discounted_price' => 200.00,
-            'offer_price' => 140.00,
+            'list_price' => 900.00,
+            'discounted_price' => 720.00,
+            'offer_price' => 576.00,
             'description' => ['Scorta digitale satellitare del mezzo'],
             'type' => 'servizio',
             'period' => 'annuale',
-            'contract_months' => 24
+            'contract_months' => 36
         ],
         'app_gt5_app' => [
             'name' => "GT FLEET 365 APP - GT 5.0.APP",
@@ -327,33 +327,33 @@ class QuoteGeneratorService
         // --- CHRONOTACHOGRAPH ---
         'carta_aziendale_crono' => [
             'name' => "COMPANY CRONO CARD",
-            'list_price' => 120.00,
-            'discounted_price' => 96.00,
-            'offer_price' => 67.20,
+            'list_price' => 188.00,
+            'discounted_price' => 150.40,
+            'offer_price' => 120.32,
             'description' => ['Hosting carta aziendale presso data center (ogni 25 mezzi)'],
             'type' => 'servizio',
             'period' => 'annuale',
-            'contract_months' => 24
+            'contract_months' => 36
         ],
         'crono_ddd_silver' => [
             'name' => "CRONO - DDD MANAGER - SILVER",
-            'list_price' => 150.00,
-            'discounted_price' => 120.00,
-            'offer_price' => 84.00,
+            'list_price' => 950.00,
+            'discounted_price' => 760.00,
+            'offer_price' => 608.00,
             'description' => ['Scarico remoto dati tachigrafo e archiviazione legale'],
             'type' => 'servizio',
             'period' => 'annuale',
-            'contract_months' => 24
+            'contract_months' => 36
         ],
         'crono_ddd_gold' => [
             'name' => "CRONO - DDD MANAGER - GOLD",
-            'list_price' => 200.00,
-            'discounted_price' => 160.00,
-            'offer_price' => 112.00,
+            'list_price' => 1900.00,
+            'discounted_price' => 1520.00,
+            'offer_price' => 1216.00,
             'description' => ['Scarico dati, archiviazione e analisi infrazioni'],
             'type' => 'servizio',
             'period' => 'annuale',
-            'contract_months' => 24
+            'contract_months' => 36
         ],
         // --- DEVELOPMENT ---
         'sviluppo_digital_transformation' => [
@@ -379,9 +379,9 @@ class QuoteGeneratorService
         ],
         'hw_sensore_temperatura' => [
             'name' => "TEMPERATURE SENSOR (Truck or Trailer)",
-            'list_price' => 80.00,
-            'discounted_price' => 64.00,
-            'offer_price' => 50.00,
+            'list_price' => 40.00,
+            'discounted_price' => 36.00,
+            'offer_price' => 36.00,
             'description' => ['Sonda termica per cella frigo'],
             'type' => 'hardware',
             'period' => 'una tantum',
@@ -389,9 +389,9 @@ class QuoteGeneratorService
         ],
         'hw_sensore_portellone' => [
             'name' => "TAILGATE SENSOR (Van, Truck, Trailer)",
-            'list_price' => 60.00,
-            'discounted_price' => 48.00,
-            'offer_price' => 40.00,
+            'list_price' => 40.00,
+            'discounted_price' => 36.00,
+            'offer_price' => 36.00,
             'description' => ['Sensore magnetico per portellone'],
             'type' => 'hardware',
             'period' => 'una tantum',
@@ -399,9 +399,9 @@ class QuoteGeneratorService
         ],
         'hw_chiave_dallas' => [
             'name' => "DALLAS KEY",
-            'list_price' => 15.00,
-            'discounted_price' => 12.00,
-            'offer_price' => 10.00,
+            'list_price' => 20.00,
+            'discounted_price' => 18.00,
+            'offer_price' => 18.00,
             'description' => ['Chiave magnetica autista'],
             'type' => 'hardware',
             'period' => 'una tantum',
@@ -409,9 +409,9 @@ class QuoteGeneratorService
         ],
         'hw_kit_lettore_dallas' => [
             'name' => "DALLAS READER + KEY KIT",
-            'list_price' => 65.00,
-            'discounted_price' => 52.00,
-            'offer_price' => 45.00,
+            'list_price' => 27.00,
+            'discounted_price' => 25.00,
+            'offer_price' => 25.00,
             'description' => ['Lettore cruscotto + Chiave Dallas'],
             'type' => 'hardware',
             'period' => 'una tantum',
@@ -419,9 +419,9 @@ class QuoteGeneratorService
         ],
         'hw_tastierino' => [
             'name' => "KEYPAD",
-            'list_price' => 90.00,
-            'discounted_price' => 72.00,
-            'offer_price' => 65.00,
+            'list_price' => 80.00,
+            'discounted_price' => 60.00,
+            'offer_price' => 60.00,
             'description' => ['Tastierino numerico per inserimento PIN'],
             'type' => 'hardware',
             'period' => 'una tantum',
@@ -429,9 +429,9 @@ class QuoteGeneratorService
         ],
         'hw_beacon' => [
             'name' => "BEACON",
-            'list_price' => 40.00,
-            'discounted_price' => 32.00,
-            'offer_price' => 25.00,
+            'list_price' => 20.00,
+            'discounted_price' => 18.00,
+            'offer_price' => 18.00,
             'description' => ['Tag Bluetooth per riconoscimento automatico'],
             'type' => 'hardware',
             'period' => 'una tantum',
@@ -439,9 +439,9 @@ class QuoteGeneratorService
         ],
         'hw_beacon_passeggero' => [
             'name' => "BEACON (Passenger Recognition)",
-            'list_price' => 40.00,
-            'discounted_price' => 32.00,
-            'offer_price' => 25.00,
+            'list_price' => 20.00,
+            'discounted_price' => 18.00,
+            'offer_price' => 18.00,
             'description' => ['Tag Bluetooth per riconoscimento passeggero'],
             'type' => 'hardware',
             'period' => 'una tantum',
@@ -449,9 +449,9 @@ class QuoteGeneratorService
         ],
         'hw_pedale_antirapina' => [
             'name' => "ANTI-ROBBERY / PANIC PEDAL",
-            'list_price' => 120.00,
-            'discounted_price' => 96.00,
-            'offer_price' => 85.00,
+            'list_price' => 70.00,
+            'discounted_price' => 63.00,
+            'offer_price' => 63.00,
             'description' => ['Pedale occultato per allarme rapina'],
             'type' => 'hardware',
             'period' => 'una tantum',
@@ -459,9 +459,9 @@ class QuoteGeneratorService
         ],
         'hw_gost_shadow' => [
             'name' => "GOST - SHADOW DEVICE SUPPLY",
-            'list_price' => 180.00,
-            'discounted_price' => 144.00,
-            'offer_price' => 120.00,
+            'list_price' => 350.00,
+            'discounted_price' => 320.00,
+            'offer_price' => 270.00,
             'description' => ['Dispositivo civetta occultato e autoalimentato'],
             'type' => 'hardware',
             'period' => 'una tantum',

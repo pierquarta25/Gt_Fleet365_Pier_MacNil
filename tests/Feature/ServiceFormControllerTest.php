@@ -38,8 +38,8 @@ class ServiceFormControllerTest extends TestCase
         ])->assertOk();
 
         $pkg = $req->fresh()->services[0]['services'][0];
-        $this->assertSame(200.0, (float) $pkg['price']);
-        $this->assertSame(180.0, (float) $pkg['final_price']);
+        $this->assertSame(180.0, (float) $pkg['price']);
+        $this->assertSame(162.0, (float) $pkg['final_price']);
     }
 
     public function test_hardware_sub_items_are_accepted(): void
