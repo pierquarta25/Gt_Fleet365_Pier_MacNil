@@ -550,7 +550,9 @@ class QuoteGeneratorService
             $discountedPrice = ($discount > 0)
                 ? ($listPrice * (1 - $discount / 100))
                 : ($priceInfo['discounted_price'] ?? $listPrice);
-            $offerPrice      = isset($srv['final_price']) ? (float) $srv['final_price'] : $priceInfo['offer_price'];
+            // Annuale: prezzo di listino al pubblico (meno eventuale sconto); mensile: dal listino (sotto)
+            $annualDefault   = (($priceInfo['period'] ?? 'annuale') === 'annuale') ? $priceInfo['list_price'] : $priceInfo['offer_price'];
+            $offerPrice      = isset($srv['final_price']) ? (float) $srv['final_price'] : $annualDefault;
 
             $contractMonths = $priceInfo['contract_months'] ?? 24;
             $period         = $priceInfo['period']          ?? 'annuale';
