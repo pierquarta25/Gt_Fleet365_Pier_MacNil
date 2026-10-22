@@ -271,7 +271,7 @@
                             @if($basePackage)
                                 <div class="section-title">{{ __('PACKAGE') }}</div>
                                 <ul class="service-list">
-                                    <li><span>{{ $basePackage['name'] }}</span></li>
+                                    <li><span>{{ $basePackage['name'] }}</span>@if(!empty($basePackage['billing'])) <span class="service-qty-badge">{{ $basePackage['billing'] === 'mensile' ? __('Monthly') : __('Annual') }}</span>@endif</li>
                                 </ul>
                             @endif
 

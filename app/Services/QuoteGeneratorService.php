@@ -509,7 +509,7 @@ class QuoteGeneratorService
 
                     // Stesso servizio con prezzo/sconto diversi (es. gruppi con sconti differenti)
                     // => righe separate, altrimenti il prezzo del primo gruppo verrebbe applicato a tutti.
-                    $key = $id . '|' . ($srv['price'] ?? '') . '|' . ($srv['discount'] ?? '') . '|' . ($srv['final_price'] ?? '');
+                    $key = $id . '|' . ($srv['price'] ?? '') . '|' . ($srv['discount'] ?? '') . '|' . ($srv['final_price'] ?? '') . '|' . ($srv['billing'] ?? 'annuale');
 
                     if (isset($aggregated[$key])) {
                         $aggregated[$key]['totalQty'] += $totalQtyForThis;
@@ -577,7 +577,7 @@ class QuoteGeneratorService
                 ? 'OMAGGIO'
                 : number_format($totaleAnnualeSingolo, 2, ',', '.') . ' ' . $euro;
             $periodicita = ($period === 'annuale')
-                ? 'Bimestrale'
+                ? (($srv['billing'] ?? 'annuale') === 'mensile' ? 'Mensile' : 'Annuale')
                 : 'Una Tantum';
 
             $rowsData[] = [

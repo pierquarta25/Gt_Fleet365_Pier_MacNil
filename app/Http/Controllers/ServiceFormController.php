@@ -131,6 +131,7 @@ class ServiceFormController extends Controller
             'vehicles.*.groups.*.quantities'               => 'nullable|array|max:100',
             'vehicles.*.groups.*.quantities.*'             => 'integer|min:0|max:9999',
             'vehicles.*.groups.*.package_discount'         => 'nullable|numeric|min:0|max:100',
+            'vehicles.*.groups.*.billing'                  => 'nullable|string|in:mensile,annuale',
             'vehicles.*.notes'                             => 'nullable|string|max:2000',
         ]);
 
@@ -143,6 +144,7 @@ class ServiceFormController extends Controller
 
             foreach ($groups as $gIdx => $group) {
                 $groupServices = [];
+                $billing = $group['billing'] ?? 'annuale';
 
                 // Pacchetto base (radio)
                 if (!empty($group['base_package'])) {
@@ -150,6 +152,7 @@ class ServiceFormController extends Controller
                         'id'   => $group['base_package'],
                         'name' => $this->getServiceName($group['base_package']),
                         'type' => 'base_package',
+                        'billing' => $billing,
                     ];
                     // Prezzi sempre dal listino server: dal client si accetta solo lo sconto %
                     $listPrice = $quoteGenerator->listPrice($group['base_package']);
@@ -169,6 +172,7 @@ class ServiceFormController extends Controller
                             'id'   => $serviceId,
                             'name' => $this->getServiceName($serviceId),
                             'type' => 'addon',
+                            'billing' => $billing,
                         ];
                         if (isset($group['quantities'][$serviceId])) {
                             $entry['qty'] = $group['quantities'][$serviceId];

@@ -10,6 +10,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <style>
+        .billing-pill { border: 2px solid #0052BD; background: #fff; color: #0052BD; padding: 6px 22px; border-radius: 50px; font-weight: 600; font-size: 0.9rem; cursor: pointer; }
+        .billing-pill.active { background: #0052BD; color: #fff; }
+        .billing-hint { color: #c0392b; font-size: 0.8rem; margin: 0 20px; display: none; }
+
         * {
             margin: 0;
             padding: 0;
@@ -658,6 +662,19 @@
                                             <span class="section-toggle" id="toggle-{{ $req->id }}-grp{{ $gIdx }}-{{ $sIndex }}">▼</span>
                                         </div>
                                         <div class="section-body" id="body-{{ $req->id }}-grp{{ $gIdx }}-{{ $sIndex }}">
+                                            @if($section['type'] === 'radio')
+                                                @php
+                                                    $savedBilling = '';
+                                                    foreach ($gServices as $gs) {
+                                                        if (($gs['type'] ?? '') === 'base_package') { $savedBilling = $gs['billing'] ?? ''; break; }
+                                                    }
+                                                @endphp
+                                                <div class="billing-toggle" style="display:flex; gap:10px; margin:12px 20px 4px 20px; flex-wrap:wrap;">
+                                                    <button type="button" class="billing-pill {{ $savedBilling === 'mensile' ? 'active' : '' }}" data-billing="mensile" onclick="selectBilling(this)">{{ __('Monthly') }}</button>
+                                                    <button type="button" class="billing-pill {{ $savedBilling === 'annuale' ? 'active' : '' }}" data-billing="annuale" onclick="selectBilling(this)">{{ __('Annual') }}</button>
+                                                    <input type="hidden" class="billing-input" name="vehicles[{{ $req->id }}][groups][{{ $gIdx }}][billing]" value="{{ $savedBilling }}">
+                                                </div>
+                                            @endif
                                             @foreach($section['items'] as $item)
                                                 <div class="service-item-wrapper">
                                                     <label class="service-item">
@@ -823,6 +840,16 @@
             toggle.classList.toggle('collapsed');
         }
 
+        // Scelta mensile/annuale: sblocca il box prezzo del pacchetto selezionato
+        function selectBilling(pill) {
+            const toggle = pill.closest('.billing-toggle');
+            toggle.querySelectorAll('.billing-pill').forEach(p => p.classList.remove('active'));
+            pill.classList.add('active');
+            toggle.querySelector('.billing-input').value = pill.dataset.billing;
+            const checked = pill.closest('.section-body').querySelector('input[type="radio"]:checked');
+            if (checked) initPricing(checked);
+        }
+
         // Aggiorna prezzi e scontistica
         function initPricing(radioInput) {
             const wrapper = radioInput.closest('.service-item-wrapper');
@@ -831,6 +858,9 @@
 
             const section = radioInput.closest('.section-body');
             section.querySelectorAll('.package-discount-box').forEach(b => b.style.display = 'none');
+
+            const billing = section.querySelector('.billing-input');
+            if (billing && !billing.value) return;
 
             if(radioInput.checked) {
                 box.style.display = 'block';
@@ -956,6 +986,8 @@
             clone.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(i => { i.checked = false; });
             clone.querySelectorAll('.service-item').forEach(el => el.classList.remove('selected'));
             clone.querySelectorAll('.package-discount-box').forEach(b => b.style.display = 'none');
+            clone.querySelectorAll('.billing-pill').forEach(p => p.classList.remove('active'));
+            clone.querySelectorAll('.billing-input').forEach(i => i.value = '');
             clone.querySelectorAll('.hardware-sub-items').forEach(el => el.style.display = 'none');
             clone.querySelectorAll('.service-qty').forEach(i => { i.disabled = true; });
             clone.querySelectorAll('.hidden-price-input, .hidden-discount-input, .hidden-final-price-input').forEach(i => i.value = 0);
@@ -1005,6 +1037,14 @@
             const btn = document.getElementById('submitBtn');
             const btnText = document.getElementById('btnText');
             const spinner = document.getElementById('btnSpinner');
+
+            for (const radio of document.querySelectorAll('#serviceForm input[type="radio"]:checked')) {
+                const billing = radio.closest('.section-body').querySelector('.billing-input');
+                if (billing && !billing.value) {
+                    showToast('❌ {{ __("Select Monthly or Annual for the selected package.") }}', 'error');
+                    return;
+                }
+            }
 
             btn.disabled = true;
             btnText.style.display = 'none';
