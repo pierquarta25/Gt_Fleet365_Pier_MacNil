@@ -680,6 +680,8 @@
                                                     <label class="service-item">
                                                         @if($section['type'] === 'radio')
                                                             <input type="radio" data-price="{{ config('vehicle_services.package_prices.' . $item['id'], 200) }}"
+                                                                   data-monthly="{{ config('vehicle_services.monthly_prices.' . $item['id'] . '.monthly', '') }}"
+                                                                   data-monthly-year="{{ config('vehicle_services.monthly_prices.' . $item['id'] . '.year', '') }}"
                                                                    name="vehicles[{{ $req->id }}][groups][{{ $gIdx }}][base_package]"
                                                                    value="{{ $item['id'] }}"
                                                                    onchange="updateSelection(this)"
@@ -728,7 +730,7 @@
                                                                     Scontistica: <span class="discount-display">0</span>%
                                                                 </div>
                                                             </div>
-                                                            <div style="display: flex; flex-direction: column; gap: 8px;">
+                                                            <div class="discount-controls" style="display: flex; flex-direction: column; gap: 8px;">
                                                                 <div style="display: flex; justify-content: space-between;">
                                                                     <label style="font-size: 0.9rem; font-weight: 600;">Sconto (%)</label>
                                                                     <label style="font-size: 0.8rem; color: #666; cursor: pointer;">
@@ -864,6 +866,20 @@
             section.querySelectorAll('.package-discount-box').forEach(b => b.style.display = 'none');
 
             const billing = section.querySelector('.billing-input');
+
+            // Il mensile esiste solo per i pacchetti con prezzo mensile nel listino
+            const monthlyPill = section.querySelector('.billing-pill[data-billing="mensile"]');
+            if (monthlyPill && radioInput.checked) {
+                const hasMonthly = !isNaN(parseFloat(radioInput.dataset.monthly));
+                monthlyPill.disabled = !hasMonthly;
+                monthlyPill.style.opacity = hasMonthly ? '' : '0.4';
+                monthlyPill.title = hasMonthly ? '' : '{{ __("Monthly payment is not available for the selected package.") }}';
+                if (!hasMonthly && billing && billing.value === 'mensile') {
+                    billing.value = '';
+                    monthlyPill.classList.remove('active');
+                }
+            }
+
             if (billing && !billing.value) return;
 
             if(radioInput.checked) {
@@ -912,14 +928,20 @@
             }
             const discount = parseInt(box.querySelector('.discount-slider').value) || 0;
             const billing = box.closest('.section-body').querySelector('.billing-input');
-            const surcharge = (billing && billing.value === 'mensile') ? {{ (float) config('vehicle_services.monthly_surcharge', 0) }} : 0;
-            const finalPrice = basePrice * (1 - discount/100) * (1 + surcharge);
+            const isMonthly = billing && billing.value === 'mensile';
+            const radio = box.closest('.service-item-wrapper').querySelector('input[type="radio"]');
+            const monthlyPrice = parseFloat(radio.dataset.monthly);
+            const monthlyYear = parseFloat(radio.dataset.monthlyYear);
+            const useListino = isMonthly && !isNaN(monthlyPrice);
 
-            box.querySelector('.discount-display').textContent = discount;
+            // Mensile: prezzi dal listino, nessuno sconto; Annuale: listino meno sconto
+            box.querySelector('.discount-controls').style.display = useListino ? 'none' : 'flex';
+            const finalPrice = useListino ? monthlyYear : basePrice * (1 - discount/100);
+
+            box.querySelector('.discount-display').textContent = useListino ? 0 : discount;
             box.querySelector('.final-price-display').textContent = finalPrice.toFixed(2);
-            const monthlyLine = box.querySelector('.monthly-price-line');
-            monthlyLine.style.display = surcharge > 0 || (billing && billing.value === 'mensile') ? 'flex' : 'none';
-            box.querySelector('.monthly-price-display').textContent = (finalPrice / 12).toFixed(2);
+            box.querySelector('.monthly-price-line').style.display = useListino ? 'flex' : 'none';
+            box.querySelector('.monthly-price-display').textContent = useListino ? monthlyPrice.toFixed(2) : '0';
 
             box.querySelector('.hidden-discount-input').value = discount;
             box.querySelector('.hidden-final-price-input').value = finalPrice.toFixed(2);

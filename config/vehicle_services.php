@@ -382,8 +382,18 @@ return [
     | Fonte unica per form servizi e validazione lato server.
     |--------------------------------------------------------------------------
     */
-    // Maggiorazione sul prezzo offerta per il pagamento mensile (listino Rel 7: 112 annuale -> 140 mensile)
-    'monthly_surcharge' => 0.25,
+    // Prezzi per pagamento mensile dal listino Rel 7 (Canone Mensile con Pagamento Bimestrale Anticipato).
+    // 'monthly' = prezzo al mese, 'year' = totale annuale per canoni mensili. Se un servizio non e' qui, il mensile non e' disponibile.
+    'monthly_prices' => [
+        'base_loc'              => ['monthly' => 11.666666666666666, 'year' => 140.0],
+        'rimorchi_comodato'     => ['monthly' => 11.666666666666666, 'year' => 140.0],
+        'app_driver'            => ['monthly' => 6.25,               'year' => 75.0],
+        'missioni'              => ['monthly' => 11.666666666666666, 'year' => 140.0],
+        'mappe_track'           => ['monthly' => 10.0,               'year' => 120.0],
+        'app_fleet_manager'     => ['monthly' => 0.0,                'year' => 0.0],
+        'manutenzioni_scadenze' => ['monthly' => 0.0,                'year' => 0.0],
+        'formazione_assistenza' => ['monthly' => 0.0,                'year' => 0.0],
+    ],
 
     'package_prices' => [
         // Pacchetti base

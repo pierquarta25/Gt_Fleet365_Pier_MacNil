@@ -145,6 +145,10 @@ class ServiceFormController extends Controller
             foreach ($groups as $gIdx => $group) {
                 $groupServices = [];
                 $billing = $group['billing'] ?? 'annuale';
+                $monthlyPrices = config('vehicle_services.monthly_prices', []);
+                if ($billing === 'mensile' && !empty($group['base_package']) && !isset($monthlyPrices[$group['base_package']])) {
+                    abort(422, __('Monthly payment is not available for the selected package.'));
+                }
 
                 // Pacchetto base (radio)
                 if (!empty($group['base_package'])) {
@@ -157,7 +161,7 @@ class ServiceFormController extends Controller
                     // Prezzi sempre dal listino server: dal client si accetta solo lo sconto %
                     $listPrice = $quoteGenerator->listPrice($group['base_package']);
                     if ($listPrice !== null) {
-                        $discount = (float) ($group['package_discount'] ?? 0);
+                        $discount = $billing === 'mensile' ? 0.0 : (float) ($group['package_discount'] ?? 0);
                         $pkg['price']       = $listPrice;
                         $pkg['discount']    = $discount;
                         $pkg['final_price'] = round($listPrice * (1 - $discount / 100), 2);
@@ -172,7 +176,7 @@ class ServiceFormController extends Controller
                             'id'   => $serviceId,
                             'name' => $this->getServiceName($serviceId),
                             'type' => 'addon',
-                            'billing' => $billing,
+                            'billing' => isset($monthlyPrices[$serviceId]) ? $billing : 'annuale',
                         ];
                         if (isset($group['quantities'][$serviceId])) {
                             $entry['qty'] = $group['quantities'][$serviceId];

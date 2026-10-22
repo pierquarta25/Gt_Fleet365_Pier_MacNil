@@ -555,15 +555,24 @@ class QuoteGeneratorService
             $contractMonths = $priceInfo['contract_months'] ?? 24;
             $period         = $priceInfo['period']          ?? 'annuale';
 
-            // Pagamento mensile: il canone costa di piu' dell'annuale (maggiorazione da config)
+            // Pagamento mensile: prezzi presi dal listino (nessun calcolo)
+            $monthlyListino = null;
             if ($period === 'annuale' && ($srv['billing'] ?? 'annuale') === 'mensile') {
-                $offerPrice = round($offerPrice * (1 + (float) config('vehicle_services.monthly_surcharge', 0)), 2);
+                $monthlyListino = config('vehicle_services.monthly_prices.' . $id);
+                if ($monthlyListino !== null) {
+                    $offerPrice = (float) $monthlyListino['year'];
+                }
             }
             $type           = $priceInfo['type']            ?? 'servizio';
             $descriptions   = $priceInfo['description']    ?? [];
 
-            $prezzoMensile        = ($period === 'annuale' && $offerPrice > 0) ? $offerPrice / 12 : 0;
-            $totaleAnnualeSingolo = ($period === 'annuale') ? $prezzoMensile * 12 : $offerPrice;
+            if ($monthlyListino !== null) {
+                $prezzoMensile        = (float) $monthlyListino['monthly'];
+                $totaleAnnualeSingolo = (float) $monthlyListino['year'];
+            } else {
+                $prezzoMensile        = ($period === 'annuale' && $offerPrice > 0) ? $offerPrice / 12 : 0;
+                $totaleAnnualeSingolo = ($period === 'annuale') ? $prezzoMensile * 12 : $offerPrice;
+            }
 
             if ($period === 'annuale') {
                 $totaleServiziAnnuo += $totaleAnnualeSingolo * $totalQty;
@@ -582,7 +591,7 @@ class QuoteGeneratorService
                 ? 'OMAGGIO'
                 : number_format($totaleAnnualeSingolo, 2, ',', '.') . ' ' . $euro;
             $periodicita = ($period === 'annuale')
-                ? (($srv['billing'] ?? 'annuale') === 'mensile' ? 'Mensile' : 'Annuale')
+                ? ($monthlyListino !== null ? 'Mensile' : 'Annuale')
                 : 'Una Tantum';
 
             $rowsData[] = [
