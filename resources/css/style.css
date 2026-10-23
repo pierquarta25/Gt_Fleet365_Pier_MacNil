@@ -196,7 +196,7 @@ header {
 }
 
 /* Mobile (sotto i 768px) */
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   /* Header: nascondo le etichette per risparmiare spazio, lascio solo i numeri */
   .step-label { display: none; }
   .header-inner { padding: 0 15px; }
